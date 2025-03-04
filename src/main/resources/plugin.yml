@@ -1,0 +1,4 @@
+name: Charter
+version: '1.0.0'
+main: dev.jabberdrake.charter.Charter
+api-version: '1.21'
