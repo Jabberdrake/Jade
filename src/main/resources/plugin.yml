@@ -1,4 +1,14 @@
 name: Charter
 version: '1.0.0'
 main: dev.jabberdrake.charter.Charter
+description: "A lightweight territory management plugin."
+author: Jabberdrake
+website: https://github.com/Jabberdrake/Charter
 api-version: '1.21'
+commands:
+  charter:
+    description: "The all-purpose command for Charter stuff!"
+    usage: "/charter"
+  town:
+    description: "Manages town interactions!"
+    usage: "/town"
