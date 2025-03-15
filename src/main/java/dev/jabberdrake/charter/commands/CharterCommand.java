@@ -26,7 +26,7 @@ public class CharterCommand {
         return Commands.literal(label)
                     .executes(HelpCommand::runCommand)
                 .then(AdminCommand.buildCommand("admin"))
-                .then(TownCommand.buildCommand("town"))
+                .then(SettlementCommand.buildCommand("settlement"))
                 .then(HelpCommand.buildCommand("help"))
                 .build();
     }
