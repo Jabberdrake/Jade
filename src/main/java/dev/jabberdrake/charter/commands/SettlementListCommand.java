@@ -21,13 +21,12 @@ public class SettlementListCommand {
     }
 
     public static int runCommand(CommandContext<CommandSourceStack> context) {
-        int maxID = 1;
+        int maxID = RealmManager.getSettlementCount();
         for (int i = 1; i <= maxID; i++) {
-            Settlement settlement = RealmManager.loadSettlementFromID(i);
+            Settlement settlement = RealmManager.getSettlement(i);
             context.getSource().getSender().sendPlainMessage("Found settlement with an ID of " + settlement.getId() + "!");
             context.getSource().getSender().sendPlainMessage("    Settlement name: " + settlement.getName());
             context.getSource().getSender().sendPlainMessage("    Settlement description: " + settlement.getDescription());
-            Charter.getPlugin(Charter.class).getLogger().info(settlement.getPopulation().toString());
             for (UUID uuid : settlement.getPopulation().keySet()) {
                 String citizenName = Bukkit.getOfflinePlayer(uuid).getName();
                 context.getSource().getSender().sendPlainMessage("    Member: " + citizenName + " | Rank: " + settlement.getPopulation().get(uuid).getName());

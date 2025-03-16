@@ -2,6 +2,7 @@ package dev.jabberdrake.charter;
 
 import dev.jabberdrake.charter.commands.CharterCommand;
 import dev.jabberdrake.charter.commands.SettlementCommand;
+import dev.jabberdrake.charter.realms.RealmManager;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
@@ -17,6 +18,7 @@ public final class Charter extends JavaPlugin {
         // Plugin startup logic
         logger.info("Starting up Charter!");
         registerCommands();
+        RealmManager.initialize();
     }
 
     @Override

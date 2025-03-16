@@ -11,6 +11,7 @@ public class AdminCommand {
     public static LiteralCommandNode<CommandSourceStack> buildCommand(final String label) {
         return Commands.literal(label)
                 .executes(AdminCommand::runCommand)
+                .then(AdminRebuildCommand.buildCommand("rebuild"))
                 .build();
     }
 

@@ -10,8 +10,7 @@ public class SettlementCreateCommand {
 
     public static LiteralCommandNode<CommandSourceStack> buildCommand(final String label) {
         return Commands.literal(label)
-                .then(Commands.literal("yepcock")
-                        .executes(SettlementCreateCommand::runCommand))
+                .executes(SettlementCreateCommand::runCommand)
                 .build();
     }
 

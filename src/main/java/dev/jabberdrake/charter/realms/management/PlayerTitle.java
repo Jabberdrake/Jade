@@ -1,14 +1,14 @@
 package dev.jabberdrake.charter.realms.management;
 
+import dev.jabberdrake.charter.Charter;
+import dev.jabberdrake.charter.realms.RealmManager;
 import dev.jabberdrake.charter.realms.Settlement;
-
-import java.util.Locale;
 
 public class PlayerTitle {
 
     private Settlement settlement;
     private String name;
-    private String decoratedName;
+    private String style;
     private int authority;
     private boolean canInvite = false;
     private boolean canKick = false;
@@ -16,13 +16,13 @@ public class PlayerTitle {
     private boolean canUnclaim = false;
     private boolean canPromote = false;
     private boolean canDemote = false;
-    private boolean canRestyle = false;
+    private boolean canEdit = false;
     private boolean canDisband = false;
 
-    public PlayerTitle(Settlement settlement, String decoratedName, int authority) {
+    public PlayerTitle(Settlement settlement, String name, String style, int authority) {
         this.settlement = settlement;
-        this.name = decoratedName.toUpperCase(Locale.ENGLISH);
-        this.decoratedName = decoratedName;
+        this.name = name;
+        this.style = style;
         this.authority = authority;
 
         generatePermissionsFromAuthority(authority);
@@ -30,7 +30,7 @@ public class PlayerTitle {
 
     public PlayerTitle(Settlement settlement, DefaultTitle defaultTitle) {
         this.name = defaultTitle.name;
-        this.decoratedName = defaultTitle.name;
+        this.style = defaultTitle.name;
         this.settlement = settlement;
         this.authority = defaultTitle.authority;
 
@@ -39,6 +39,46 @@ public class PlayerTitle {
 
     public String getName() {
         return this.name;
+    }
+
+    public String getStyle() {
+        return this.style;
+    }
+
+    public int getAuthority() {
+        return this.authority;
+    }
+
+    public boolean canInvite() {
+        return this.canInvite;
+    }
+
+    public boolean canKick() {
+        return this.canKick;
+    }
+
+    public boolean canClaim() {
+        return this.canClaim;
+    }
+
+    public boolean canUnclaim() {
+        return this.canUnclaim;
+    }
+
+    public boolean canPromote() {
+        return this.canPromote;
+    }
+
+    public boolean canDemote() {
+        return this.canDemote;
+    }
+
+    public boolean canEdit() {
+        return this.canEdit;
+    }
+
+    public boolean canDisband() {
+        return this.canDisband;
     }
 
     public enum DefaultTitle {
@@ -63,7 +103,7 @@ public class PlayerTitle {
             this.canUnclaim = true;
             this.canPromote = true;
             this.canDemote = true;
-            this.canRestyle = true;
+            this.canEdit = true;
             this.canDisband = true;
         } else if (authority >= 40) { // Officer, or above
             this.canInvite = true;
@@ -72,7 +112,7 @@ public class PlayerTitle {
             this.canUnclaim = false;
             this.canPromote = false;
             this.canDemote = false;
-            this.canRestyle = false;
+            this.canEdit = false;
             this.canDisband = false;
         } else {
             this.canInvite = false;
@@ -81,12 +121,12 @@ public class PlayerTitle {
             this.canUnclaim = false;
             this.canPromote = false;
             this.canDemote = false;
-            this.canRestyle = false;
+            this.canEdit = false;
             this.canDisband = false;
         }
     }
 
-    public int setPermission(String permissionName, boolean value) {
+    public void setPermission(String permissionName, boolean value) {
         switch (permissionName) {
             case "canInvite":
                 this.canInvite = value;
@@ -107,14 +147,36 @@ public class PlayerTitle {
                 this.canDemote = value;
                 break;
             case "canRestyle":
-                this.canRestyle = value;
+                this.canEdit = value;
                 break;
             case "canDisband":
                 this.canDisband = value;
                 break;
             default:
-                return -1;
+                Charter.getPlugin(Charter.class).getLogger().warning("[PlayerTitle::setPermission] Unknown permission key: " + permissionName);
         }
-        return 0;
+    }
+
+    public static PlayerTitle fromString(String str, Settlement settlement) {
+        String[] parts = str.split(";");
+        PlayerTitle title = new PlayerTitle(settlement, parts[0], parts[1], Integer.parseInt(parts[2]));
+        title.setPermission("canInvite", Boolean.parseBoolean(parts[3]));
+        title.setPermission("canKick", Boolean.parseBoolean(parts[4]));
+        title.setPermission("canClaim", Boolean.parseBoolean(parts[5]));
+        title.setPermission("canUnclaim", Boolean.parseBoolean(parts[6]));
+        title.setPermission("canPromote", Boolean.parseBoolean(parts[7]));
+        title.setPermission("canDemote", Boolean.parseBoolean(parts[8]));
+        title.setPermission("canEdit", Boolean.parseBoolean(parts[9]));
+        title.setPermission("canDisband", Boolean.parseBoolean(parts[10]));
+        return title;
+    }
+
+    @Override
+    public String toString() {
+        return this.getName() + ";" + this.getStyle() + ";" + this.getAuthority()
+                + ";" + this.canInvite() + ";" + this.canKick()
+                + ";" + this.canClaim() + ";" + this.canUnclaim()
+                + ";" + this.canPromote() + ";" + this.canDemote()
+                + ";" + this.canEdit() + ";" + this.canDisband();
     }
 }
