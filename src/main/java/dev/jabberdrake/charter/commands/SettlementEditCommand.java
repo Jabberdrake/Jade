@@ -6,16 +6,13 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import com.mojang.brigadier.tree.LiteralCommandNode;
-import dev.jabberdrake.charter.Charter;
 import dev.jabberdrake.charter.realms.RealmManager;
 import dev.jabberdrake.charter.realms.Settlement;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
-import org.bukkit.Bukkit;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 public class SettlementEditCommand {
@@ -46,8 +43,8 @@ public class SettlementEditCommand {
                 settlement.setName(value);
                 context.getSource().getSender().sendPlainMessage("Settlement name updated!");
                 break;
-            case "decoratedName":
-                settlement.setDecoratedName(value);
+            case "style":
+                settlement.setStyle(value);
                 context.getSource().getSender().sendPlainMessage("Settlement decorated name updated!");
                 break;
             case "description":
@@ -77,7 +74,7 @@ public class SettlementEditCommand {
 
     public static CompletableFuture<Suggestions> buildStmFieldSuggestions(final CommandContext<CommandSourceStack> context, final SuggestionsBuilder builder) {
         builder.suggest("name");
-        builder.suggest("decoratedName");
+        builder.suggest("style");
         builder.suggest("description");
         return builder.buildFuture();
     }

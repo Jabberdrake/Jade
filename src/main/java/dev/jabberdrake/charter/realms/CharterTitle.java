@@ -1,14 +1,12 @@
-package dev.jabberdrake.charter.realms.management;
+package dev.jabberdrake.charter.realms;
 
 import dev.jabberdrake.charter.Charter;
-import dev.jabberdrake.charter.realms.RealmManager;
-import dev.jabberdrake.charter.realms.Settlement;
+import dev.jabberdrake.charter.jade.titles.NamedTitle;
 
-public class PlayerTitle {
+public class CharterTitle extends NamedTitle {
 
+    private NamedTitle title;
     private Settlement settlement;
-    private String name;
-    private String style;
     private int authority;
     private boolean canInvite = false;
     private boolean canKick = false;
@@ -19,30 +17,20 @@ public class PlayerTitle {
     private boolean canEdit = false;
     private boolean canDisband = false;
 
-    public PlayerTitle(Settlement settlement, String name, String style, int authority) {
+    public CharterTitle(String name, String title, Settlement settlement, int authority) {
+        super(name, title);
         this.settlement = settlement;
-        this.name = name;
-        this.style = style;
         this.authority = authority;
 
         generatePermissionsFromAuthority(authority);
     }
 
-    public PlayerTitle(Settlement settlement, DefaultTitle defaultTitle) {
-        this.name = defaultTitle.name;
-        this.style = defaultTitle.name;
+    public CharterTitle(Settlement settlement, DefaultCharterTitle defaultTitle) {
+        super(defaultTitle.name, defaultTitle.name);
         this.settlement = settlement;
         this.authority = defaultTitle.authority;
 
         generatePermissionsFromAuthority(authority);
-    }
-
-    public String getName() {
-        return this.name;
-    }
-
-    public String getStyle() {
-        return this.style;
     }
 
     public int getAuthority() {
@@ -81,14 +69,14 @@ public class PlayerTitle {
         return this.canDisband;
     }
 
-    public enum DefaultTitle {
+    public enum DefaultCharterTitle {
         LEADER("Leader", 60),
         OFFICER("Officer", 40),
         MEMBER("Member", 20);
 
         public final String name;
         public final int authority;
-        DefaultTitle(String name, int authority) {
+        DefaultCharterTitle(String name, int authority) {
             this.name = name;
             this.authority = authority;
         }
@@ -146,7 +134,7 @@ public class PlayerTitle {
             case "canDemote":
                 this.canDemote = value;
                 break;
-            case "canRestyle":
+            case "canEdit":
                 this.canEdit = value;
                 break;
             case "canDisband":
@@ -157,9 +145,9 @@ public class PlayerTitle {
         }
     }
 
-    public static PlayerTitle fromString(String str, Settlement settlement) {
+    public static CharterTitle fromString(String str, Settlement settlement) {
         String[] parts = str.split(";");
-        PlayerTitle title = new PlayerTitle(settlement, parts[0], parts[1], Integer.parseInt(parts[2]));
+        CharterTitle title = new CharterTitle(parts[0], parts[1], settlement, Integer.parseInt(parts[2]));
         title.setPermission("canInvite", Boolean.parseBoolean(parts[3]));
         title.setPermission("canKick", Boolean.parseBoolean(parts[4]));
         title.setPermission("canClaim", Boolean.parseBoolean(parts[5]));
@@ -172,11 +160,26 @@ public class PlayerTitle {
     }
 
     @Override
-    public String toString() {
-        return this.getName() + ";" + this.getStyle() + ";" + this.getAuthority()
+    public boolean equals(Object object) {
+        if (object instanceof CharterTitle) {
+            CharterTitle other = (CharterTitle) object;
+            return this.settlement == other.settlement
+                    && this.getName().equals(other.getName())
+                    && this.getTitleAsString().equals(other.getTitleAsString())
+                    && this.getAuthority() == other.getAuthority();
+        } else return false;
+    }
+
+    public String toDataString() {
+        return this.getName() + ";" + this.getTitleAsString() + ";" + this.getAuthority()
                 + ";" + this.canInvite() + ";" + this.canKick()
                 + ";" + this.canClaim() + ";" + this.canUnclaim()
                 + ";" + this.canPromote() + ";" + this.canDemote()
                 + ";" + this.canEdit() + ";" + this.canDisband();
+    }
+
+    @Override
+    public String toString() {
+        return "PlayerTitle{" + this.toDataString() + "}";
     }
 }

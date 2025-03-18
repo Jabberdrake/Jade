@@ -2,6 +2,8 @@ package dev.jabberdrake.charter;
 
 import dev.jabberdrake.charter.commands.CharterCommand;
 import dev.jabberdrake.charter.commands.SettlementCommand;
+import dev.jabberdrake.charter.handlers.CharterChatHandler;
+import dev.jabberdrake.charter.handlers.CharterProfileHandler;
 import dev.jabberdrake.charter.realms.RealmManager;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -17,8 +19,10 @@ public final class Charter extends JavaPlugin {
     public void onEnable() {
         // Plugin startup logic
         logger.info("Starting up Charter!");
-        registerCommands();
         RealmManager.initialize();
+
+        registerCommands();
+        registerHandlers();
     }
 
     @Override
@@ -32,5 +36,10 @@ public final class Charter extends JavaPlugin {
             commands.registrar().register(CharterCommand.buildCommand("charter"), "An all-purpose command for the Charter plugin!");
             commands.registrar().register(SettlementCommand.buildCommand("settlement"), "Manages settlement interactions!");
         });
+    }
+
+    public void registerHandlers() {
+        this.getServer().getPluginManager().registerEvents(new CharterProfileHandler(), this);
+        this.getServer().getPluginManager().registerEvents(new CharterChatHandler(), this);
     }
 }

@@ -14,6 +14,8 @@ public class SettlementCommand {
                 .then(SettlementListCommand.buildCommand("list"))
                 .then(SettlementInfoCommand.buildCommand("info"))
                 .then(SettlementEditCommand.buildCommand("edit"))
+                .then(SettlementClaimCommand.buildCommand("claim"))
+                .then(SettlementMapCommand.buildCommand("map"))
                 .then(SettlementCreateCommand.buildCommand("create"))
                 .build();
     }
