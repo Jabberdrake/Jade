@@ -32,7 +32,7 @@ public class SettlementClaimCommand {
 
     public static int runCommand(CommandContext<CommandSourceStack> context) {
         if (!(context.getSource().getSender() instanceof Player)) {
-            Charter.getPlugin(Charter.class).getLogger().warning("[SettlementClaimCommand::runCommand] Only players can run this command!!");
+            Charter.getPlugin(Charter.class).getLogger().warning("[SettlementClaimCommand::runCommand] Only players can run this command!");
             return Command.SINGLE_SUCCESS;
         }
 

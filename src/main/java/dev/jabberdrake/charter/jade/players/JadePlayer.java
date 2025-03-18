@@ -1,19 +1,21 @@
 package dev.jabberdrake.charter.jade.players;
 
-import dev.jabberdrake.charter.players.CharterProfile;
 import dev.jabberdrake.charter.realms.Settlement;
 
 import java.util.UUID;
 
 public class JadePlayer {
     private UUID uuid;
-    private CharterProfile profile;
+    private JadeProfile profile;
+
+    // For Jade stuff
+    private boolean inRoleplay = false;
 
     // For realm commands
     private Settlement stmFocus = null;
     // private Polity focus = null;
 
-    public JadePlayer(UUID uuid, CharterProfile profile) {
+    public JadePlayer(UUID uuid, JadeProfile profile) {
         this.uuid = uuid;
         this.profile = profile;
     }
@@ -22,8 +24,16 @@ public class JadePlayer {
         return this.uuid;
     }
 
-    public CharterProfile getProfile() {
+    public JadeProfile getProfile() {
         return this.profile;
+    }
+
+    public boolean isInRoleplay() {
+        return this.inRoleplay;
+    }
+
+    public void toggleRoleplay() {
+        this.inRoleplay = !this.inRoleplay;
     }
 
     public Settlement getSettlementFocus() {

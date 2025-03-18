@@ -1,7 +1,9 @@
 package dev.jabberdrake.charter;
 
 import dev.jabberdrake.charter.commands.CharterCommand;
+import dev.jabberdrake.charter.commands.ProfileCommand;
 import dev.jabberdrake.charter.commands.SettlementCommand;
+import dev.jabberdrake.charter.commands.ToggleRoleplayCommand;
 import dev.jabberdrake.charter.handlers.CharterChatHandler;
 import dev.jabberdrake.charter.handlers.CharterProfileHandler;
 import dev.jabberdrake.charter.realms.RealmManager;
@@ -35,6 +37,8 @@ public final class Charter extends JavaPlugin {
         this.getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, commands -> {
             commands.registrar().register(CharterCommand.buildCommand("charter"), "An all-purpose command for the Charter plugin!");
             commands.registrar().register(SettlementCommand.buildCommand("settlement"), "Manages settlement interactions!");
+            commands.registrar().register(ProfileCommand.buildCommand("profile"), "Manage profile interactions!");
+            commands.registrar().register(ToggleRoleplayCommand.buildCommand("toggleroleplay"), "Toggle roleplay mode!");
         });
     }
 

@@ -1,29 +1,30 @@
-package dev.jabberdrake.charter.players;
+package dev.jabberdrake.charter.jade.players;
 
 import dev.jabberdrake.charter.jade.titles.DefaultJadeTitle;
 import dev.jabberdrake.charter.jade.titles.JadeTitle;
 import dev.jabberdrake.charter.jade.titles.TitleManager;
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class CharterProfile {
+public class JadeProfile {
 
     private UUID uuid;
     private String roleplayName;
     private List<JadeTitle> availableTitles;
 
-    public CharterProfile(UUID uuid, String roleplayName, List<JadeTitle> availableTitles) {
+    public JadeProfile(UUID uuid, String roleplayName, List<JadeTitle> availableTitles) {
         this.uuid = uuid;
         this.roleplayName = roleplayName;
         this.availableTitles = availableTitles;
     }
 
-    public CharterProfile(UUID uuid) {
+    public JadeProfile(UUID uuid) {
         this.uuid = uuid;
-        this.roleplayName = "";
+        this.roleplayName = Bukkit.getPlayer(uuid).getName();
         this.availableTitles = List.of(DefaultJadeTitle.PEASANT);
     }
 
@@ -51,7 +52,7 @@ public class CharterProfile {
         return this.availableTitles;
     }
 
-    public static CharterProfile load(FileConfiguration data, String root) {
+    public static JadeProfile load(FileConfiguration data, String root) {
         // Obtain matching player's unique ID
         String uuidAsString = data.getString(root + ".uuid");
         UUID uuid = UUID.fromString(uuidAsString);
@@ -63,13 +64,13 @@ public class CharterProfile {
         List<JadeTitle> titles = new ArrayList<>();
         List<String> titlesAsStrings = data.getStringList(root + ".availableTitles");
         for (String titleAsString : titlesAsStrings) {
-            JadeTitle title = TitleManager.fetchTitle(titleAsString);
+            titles.add(TitleManager.fetchTitle(titleAsString));
         }
 
-        return new CharterProfile(uuid, roleplayName, titles);
+        return new JadeProfile(uuid, roleplayName, titles);
     }
 
-    public static void store(CharterProfile profile, FileConfiguration data, String root) {
+    public static void store(JadeProfile profile, FileConfiguration data, String root) {
         // Storing simple variables
         data.set(root + ".uuid", profile.getUUID().toString());
         data.set(root + ".roleplayName", profile.getRoleplayName());

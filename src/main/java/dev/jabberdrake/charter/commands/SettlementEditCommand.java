@@ -21,7 +21,7 @@ public class SettlementEditCommand {
         return Commands.literal(label)
                 .then(Commands.argument("settlement", StringArgumentType.string())
                         .suggests(SettlementEditCommand::buildSettlementSuggestions)
-                        .then(Commands.argument("key", StringArgumentType.word())
+                        .then(Commands.argument("attribute", StringArgumentType.word())
                                 .suggests(SettlementEditCommand::buildStmFieldSuggestions)
                                 .then(Commands.argument("value", StringArgumentType.greedyString())
                                         .executes(SettlementEditCommand::runCommand)
@@ -35,10 +35,10 @@ public class SettlementEditCommand {
         String stmString = StringArgumentType.getString(context, "settlement");
         Settlement settlement = RealmManager.getSettlement(stmString);
 
-        String key = StringArgumentType.getString(context, "key");
+        String attr = StringArgumentType.getString(context, "attribute");
         String value = StringArgumentType.getString(context, "value");
 
-        switch (key) {
+        switch (attr) {
             case "name":
                 settlement.setName(value);
                 context.getSource().getSender().sendPlainMessage("Settlement name updated!");

@@ -1,9 +1,9 @@
-package dev.jabberdrake.charter.players;
+package dev.jabberdrake.charter.jade.players;
 
 import dev.jabberdrake.charter.Charter;
-import dev.jabberdrake.charter.jade.players.JadePlayer;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,7 +27,11 @@ public class PlayerManager {
 
     }
 
-    public static CharterProfile fetchProfile(UUID uuid) {
+    public static JadePlayer parsePlayer(UUID uuid) {
+        return cache.getOrDefault(uuid, null);
+    }
+
+    public static JadeProfile fetchProfile(UUID uuid) {
         return cache.getOrDefault(uuid, null).getProfile();
     }
 
@@ -43,7 +47,7 @@ public class PlayerManager {
 
         if (!profileFile.exists()) {
             // If no matching profile file was found, it's probably the first login.
-            CharterProfile profile = new CharterProfile(uuid);
+            JadeProfile profile = new JadeProfile(uuid);
             JadePlayer jadePlayer = new JadePlayer(uuid, profile);
 
             PlayerManager.cache.put(uuid, jadePlayer);
@@ -53,9 +57,9 @@ public class PlayerManager {
 
         // If a matching profile file was found, compose the profile object from the data therein.
         FileConfiguration data = YamlConfiguration.loadConfiguration(profileFile);
-        CharterProfile chp = CharterProfile.load(data, "profile");
+        JadeProfile profile = JadeProfile.load(data, "profile");
 
-        JadePlayer jadePlayer = new JadePlayer(uuid, chp);
+        JadePlayer jadePlayer = new JadePlayer(uuid, profile);
         PlayerManager.cache.put(uuid, jadePlayer);
         return true;
     }
@@ -65,8 +69,8 @@ public class PlayerManager {
         File profileFile = new File(pathname);
         FileConfiguration data = YamlConfiguration.loadConfiguration(profileFile);
 
-        CharterProfile profile = PlayerManager.fetchProfile(uuid);
-        CharterProfile.store(profile, data, "profile");
+        JadeProfile profile = PlayerManager.fetchProfile(uuid);
+        JadeProfile.store(profile, data, "profile");
 
         try {
             data.save(profileFile);
