@@ -6,13 +6,12 @@ import com.mojang.brigadier.tree.LiteralCommandNode;
 import dev.jabberdrake.charter.utils.TextUtils;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
-import net.kyori.adventure.text.Component;
 
-public class HelpCommand {
+public class CharterHelpCommand {
 
     public static LiteralCommandNode<CommandSourceStack> buildCommand(final String label) {
         return Commands.literal(label)
-                    .executes(HelpCommand::runCommand)
+                    .executes(CharterHelpCommand::runCommand)
                 .build();
     }
 

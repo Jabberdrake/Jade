@@ -289,8 +289,10 @@ public class RealmManager {
     public static boolean claimChunk(Settlement settlement, Chunk chunk) {
         ChunkAnchor anchor = new ChunkAnchor(chunk);
         if (getChunkOwner(chunk) == null) {
-            territoryMap.put(anchor, settlement);
             settlement.addTerritory(anchor);
+
+            territoryMap.put(anchor, settlement);
+            dirtySettlements.add(settlement);
             return true;
         } else return false;
     }
@@ -298,8 +300,10 @@ public class RealmManager {
     public static boolean unclaimChunk(Settlement settlement, Chunk chunk) {
        ChunkAnchor anchor = new ChunkAnchor(chunk);
        if (Objects.equals(getChunkOwner(chunk), settlement)) {
-           territoryMap.remove(anchor);
            settlement.removeTerritory(anchor);
+
+           dirtySettlements.add(settlement);
+           territoryMap.remove(anchor);
            return true;
        } else return false;
     }

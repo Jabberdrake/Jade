@@ -24,10 +24,10 @@ public class CharterCommand {
 
     public static LiteralCommandNode<CommandSourceStack> buildCommand(final String label) {
         return Commands.literal(label)
-                    .executes(HelpCommand::runCommand)
+                    .executes(CharterHelpCommand::runCommand)
                 .then(AdminCommand.buildCommand("admin"))
                 .then(SettlementCommand.buildCommand("settlement"))
-                .then(HelpCommand.buildCommand("help"))
+                .then(CharterHelpCommand.buildCommand("help"))
                 .build();
     }
 }

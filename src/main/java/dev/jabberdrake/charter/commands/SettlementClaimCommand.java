@@ -26,18 +26,15 @@ public class SettlementClaimCommand {
         return Commands.literal(label)
                 .then(Commands.argument("settlement", StringArgumentType.greedyString())
                         .suggests(SettlementClaimCommand::buildSettlementSuggestions)
+                        .requires(sender -> sender.getExecutor() instanceof Player)
                         .executes(SettlementClaimCommand::runCommand))
                 .build();
     }
 
     public static int runCommand(CommandContext<CommandSourceStack> context) {
-        if (!(context.getSource().getSender() instanceof Player)) {
-            Charter.getPlugin(Charter.class).getLogger().warning("[SettlementClaimCommand::runCommand] Only players can run this command!");
-            return Command.SINGLE_SUCCESS;
-        }
-
         Player player = (Player) context.getSource().getSender();
         Chunk currentChunk = player.getLocation().getChunk();
+
         String stmString = StringArgumentType.getString(context, "settlement");
         Settlement settlement = RealmManager.getSettlement(stmString);
         if (settlement == null) {

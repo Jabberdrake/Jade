@@ -5,13 +5,11 @@ import dev.jabberdrake.charter.commands.ProfileCommand;
 import dev.jabberdrake.charter.commands.SettlementCommand;
 import dev.jabberdrake.charter.commands.ToggleRoleplayCommand;
 import dev.jabberdrake.charter.handlers.CharterChatHandler;
-import dev.jabberdrake.charter.handlers.CharterProfileHandler;
+import dev.jabberdrake.charter.handlers.CharterPlayerHandler;
 import dev.jabberdrake.charter.realms.RealmManager;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.jetbrains.annotations.NotNull;
 
-import java.nio.file.Path;
 import java.util.logging.Logger;
 
 public final class Charter extends JavaPlugin {
@@ -43,7 +41,7 @@ public final class Charter extends JavaPlugin {
     }
 
     public void registerHandlers() {
-        this.getServer().getPluginManager().registerEvents(new CharterProfileHandler(), this);
+        this.getServer().getPluginManager().registerEvents(new CharterPlayerHandler(), this);
         this.getServer().getPluginManager().registerEvents(new CharterChatHandler(), this);
     }
 }

@@ -12,6 +12,7 @@ import org.bukkit.entity.Player;
 import org.w3c.dom.Text;
 
 public class RoleplayChatRenderer implements ChatRenderer {
+
     @Override
     public Component render(Player source, Component sourceDisplayName, Component message, Audience audience) {
         // There are two different formats for messages in the Roleplay channel:

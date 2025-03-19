@@ -1,9 +1,10 @@
 package dev.jabberdrake.charter.jade.players;
 
 import dev.jabberdrake.charter.Charter;
+import dev.jabberdrake.charter.realms.RealmManager;
+import dev.jabberdrake.charter.realms.Settlement;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.entity.Player;
 
 import java.io.File;
 import java.io.IOException;
@@ -30,6 +31,28 @@ public class PlayerManager {
     public static JadePlayer parsePlayer(UUID uuid) {
         return cache.getOrDefault(uuid, null);
     }
+
+    public static void handleLogin(UUID uuid) {
+        PlayerManager.loadProfile(uuid);
+        JadePlayer jadePlayer = parsePlayer(uuid);
+
+        for (int stmID = 1; stmID <= RealmManager.getSettlementCount(); stmID++) {
+            Settlement stm = RealmManager.getSettlement(stmID);
+            if (stm != null && stm.containsPlayer(uuid)) {
+                jadePlayer.addSettlement(stmID);
+                if (jadePlayer.getFocusSettlementID() == -1) {
+                    jadePlayer.setFocusSettlement(stmID);
+                }
+            }
+        }
+
+        logger.info("[PlayerManager::handleLogin] Successfully composed internal data structures for player " + plugin.getServer().getPlayer(uuid).getName() + "!");
+    }
+
+    public static void handleLogout(UUID uuid) {
+        PlayerManager.storeProfile(uuid);
+    }
+
 
     public static JadeProfile fetchProfile(UUID uuid) {
         return cache.getOrDefault(uuid, null).getProfile();

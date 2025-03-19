@@ -4,7 +4,7 @@ import java.util.*;
 
 public class Settlement {
 
-    private static final String DEFAULT_DESC = "Settlement of ";
+    private static final String DEFAULT_DESC = "<green>Settlement of <gold>";
 
     private int id;
     private String name;
@@ -95,6 +95,10 @@ public class Settlement {
 
     public Map<UUID, CharterTitle> getPopulation() {
         return this.population;
+    }
+
+    public boolean containsPlayer(UUID uuid) {
+        return this.population.containsKey(uuid);
     }
 
     public Set<ChunkAnchor> getTerritory() {

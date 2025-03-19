@@ -9,6 +9,3 @@ commands:
   charter:
     description: "The all-purpose command for Charter stuff!"
     usage: "/charter"
-  town:
-    description: "Manages town interactions!"
-    usage: "/town"

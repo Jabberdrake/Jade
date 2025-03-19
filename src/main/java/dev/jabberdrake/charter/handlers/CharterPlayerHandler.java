@@ -9,14 +9,14 @@ import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.UUID;
 
-public class CharterProfileHandler implements Listener {
+public class CharterPlayerHandler implements Listener {
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         UUID uuid = player.getUniqueId();
 
-        PlayerManager.loadProfile(uuid);
+        PlayerManager.handleLogin(uuid);
     }
 
     @EventHandler
@@ -24,6 +24,6 @@ public class CharterProfileHandler implements Listener {
         Player player = event.getPlayer();
         UUID uuid = player.getUniqueId();
 
-        PlayerManager.storeProfile(uuid);
+        PlayerManager.handleLogout(uuid);
     }
 }
