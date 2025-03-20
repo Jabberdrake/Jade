@@ -1,4 +1,4 @@
-package dev.jabberdrake.charter.commands;
+package dev.jabberdrake.charter.commands.settlement;
 
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;

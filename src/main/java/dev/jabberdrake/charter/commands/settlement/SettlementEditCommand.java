@@ -1,4 +1,4 @@
-package dev.jabberdrake.charter.commands;
+package dev.jabberdrake.charter.commands.settlement;
 
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.StringArgumentType;
@@ -44,7 +44,7 @@ public class SettlementEditCommand {
                 context.getSource().getSender().sendPlainMessage("Settlement name updated!");
                 break;
             case "style":
-                settlement.setStyle(value);
+                settlement.setDisplayName(value);
                 context.getSource().getSender().sendPlainMessage("Settlement decorated name updated!");
                 break;
             case "description":

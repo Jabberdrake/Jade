@@ -15,6 +15,7 @@ public class JadePlayer {
     private boolean inRoleplay = false;
 
     // For Charter stuff
+    private boolean autoclaim = false;
     private List<Integer> settlements = new ArrayList<>();
     private int stmFocus = -1;
     // private Polity focus = null;
@@ -38,6 +39,14 @@ public class JadePlayer {
 
     public void toggleRoleplay() {
         this.inRoleplay = !this.inRoleplay;
+    }
+
+    public boolean isAutoclaiming() {
+        return this.autoclaim;
+    }
+
+    public void toggleAutoclaim() {
+        this.autoclaim = !this.autoclaim;
     }
 
     public Settlement getFocusSettlement() {

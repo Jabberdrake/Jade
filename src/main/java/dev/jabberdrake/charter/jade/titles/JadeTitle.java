@@ -124,7 +124,7 @@ public class JadeTitle extends NamedTitle {
     }
 
     public static void store(JadeTitle title, FileConfiguration data, String root) {
-        // Storing NamedTitle variables
+        // Storing NamedTitle attributes
         data.set(root + ".name", title.getName());
         data.set(root + ".title", title.getTitleAsString());
 

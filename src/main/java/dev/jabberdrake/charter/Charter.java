@@ -4,8 +4,11 @@ import dev.jabberdrake.charter.commands.CharterCommand;
 import dev.jabberdrake.charter.commands.ProfileCommand;
 import dev.jabberdrake.charter.commands.SettlementCommand;
 import dev.jabberdrake.charter.commands.ToggleRoleplayCommand;
-import dev.jabberdrake.charter.handlers.CharterChatHandler;
-import dev.jabberdrake.charter.handlers.CharterPlayerHandler;
+import dev.jabberdrake.charter.handlers.PlayerChatHandler;
+import dev.jabberdrake.charter.handlers.PlayerMoveHandler;
+import dev.jabberdrake.charter.handlers.PlayerSessionHandler;
+import dev.jabberdrake.charter.jade.players.PlayerManager;
+import dev.jabberdrake.charter.jade.titles.TitleManager;
 import dev.jabberdrake.charter.realms.RealmManager;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -19,16 +22,23 @@ public final class Charter extends JavaPlugin {
     public void onEnable() {
         // Plugin startup logic
         logger.info("Starting up Charter!");
-        RealmManager.initialize();
 
         registerCommands();
         registerHandlers();
+
+        RealmManager.initialize();
+        TitleManager.initialize();
+        PlayerManager.initialize();
     }
 
     @Override
     public void onDisable() {
         // Plugin shutdown logic
         logger.info("Shutting down Charter!");
+
+        RealmManager.shutdown();
+        TitleManager.shutdown();
+        PlayerManager.shutdown();
     }
 
     public void registerCommands() {
@@ -41,7 +51,8 @@ public final class Charter extends JavaPlugin {
     }
 
     public void registerHandlers() {
-        this.getServer().getPluginManager().registerEvents(new CharterPlayerHandler(), this);
-        this.getServer().getPluginManager().registerEvents(new CharterChatHandler(), this);
+        this.getServer().getPluginManager().registerEvents(new PlayerSessionHandler(), this);
+        this.getServer().getPluginManager().registerEvents(new PlayerChatHandler(), this);
+        this.getServer().getPluginManager().registerEvents(new PlayerMoveHandler(), this);
     }
 }

@@ -4,11 +4,14 @@ import dev.jabberdrake.charter.Charter;
 import org.bukkit.Chunk;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
+import org.checkerframework.checker.units.qual.C;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 public class RealmManager {
 
@@ -26,9 +29,9 @@ public class RealmManager {
     private static int nationCount;
 
     // a "dirty" realm is a realm that has been edited, and whose edits have not been written on the disk
-    private static List<Settlement> dirtySettlements;
+    private static List<Settlement> dirtySettlements = new ArrayList<>();
 
-    private static Map<Integer, Settlement> settlementMap = new HashMap<>();
+    private static Map<Integer, Settlement> cache = new HashMap<>();
     // ADD NATION MAP
 
     private static Map<ChunkAnchor, Settlement> territoryMap = new HashMap<>();
@@ -46,6 +49,8 @@ public class RealmManager {
         for (Settlement dirtySettlement : dirtySettlements) {
             RealmManager.storeSettlement(dirtySettlement);
         }
+        // Since this is called when we do '/charter admin rebuild', maybe we should explicitly
+        // wipe all internal data maps/caches?
 
         storeManifest();
     }
@@ -66,6 +71,27 @@ public class RealmManager {
         return nationCount++;
     }
 
+    // This should only be used when loading settlements.
+    public static Map<ChunkAnchor, Settlement> getTerritoryMap() {
+        return RealmManager.territoryMap;
+    }
+
+    public static List<Settlement> getAllSettlements() {
+        return new ArrayList<>(cache.values());
+    }
+
+    public static List<Settlement> getSettlementsForPlayer(Player player) {
+        UUID uuid = player.getUniqueId();
+        List<Settlement> result = new ArrayList<>();
+
+        for (Settlement stm : cache.values()) {
+            if (stm.containsPlayer(uuid)) {
+                result.add(stm);
+            }
+        }
+        return result;
+    }
+
     public static String getSettlementFilepath(int id) {
         return Charter.getPlugin(Charter.class).getDataFolder() + SETTLEMENT_FOLDER + SETTLEMENT_FILE_PREFIX + String.valueOf(id) + ".yml";
     }
@@ -83,98 +109,33 @@ public class RealmManager {
         // If no matching file is found, quit
         String pathname = getSettlementFilepath(id);
         File settlementFile = new File(pathname);
-        if (!settlementFile.exists()) { return null; }
+        if (!settlementFile.exists()) {
+            logger.warning("[RealmManager::loadSettlement] Attempted to load non-existing settlement for id=" + id + "!");
+            return null;
+        }
 
-        // Start building Settlement object, starting with basic info
+        // Compose Settlement object from file data
         FileConfiguration data = YamlConfiguration.loadConfiguration(settlementFile);
-        int stmID = data.getInt("settlement.id");
-        String stmName = data.getString("settlement.name");
-        String stmStyle = data.getString("settlement.style");
-        String stmDescription = data.getString("settlement.description");
+        Settlement settlement = Settlement.load(data, "settlement");
 
-        Settlement stm = new Settlement(stmID, stmName, stmStyle, stmDescription);
+        // Cache it to avoid having to read the file again
+        RealmManager.cache.put(id, settlement);
 
-        // Build title list for Settlement
-        List<String> readTitles = data.getStringList("settlement.titles");
-        for (String readTitle : readTitles) {
-            stm.addTitle(CharterTitle.fromString(readTitle, stm));
-        }
-
-        // Build population map for Settlement
-        List<String> readPopulation = data.getStringList("settlement.population");
-        for (String readCitizen : readPopulation) {
-            String[] parts = readCitizen.split(";");
-            UUID convertedUUID = UUID.fromString(parts[0]);
-            CharterTitle fetchedTitle = stm.getTitleFromName(parts[1]);
-
-            stm.addCitizen(convertedUUID, fetchedTitle);
-        }
-
-        // Build chunk anchor set for Settlement
-        List<String> readTerritory = data.getStringList("settlement.territory");
-        for (String readChunk: readTerritory) {
-            String[] parts = readChunk.split(";");
-            int readX = Integer.parseInt(parts[0]);
-            int readZ = Integer.parseInt(parts[1]);
-            ChunkAnchor anchor = new ChunkAnchor(readX, readZ);
-            stm.addTerritory(anchor);
-            if (RealmManager.territoryMap.containsKey(anchor)) {
-                Settlement owner = RealmManager.territoryMap.get(anchor);
-                if (!owner.equals(stm)) {
-                    logger.warning("[RealmManager::loadSettlementFromID] Chunk at [x=" + readX + ", z=" + readZ + "] claimed by both " + owner.getName() + " and " + stm.getName() + "!");
-                }
-            } else {
-                RealmManager.territoryMap.put(anchor, stm);
-            }
-        }
-
-        return stm;
+        return settlement;
     }
 
     public static void storeSettlement(Settlement settlement) {
-        int ID = settlement.getId();
-        String name = settlement.getName();
-        String style = settlement.getStyle();
-        String description = settlement.getDescription();
-
-        logger.info("[RealmManager::storeSettlement] Storing settlement ID=" + ID + " (" + name + ")...");
-
-        String pathname = getSettlementFilepath(ID);
+        String pathname = getSettlementFilepath(settlement.getId());
         File settlementFile = new File(pathname);
-
-        List<String> preparedTitleStrings = new ArrayList<>();
-        for (CharterTitle title : settlement.getTitles()) {
-            preparedTitleStrings.add(title.toDataString());
-        }
-
-        List<String> preparedPopulationStrings = new ArrayList<>();
-        for (UUID uuid : settlement.getPopulation().keySet()) {
-            preparedPopulationStrings.add(uuid.toString() + ";" + settlement.getPopulation().get(uuid).getName());
-        }
-
-        List<String> preparedTerritoryStrings = new ArrayList<>();
-        for (ChunkAnchor chunk : settlement.getTerritory()) {
-            logger.info(chunk.toString());
-            preparedTerritoryStrings.add(chunk.getX() + ";" + chunk.getZ());
-        }
-
-        for (String str : preparedTitleStrings) {
-            Charter.getPlugin(Charter.class).getLogger().info(str);
-        }
-
         FileConfiguration data = YamlConfiguration.loadConfiguration(settlementFile);
-        data.set("settlement.id", ID);
-        data.set("settlement.name", name);
-        data.set("settlement.style", style);
-        data.set("settlement.description", description);
-        data.set("settlement.titles", preparedTitleStrings);
-        data.set("settlement.population", preparedPopulationStrings);
-        data.set("settlement.territory", preparedTerritoryStrings);
+
+        Settlement.store(settlement, data, "settlement");
+
         try {
             data.save(settlementFile);
-            logger.info("[RealmManager::storeSettlement] Successfully stored settlement ID=" + ID + " (" + name + ")!");
+            logger.info("[RealmManager::storeSettlement] Successfully stored settlement ID=" + settlement.getId() + " (" + settlement.getName() + ")!");
         } catch (IOException e) {
-            logger.warning("[RealmManager::storeSettlement] Failed to save data for settlement ID=" + ID + " (" + name + ")!");
+            logger.warning("[RealmManager::storeSettlement] Failed to save data for settlement ID=" + settlement.getId() + " (" + settlement.getName() + ")!");
             e.printStackTrace();
         }
     }
@@ -213,7 +174,8 @@ public class RealmManager {
         for (String readSettlement : readSettlements) {
             String[] parts = readSettlement.split(";");
             int readID = Integer.parseInt(parts[0]);
-            RealmManager.settlementMap.put(readID, loadSettlement(readID));
+
+            RealmManager.loadSettlement(readID);
         }
 
         // ADD NATIONS LATER
@@ -232,8 +194,8 @@ public class RealmManager {
         data.set("manifest.settlements.count", RealmManager.getSettlementCount());
 
         List<String> stmMap = new ArrayList<>(RealmManager.getSettlementCount());
-        for (int stmID : settlementMap.keySet()) {
-            String stmString = stmID + ";" + settlementMap.get(stmID).getName();
+        for (int stmID : cache.keySet()) {
+            String stmString = stmID + ";" + cache.get(stmID).getName();
             stmMap.add(stmString);
         }
         data.set("manifest.settlements.map", stmMap);
@@ -250,34 +212,29 @@ public class RealmManager {
         return true;
     }
 
-    public static Settlement getSettlement(int id) {
-        return settlementMap.get(id);
-    }
+    public static Settlement getSettlement(int id) { return cache.getOrDefault(id, null); }
 
     public static Settlement getSettlement(String name) {
-        for (int ID : settlementMap.keySet()) {
-            if (name.equals(settlementMap.get(ID).getName())) {
-                return settlementMap.get(ID);
+        for (int ID : cache.keySet()) {
+            if (name.equals(cache.get(ID).getName())) {
+                return cache.get(ID);
             }
         }
         return null;
     }
 
-    public static void markAsDirty(String realmType, Object realm) {
-        switch (realmType) {
-            case "settlement":
-                dirtySettlements.add((Settlement) realm);
-                break;
-            case "nation":
-                // ADD NATION HERE
-                break;
-            default:
-                logger.warning("[RealmManager::markAsDirty] Invalid realm type: " + realmType);
+    public static void markAsDirty(Settlement settlement) {
+        if (!RealmManager.dirtySettlements.contains(settlement)) {
+            RealmManager.dirtySettlements.add(settlement);
         }
     }
 
     public static Settlement getChunkOwner(Chunk chunk) {
         ChunkAnchor anchor = new ChunkAnchor(chunk);
+        return getChunkOwner(anchor);
+    }
+
+    public static Settlement getChunkOwner(ChunkAnchor anchor) {
         for (ChunkAnchor ca : territoryMap.keySet()) {
             if (anchor.equals(ca)) {
                 return territoryMap.get(ca);
@@ -286,25 +243,70 @@ public class RealmManager {
         return null;
     }
 
+    public static boolean isUnclaimedChunk(Chunk chunk) {
+        ChunkAnchor anchor = new ChunkAnchor(chunk);
+        return RealmManager.isUnclaimedChunk(anchor);
+    }
+
+    public static boolean isUnclaimedChunk(ChunkAnchor anchor) {
+        return RealmManager.getChunkOwner(anchor) == null;
+    }
+
     public static boolean claimChunk(Settlement settlement, Chunk chunk) {
         ChunkAnchor anchor = new ChunkAnchor(chunk);
-        if (getChunkOwner(chunk) == null) {
+        return RealmManager.claimChunk(settlement, anchor);
+    }
+
+    public static boolean claimChunk(Settlement settlement, ChunkAnchor anchor) {
+        if (RealmManager.getChunkOwner(anchor) == null) {
             settlement.addTerritory(anchor);
 
             territoryMap.put(anchor, settlement);
-            dirtySettlements.add(settlement);
+            RealmManager.markAsDirty(settlement);
             return true;
         } else return false;
     }
 
     public static boolean unclaimChunk(Settlement settlement, Chunk chunk) {
-       ChunkAnchor anchor = new ChunkAnchor(chunk);
-       if (Objects.equals(getChunkOwner(chunk), settlement)) {
-           settlement.removeTerritory(anchor);
+        ChunkAnchor anchor = new ChunkAnchor(chunk);
+       return RealmManager.unclaimChunk(settlement, anchor);
+    }
 
-           dirtySettlements.add(settlement);
-           territoryMap.remove(anchor);
-           return true;
-       } else return false;
+    public static boolean unclaimChunk(Settlement settlement, ChunkAnchor anchor) {
+        if (Objects.equals(getChunkOwner(anchor), settlement)) {
+            settlement.removeTerritory(anchor);
+
+            territoryMap.remove(anchor);
+            RealmManager.markAsDirty(settlement);
+            return true;
+        } else return false;
+    }
+
+    public static Set<ChunkAnchor> prepareRecursiveChunkClaim(Settlement settlement, ChunkAnchor anchor) {
+        final int MAX_CHUNKS_TO_CLAIM = 50;
+
+        Set<ChunkAnchor> chunksToClaim = new LinkedHashSet<>();
+        Queue<ChunkAnchor> queue = new LinkedList<>();
+        queue.add(anchor);
+        while (!queue.isEmpty() && chunksToClaim.size() < MAX_CHUNKS_TO_CLAIM) {
+            ChunkAnchor head = queue.poll();
+            if (!isUnclaimedChunk(head) || chunksToClaim.contains(head)) { continue; }
+
+            chunksToClaim.add(head);
+            enqueueIfUnclaimed(chunksToClaim, queue, head.getRelativeChunk(0, 1));
+            enqueueIfUnclaimed(chunksToClaim, queue, head.getRelativeChunk(0, -1));
+            enqueueIfUnclaimed(chunksToClaim, queue, head.getRelativeChunk(1, 0));
+            enqueueIfUnclaimed(chunksToClaim, queue, head.getRelativeChunk(-1, 0));
+        }
+
+        if (chunksToClaim.size() >= MAX_CHUNKS_TO_CLAIM) {
+            return null;
+        } else return chunksToClaim;
+    }
+
+    public static void enqueueIfUnclaimed(Set<ChunkAnchor> set, Queue<ChunkAnchor> queue, ChunkAnchor anchor) {
+        if (RealmManager.isUnclaimedChunk(anchor) && !set.contains(anchor) && !queue.contains(anchor)) {
+            queue.add(anchor);
+        }
     }
 }

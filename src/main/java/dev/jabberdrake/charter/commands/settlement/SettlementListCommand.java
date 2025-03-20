@@ -1,9 +1,8 @@
-package dev.jabberdrake.charter.commands;
+package dev.jabberdrake.charter.commands.settlement;
 
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.LiteralCommandNode;
-import dev.jabberdrake.charter.Charter;
 import dev.jabberdrake.charter.realms.RealmManager;
 import dev.jabberdrake.charter.realms.Settlement;
 import io.papermc.paper.command.brigadier.CommandSourceStack;

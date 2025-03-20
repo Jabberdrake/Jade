@@ -4,9 +4,7 @@ import dev.jabberdrake.charter.handlers.renderers.GlobalChatRenderer;
 import dev.jabberdrake.charter.handlers.renderers.RoleplayChatRenderer;
 import dev.jabberdrake.charter.jade.players.PlayerManager;
 import dev.jabberdrake.charter.utils.TextUtils;
-import io.papermc.paper.chat.ChatRenderer;
 import io.papermc.paper.event.player.AsyncChatEvent;
-import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -14,12 +12,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
-public class CharterChatHandler implements Listener{
+public class PlayerChatHandler implements Listener{
 
     private static final int MAX_DISTANCE_SQUARED = 250;
 
     @EventHandler
-    public void onChat(AsyncChatEvent event) {
+    public void onPlayerChat(AsyncChatEvent event) {
         Player sender = event.getPlayer();
 
         String originalMessage = MiniMessage.miniMessage().serialize(event.originalMessage());
@@ -38,7 +36,7 @@ public class CharterChatHandler implements Listener{
                     viewer instanceof Player &&
                     ((Player) viewer).getWorld().equals(sender.getWorld()) &&
                     ((Player) viewer).getLocation().distanceSquared(sender.getLocation())
-                            > CharterChatHandler.MAX_DISTANCE_SQUARED
+                            > PlayerChatHandler.MAX_DISTANCE_SQUARED
             );
             event.renderer(new RoleplayChatRenderer());
         } else {

@@ -71,7 +71,7 @@ public class JadeProfile {
     }
 
     public static void store(JadeProfile profile, FileConfiguration data, String root) {
-        // Storing simple variables
+        // Storing basic attributes
         data.set(root + ".uuid", profile.getUUID().toString());
         data.set(root + ".roleplayName", profile.getRoleplayName());
 

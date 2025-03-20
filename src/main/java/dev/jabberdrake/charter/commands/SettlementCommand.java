@@ -3,6 +3,7 @@ package dev.jabberdrake.charter.commands;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.LiteralCommandNode;
+import dev.jabberdrake.charter.commands.settlement.*;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 
@@ -16,6 +17,8 @@ public class SettlementCommand {
                 .then(SettlementEditCommand.buildCommand("edit"))
                 .then(SettlementClaimCommand.buildCommand("claim"))
                 .then(SettlementMapCommand.buildCommand("map"))
+                .then(SettlementFocusCommand.buildCommand("focus"))
+                .then(SettlementJoinCommand.buildCommand("join"))
                 .then(SettlementCreateCommand.buildCommand("create"))
                 .build();
     }

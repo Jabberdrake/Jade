@@ -2,6 +2,7 @@ package dev.jabberdrake.charter.realms;
 
 import dev.jabberdrake.charter.Charter;
 import dev.jabberdrake.charter.jade.titles.NamedTitle;
+import org.bukkit.configuration.file.FileConfiguration;
 
 public class CharterTitle extends NamedTitle {
 
@@ -170,7 +171,8 @@ public class CharterTitle extends NamedTitle {
         } else return false;
     }
 
-    public String toDataString() {
+    @Override
+    public String serialize() {
         return this.getName() + ";" + this.getTitleAsString() + ";" + this.getAuthority()
                 + ";" + this.canInvite() + ";" + this.canKick()
                 + ";" + this.canClaim() + ";" + this.canUnclaim()
@@ -180,6 +182,6 @@ public class CharterTitle extends NamedTitle {
 
     @Override
     public String toString() {
-        return "PlayerTitle{" + this.toDataString() + "}";
+        return "PlayerTitle{" + this.serialize() + "}";
     }
 }

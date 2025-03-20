@@ -1,4 +1,4 @@
-package dev.jabberdrake.charter.commands;
+package dev.jabberdrake.charter.commands.profile;
 
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.StringArgumentType;
@@ -8,8 +8,6 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import dev.jabberdrake.charter.Charter;
 import dev.jabberdrake.charter.jade.players.PlayerManager;
-import dev.jabberdrake.charter.realms.RealmManager;
-import dev.jabberdrake.charter.realms.Settlement;
 import dev.jabberdrake.charter.utils.TextUtils;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;

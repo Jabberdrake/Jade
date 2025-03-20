@@ -21,6 +21,10 @@ public record ChunkAnchor(int x, int z) {
         return this.z;
     }
 
+    public ChunkAnchor getRelativeChunk(int dx, int dz) {
+        return new ChunkAnchor(this.x + dx, this.z + dz);
+    }
+
     public String serialize() {
         return this.x + ";" + this.z;
     }

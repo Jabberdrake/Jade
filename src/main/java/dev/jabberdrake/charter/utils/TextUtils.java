@@ -27,7 +27,9 @@ public class TextUtils {
     public static final TextColor DARK_MANA = TextColor.color(0x5d9da8);
     public static final TextColor LIGHT_MANA = TextColor.color(0x84e1e1);
 
-    public static final TextColor ROSEMETAL = TextColor.color(0xf5afaf);
+    public static final TextColor LIGHT_ROSEMETAL = TextColor.color(0xf5afaf);
+    public static final TextColor ROSEMETAL = TextColor.color(0xfc7c96);
+
     public static final TextColor LIVINGMETAL = TextColor.color(0x5afc9f);
 
     public static Component composeInfoPrefix() {
@@ -56,6 +58,8 @@ public class TextUtils {
     public static Component composeErrorText(String content) {
         return Component.text(content, NamedTextColor.DARK_RED);
     }
+
+    public static Component composeErrorHighlight(String content) { return Component.text(content, NamedTextColor.RED); }
 
     public static Component composePlainErrorMessage(String content) {
         return Component.text()
