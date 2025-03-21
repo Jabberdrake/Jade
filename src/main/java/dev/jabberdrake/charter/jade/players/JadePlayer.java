@@ -15,10 +15,11 @@ public class JadePlayer {
     private boolean inRoleplay = false;
 
     // For Charter stuff
-    private boolean autoclaim = false;
     private List<Integer> settlements = new ArrayList<>();
     private int stmFocus = -1;
     // private Polity focus = null;
+    private boolean autoclaim = false;
+    private boolean borderview = false;
 
     public JadePlayer(UUID uuid, JadeProfile profile) {
         this.uuid = uuid;
@@ -47,6 +48,14 @@ public class JadePlayer {
 
     public void toggleAutoclaim() {
         this.autoclaim = !this.autoclaim;
+    }
+
+    public boolean isViewingBorders() {
+        return this.borderview;
+    }
+
+    public void toggleBorderview() {
+        this.borderview = !this.borderview;
     }
 
     public Settlement getFocusSettlement() {

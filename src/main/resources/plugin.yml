@@ -5,6 +5,7 @@ description: "A lightweight territory management plugin."
 author: Jabberdrake
 website: https://github.com/Jabberdrake/Charter
 api-version: '1.21'
+depend: [BlueMap]
 commands:
   charter:
     description: "The all-purpose command for Charter stuff!"

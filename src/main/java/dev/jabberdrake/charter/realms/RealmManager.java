@@ -5,13 +5,11 @@ import org.bukkit.Chunk;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
-import org.checkerframework.checker.units.qual.C;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 public class RealmManager {
 
@@ -282,6 +280,7 @@ public class RealmManager {
         } else return false;
     }
 
+    // used for SettlementClaimCommand::runCommandForFill ('/settlement claim fill')
     public static Set<ChunkAnchor> prepareRecursiveChunkClaim(Settlement settlement, ChunkAnchor anchor) {
         final int MAX_CHUNKS_TO_CLAIM = 50;
 
@@ -304,6 +303,7 @@ public class RealmManager {
         } else return chunksToClaim;
     }
 
+    // auxiliary function of RealmManager::prepareRecursiveChunkClaim
     public static void enqueueIfUnclaimed(Set<ChunkAnchor> set, Queue<ChunkAnchor> queue, ChunkAnchor anchor) {
         if (RealmManager.isUnclaimedChunk(anchor) && !set.contains(anchor) && !queue.contains(anchor)) {
             queue.add(anchor);
