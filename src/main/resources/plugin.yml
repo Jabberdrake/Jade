@@ -1,9 +1,9 @@
-name: Charter
+name: Jade
 version: '1.0.0'
-main: dev.jabberdrake.charter.Charter
+main: dev.jabberdrake.jade.Jade
 description: "A lightweight territory management plugin."
 author: Jabberdrake
-website: https://github.com/Jabberdrake/Charter
+website: https://github.com/Jabberdrake/Jade
 api-version: '1.21'
 depend: [BlueMap]
 commands:
