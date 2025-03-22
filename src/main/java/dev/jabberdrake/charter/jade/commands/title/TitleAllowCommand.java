@@ -62,7 +62,7 @@ public class TitleAllowCommand {
                         .append(TextUtils.composeSuccessHighlight(player.getName()))
                         .append(TextUtils.composeSuccessText(" can now use the "))
                         .append(title.getTitleAsComponent())
-                        .append(TextUtils.composePlainSuccessMessage(" title!"))
+                        .append(TextUtils.composeSuccessText(" title!"))
         );
 
         return Command.SINGLE_SUCCESS;

@@ -28,7 +28,7 @@ public class TitleEditCommand {
                 .then(Commands.argument("title", StringArgumentType.word())
                         .suggests(CommonTitleSuggestions::suggestOwnedTitles)
                         .then(Commands.literal("name")
-                                .then(Commands.argument("name", StringArgumentType.word())
+                                .then(Commands.argument("name", StringArgumentType.string())
                                         .requires(sender -> sender.getExecutor() instanceof Player)
                                         .executes(TitleEditCommand::runCommandForName))))
                 .build();
@@ -50,6 +50,7 @@ public class TitleEditCommand {
 
         Component oldTitleAsComponent = title.getTitleAsComponent();
         String newName = StringArgumentType.getString(context, "name");
+        newName = newName.replace(" ", "_");
         Component newNameAsComponent = MiniMessage.miniMessage().deserialize(newName);
         String referenceName = PlainTextComponentSerializer.plainText().serialize(newNameAsComponent);
 
@@ -68,7 +69,7 @@ public class TitleEditCommand {
 
         player.sendMessage(TextUtils.composePlainSuccessMessage("Successfully renamed the ")
                 .append(oldTitleAsComponent)
-                .append(TextUtils.composePlainSuccessMessage(" title to "))
+                .append(TextUtils.composeSuccessText(" title to "))
                 .append(newNameAsComponent)
                 .append(TextUtils.composeSuccessText("!"))
         );

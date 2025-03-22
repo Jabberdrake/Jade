@@ -26,7 +26,7 @@ public class TitleCreateCommand {
 
     public static LiteralCommandNode<CommandSourceStack> buildCommand(final String label) {
         return Commands.literal(label)
-                .then(Commands.argument("name", StringArgumentType.word())
+                .then(Commands.argument("name", StringArgumentType.string())
                         .then(Commands.argument("color", StringArgumentType.word())
                                 .suggests(TitleCreateCommand::suggestNamedTextColors)
                                 .requires(sender -> sender.getExecutor() instanceof Player)
@@ -38,6 +38,7 @@ public class TitleCreateCommand {
         Player player = (Player) context.getSource().getSender();
 
         String nameArgument = StringArgumentType.getString(context, "name");
+        nameArgument = nameArgument.replace(" ", "_");
         if (!TitleManager.isUniqueName(player.getUniqueId(), nameArgument)) {
             player.sendMessage(TextUtils.composePlainErrorMessage("You already own a title with that name!"));
             return Command.SINGLE_SUCCESS;
@@ -61,7 +62,7 @@ public class TitleCreateCommand {
         JadeTitle createdTitle = TitleManager.createTitle(nameArgument, color, player.getUniqueId());
         player.sendMessage(TextUtils.composePlainSuccessMessage("Successfully created the ")
                 .append(createdTitle.getTitleAsComponent())
-                .append(TextUtils.composePlainSuccessMessage(" title!"))
+                .append(TextUtils.composeSuccessText(" title!"))
         );
 
         return Command.SINGLE_SUCCESS;

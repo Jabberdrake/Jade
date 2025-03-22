@@ -62,7 +62,7 @@ public class TitleDisallowCommand {
                 .append(TextUtils.composeSuccessHighlight(player.getName()))
                 .append(TextUtils.composeSuccessText(" can no longer use the "))
                 .append(title.getTitleAsComponent())
-                .append(TextUtils.composePlainSuccessMessage(" title!"))
+                .append(TextUtils.composeSuccessText(" title!"))
         );
 
         return Command.SINGLE_SUCCESS;

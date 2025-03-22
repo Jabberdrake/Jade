@@ -25,7 +25,9 @@ public class PlayerManager {
     }
 
     public static void shutdown() {
-
+        for (UUID uuid : cache.keySet()) {
+            PlayerManager.storeProfile(uuid);
+        }
     }
 
     public static JadePlayer parsePlayer(UUID uuid) {

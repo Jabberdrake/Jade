@@ -47,6 +47,10 @@ public class TitleManager {
     public static JadeTitle createTitle(String name, TextColor color, UUID owner) {
         Component titleComponent = Component.text(name, color);
         JadeTitle title = new JadeTitle(name, JadeTitle.serializeTitle(titleComponent), owner);
+
+        JadeProfile profile = PlayerManager.fetchProfile(owner);
+        profile.addTitle(title);
+
         TitleManager.cache.put(name, title);
         TitleManager.markAsDirty(title);
         return title;
