@@ -4,6 +4,8 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 
+import javax.naming.Name;
+
 public class TextUtils {
     public static final TextColor DARK_ZORBA = TextColor.color(0x4b4047);
     public static final TextColor ZORBA = TextColor.color(0x9f918d);
@@ -31,6 +33,15 @@ public class TextUtils {
     public static final TextColor ROSEMETAL = TextColor.color(0xfc7c96);
 
     public static final TextColor LIVINGMETAL = TextColor.color(0x5afc9f);
+
+    public static final TextColor MYTHIC_BLUE = NamedTextColor.AQUA;
+    public static final TextColor LEGENDARY_ORANGE = NamedTextColor.GOLD;
+    public static final TextColor RARE_PURPLE = NamedTextColor.DARK_PURPLE;
+    public static final TextColor UNCOMMON_YELLOW = NamedTextColor.YELLOW;
+    public static final TextColor COMMON_WHITE = NamedTextColor.WHITE;
+
+    public static final Component SYMBOL_ACCEPTED = Component.text("✔", NamedTextColor.GREEN);
+    public static final Component SYMBOL_DENIED = Component.text("❌", NamedTextColor.RED);
 
     public static Component composeInfoPrefix() {
         return Component.text("[!] > ", LIGHT_ZORBA);
@@ -103,6 +114,20 @@ public class TextUtils {
         return Component.text()
                 .append(composeOperatorPrefix())
                 .append(composeOperatorText(content))
+                .build();
+    }
+
+    public static Component composeAcceptedRequirement(String content) {
+        return Component.text()
+                .append(TextUtils.SYMBOL_ACCEPTED)
+                .append(Component.text(" " + content, TextUtils.LIGHT_CHROME))
+                .build();
+    }
+
+    public static Component composeDeniedRequirement(String content) {
+        return Component.text()
+                .append(TextUtils.SYMBOL_DENIED)
+                .append(Component.text(" " + content, TextUtils.DARK_CHROME))
                 .build();
     }
 

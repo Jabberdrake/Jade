@@ -6,6 +6,8 @@ import org.bukkit.configuration.file.FileConfiguration;
 
 public class CharterTitle extends NamedTitle {
 
+    public static final int MAX_AUTHORITY = 8;
+
     private NamedTitle title;
     private Settlement settlement;
     private int authority;
@@ -26,17 +28,24 @@ public class CharterTitle extends NamedTitle {
         generatePermissionsFromAuthority(authority);
     }
 
-    public CharterTitle(Settlement settlement, DefaultCharterTitle defaultTitle) {
-        super(defaultTitle.name, defaultTitle.name);
+    // used during settlement creation
+    public CharterTitle(Settlement settlement, DefaultCharterTitle defaultCharterTitle) {
+        super(defaultCharterTitle.getName(), defaultCharterTitle.getTitleAsString());
         this.settlement = settlement;
-        this.authority = defaultTitle.authority;
+        this.authority = defaultCharterTitle.getAuthority();
 
         generatePermissionsFromAuthority(authority);
     }
 
+    public Settlement getSettlement() { return this.settlement; }
+
     public int getAuthority() {
         return this.authority;
     }
+
+    public boolean isLeader() { return this.authority == 8; }
+
+    public boolean isDefault() { return this.equals(this.getSettlement().getDefaultTitle()); }
 
     public boolean canInvite() {
         return this.canInvite;
@@ -70,22 +79,9 @@ public class CharterTitle extends NamedTitle {
         return this.canDisband;
     }
 
-    public enum DefaultCharterTitle {
-        LEADER("Leader", 60),
-        OFFICER("Officer", 40),
-        MEMBER("Member", 20);
-
-        public final String name;
-        public final int authority;
-        DefaultCharterTitle(String name, int authority) {
-            this.name = name;
-            this.authority = authority;
-        }
-    }
-
     public void generatePermissionsFromAuthority(int authority) {
 
-        if (authority == 60) {  // Leader
+        if (authority == MAX_AUTHORITY) {  // Leader
             this.canInvite = true;
             this.canKick = true;
             this.canClaim = true;
@@ -94,7 +90,7 @@ public class CharterTitle extends NamedTitle {
             this.canDemote = true;
             this.canEdit = true;
             this.canDisband = true;
-        } else if (authority >= 40) { // Officer, or above
+        } else if (authority >= MAX_AUTHORITY / 2) { // Officer, or above
             this.canInvite = true;
             this.canKick = true;
             this.canClaim = false;
@@ -164,10 +160,8 @@ public class CharterTitle extends NamedTitle {
     public boolean equals(Object object) {
         if (object instanceof CharterTitle) {
             CharterTitle other = (CharterTitle) object;
-            return this.settlement == other.settlement
-                    && this.getName().equals(other.getName())
-                    && this.getTitleAsString().equals(other.getTitleAsString())
-                    && this.getAuthority() == other.getAuthority();
+            return this.getName().equals(other.getName()) &&
+                    this.getSettlement().getName().equals(other.getSettlement().getName());
         } else return false;
     }
 

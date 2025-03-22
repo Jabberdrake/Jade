@@ -19,6 +19,7 @@ import dev.jabberdrake.charter.commands.ToggleRoleplayCommand;
 import dev.jabberdrake.charter.handlers.PlayerChatHandler;
 import dev.jabberdrake.charter.handlers.PlayerMoveHandler;
 import dev.jabberdrake.charter.handlers.PlayerSessionHandler;
+import dev.jabberdrake.charter.jade.handlers.JadeMenuHandler;
 import dev.jabberdrake.charter.jade.players.PlayerManager;
 import dev.jabberdrake.charter.jade.titles.TitleManager;
 import dev.jabberdrake.charter.realms.RealmManager;
@@ -79,8 +80,11 @@ public final class Charter extends JavaPlugin {
 
     private void registerHandlers() {
         this.getServer().getPluginManager().registerEvents(new PlayerSessionHandler(), this);
-        this.getServer().getPluginManager().registerEvents(new PlayerChatHandler(), this);
         this.getServer().getPluginManager().registerEvents(new PlayerMoveHandler(), this);
+
+        // To be refactored into Jade
+        this.getServer().getPluginManager().registerEvents(new PlayerChatHandler(), this);
+        this.getServer().getPluginManager().registerEvents(new JadeMenuHandler(), this);
     }
 
     private void syncRealms(BlueMapAPI api, Charter charter) {
