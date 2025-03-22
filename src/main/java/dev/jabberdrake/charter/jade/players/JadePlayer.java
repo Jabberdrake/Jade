@@ -69,11 +69,13 @@ public class JadePlayer {
     }
 
     public void setFocusSettlement(Settlement settlement) {
-        this.stmFocus = settlement.getId();
+        this.setFocusSettlement(settlement.getId());
     }
 
     public void setFocusSettlement(int settlementID) {
-        this.stmFocus = settlementID;
+        if (this.settlements.contains(settlementID)) {
+            this.stmFocus = settlementID;
+        }
     }
 
     public List<Settlement> getSettlements() {
@@ -107,14 +109,20 @@ public class JadePlayer {
 
     public void removeSettlement(Settlement settlement) {
         int stmID = settlement.getId();
-        if (this.settlements.contains(stmID)) {
-            this.settlements.remove(stmID);
-        }
+        this.removeSettlement(stmID);
     }
 
     public void removeSettlement(int settlementID) {
         if (this.settlements.contains(settlementID)) {
             this.settlements.remove(settlementID);
+        }
+
+        if (this.stmFocus == settlementID) {
+            if (this.settlements.isEmpty()) {
+                this.stmFocus = -1;
+            } else {
+                this.stmFocus = this.settlements.getFirst();
+            }
         }
     }
 }

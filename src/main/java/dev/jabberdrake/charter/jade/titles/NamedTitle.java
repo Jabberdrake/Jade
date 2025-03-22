@@ -21,6 +21,8 @@ public abstract class NamedTitle {
         return this.name;
     }
 
+    public void setName(String name) { this.name = name; }
+
     public String getTitleAsString() {
         return this.title;
     }
@@ -28,6 +30,15 @@ public abstract class NamedTitle {
     public Component getTitleAsComponent() {
         MiniMessage mm = MiniMessage.miniMessage();
         return mm.deserialize(this.title);
+    }
+
+    public void setTitle(Component title) {
+        MiniMessage mm = MiniMessage.miniMessage();
+        this.title = mm.serialize(title);
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public String serialize() {

@@ -8,13 +8,13 @@ import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Player;
 
 import java.util.*;
 
 public class Settlement {
 
-
-
+    private static final String DEFAULT_NAME_DECORATION = "<gold><bold> ";
     private static final String DEFAULT_DESC = "<green>Settlement of <gold>";
     private static final TextColor DEFAULT_COLOR = TextUtils.ZORBA;
 
@@ -40,16 +40,24 @@ public class Settlement {
         this.territory = territory;
     }
 
-    public Settlement(String name, List<CharterTitle> titles, CharterTitle defaultTitle, UUID leaderID, Map<UUID, CharterTitle> population, Set<ChunkAnchor> territory) {
+    public Settlement(String name, Player leader, ChunkAnchor startingChunk) {
         this.id = RealmManager.incrementSettlementCount();
         this.name = name;
-        this.displayName = name;
-        this.description = DEFAULT_DESC + Bukkit.getPlayer(leaderID).getName();
+        this.displayName = DEFAULT_NAME_DECORATION + name;
+        this.description = DEFAULT_DESC + leader.getName();
         this.mapColor = DEFAULT_COLOR;
-        this.titles = titles;
-        this.defaultTitle = defaultTitle;
-        this.population = population;
-        this.territory = territory;
+
+        this.titles = new ArrayList<>();
+        titles.add(DefaultCharterTitle.leader(this));
+        titles.add(DefaultCharterTitle.officer(this));
+        titles.add(DefaultCharterTitle.peasant(this));
+        this.defaultTitle = titles.getLast();
+
+        this.population = new HashMap<>();
+        population.put(leader.getUniqueId(), titles.getFirst());
+
+        this.territory = new LinkedHashSet<>();
+        territory.add(startingChunk);
     }
 
     public Settlement(int id, String name, String displayName, String description, TextColor mapColor) {
@@ -127,6 +135,8 @@ public class Settlement {
         return this.population;
     }
 
+    public Set<UUID> getPopulationAsIDSet() { return this.population.keySet(); }
+
     public boolean containsPlayer(UUID uuid) {
         return this.population.containsKey(uuid);
     }
@@ -139,8 +149,14 @@ public class Settlement {
         this.titles.add(title);
     }
 
-    public void addCitizen(UUID playerID, CharterTitle title) {
+    public void addMember(UUID playerID, CharterTitle title) {
         this.population.put(playerID, title);
+    }
+
+    public void removeMember(UUID playerID) {
+        if (this.containsPlayer(playerID)) {
+            this.population.remove(playerID);
+        }
     }
 
     public void addTerritory(ChunkAnchor anchor) {
@@ -164,6 +180,48 @@ public class Settlement {
         return this.population.getOrDefault(memberID, null);
     }
 
+    public CharterTitle getTitleForAuthority(int authority) {
+        for (CharterTitle title : this.titles) {
+            if (title.getAuthority() == authority) {
+                return title;
+            }
+        }
+        return null;
+    }
+
+    public CharterTitle getTitleAbove(CharterTitle title) {
+        int referenceAuthority = title.getAuthority();
+        for (int a = referenceAuthority + 1; a < CharterTitle.MAX_AUTHORITY; a++) {
+            CharterTitle titleAtAuthority = this.getTitleForAuthority(a);
+            if (titleAtAuthority != null) { return titleAtAuthority; }
+        }
+        return null;
+    }
+
+    public CharterTitle getTitleBelow(CharterTitle title) {
+        int referenceAuthority = title.getAuthority();
+        for (int a = referenceAuthority - 1; a >= CharterTitle.MIN_AUTHORITY; a--) {
+            CharterTitle titleAtAuthority = this.getTitleForAuthority(a);
+            if (titleAtAuthority != null) { return titleAtAuthority; }
+        }
+        return null;
+    }
+
+    public boolean canManageTitle(CharterTitle reference, CharterTitle target) {
+        return reference.getAuthority() > target.getAuthority();
+    }
+
+    public boolean setPlayerTitle(UUID playerID, CharterTitle title) {
+        if (!this.containsPlayer(playerID)) { return false; }
+
+        this.getPopulation().remove(playerID);
+        this.getPopulation().put(playerID, title);
+
+        RealmManager.markAsDirty(this);
+
+        return true;
+    }
+
     public static Settlement load(FileConfiguration data, String root) {
         // Obtaining basic attributes
         int stmID = data.getInt(root + ".id");
@@ -171,6 +229,7 @@ public class Settlement {
         String stmDisplayName = data.getString(root + ".displayName");
         String stmDescription = data.getString(root + ".description");
         String stmMapColorAsString = data.getString(root + ".mapColor");
+        assert stmMapColorAsString != null;
         TextColor stmMapColor = TextColor.fromHexString(stmMapColorAsString);
 
         Settlement stm = new Settlement(stmID, stmName, stmDisplayName, stmDescription, stmMapColor);
@@ -199,7 +258,7 @@ public class Settlement {
             UUID convertedUUID = UUID.fromString(parts[0]);
             CharterTitle fetchedTitle = stm.getTitleFromName(parts[1]);
 
-            stm.addCitizen(convertedUUID, fetchedTitle);
+            stm.addMember(convertedUUID, fetchedTitle);
         }
 
         // Build chunk anchor set for Settlement

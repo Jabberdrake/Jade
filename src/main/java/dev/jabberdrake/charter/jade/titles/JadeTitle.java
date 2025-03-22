@@ -1,6 +1,7 @@
 package dev.jabberdrake.charter.jade.titles;
 
 import dev.jabberdrake.charter.Charter;
+import dev.jabberdrake.charter.realms.Settlement;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
@@ -144,6 +145,15 @@ public class JadeTitle extends NamedTitle {
             }
             data.set(root + ".users", usersAsStrings);
         }
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (object instanceof JadeTitle) {
+            JadeTitle other = (JadeTitle) object;
+            return this.getName().equals(other.getName())
+                    && this.getOwner().equals(other.getOwner());
+        } else return false;
     }
 
     @Override

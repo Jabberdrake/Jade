@@ -6,6 +6,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 
 public class CharterTitle extends NamedTitle {
 
+    public static final int MIN_AUTHORITY = 0;
     public static final int MAX_AUTHORITY = 8;
 
     private NamedTitle title;

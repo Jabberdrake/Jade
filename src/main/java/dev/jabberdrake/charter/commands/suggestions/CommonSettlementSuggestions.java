@@ -7,10 +7,13 @@ import dev.jabberdrake.charter.jade.players.PlayerManager;
 import dev.jabberdrake.charter.realms.RealmManager;
 import dev.jabberdrake.charter.realms.Settlement;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 public class CommonSettlementSuggestions {
@@ -39,6 +42,23 @@ public class CommonSettlementSuggestions {
 
         stmNames.stream()
                 .filter(entry -> entry.toLowerCase().startsWith(builder.getRemainingLowerCase()))
+                .forEach(builder::suggest);
+
+        return builder.buildFuture();
+    }
+
+    public static CompletableFuture<Suggestions> buildSuggestionsForAllPlayersInSettlement(final CommandContext<CommandSourceStack> context, final SuggestionsBuilder builder) {
+        Player player = (Player) context.getSource().getSender();
+        Settlement focus = PlayerManager.parsePlayer(player.getUniqueId()).getFocusSettlement();
+
+        if (focus.getTitleFromMember(player.getUniqueId()) == null) {
+            return builder.buildFuture();
+        }
+
+        Set<UUID> memberSet = focus.getPopulationAsIDSet();
+
+        memberSet.stream().map(uuid -> Bukkit.getPlayer(uuid).getName())
+                .filter(playerName -> playerName.toLowerCase().startsWith(builder.getRemainingLowerCase()))
                 .forEach(builder::suggest);
 
         return builder.buildFuture();

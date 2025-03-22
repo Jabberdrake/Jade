@@ -19,6 +19,7 @@ import dev.jabberdrake.charter.commands.ToggleRoleplayCommand;
 import dev.jabberdrake.charter.handlers.PlayerChatHandler;
 import dev.jabberdrake.charter.handlers.PlayerMoveHandler;
 import dev.jabberdrake.charter.handlers.PlayerSessionHandler;
+import dev.jabberdrake.charter.jade.commands.TitleCommand;
 import dev.jabberdrake.charter.jade.handlers.JadeMenuHandler;
 import dev.jabberdrake.charter.jade.players.PlayerManager;
 import dev.jabberdrake.charter.jade.titles.TitleManager;
@@ -50,9 +51,9 @@ public final class Charter extends JavaPlugin {
         TitleManager.initialize();
         PlayerManager.initialize();
 
-        logger.info("Looking for dependencies...");
+        logger.info("[Charter::onEnable] Looking for dependencies...");
         BlueMapAPI.onEnable(api -> {
-            logger.info("~ Bluemap found! Integrating...");
+            logger.info("[Charter::onEnable] Bluemap found! Integrating...");
 
             // sync realm claims every minute
             getServer().getScheduler().runTaskTimerAsynchronously(this, () -> syncRealms(api, this), 0, 60 * 20);
@@ -73,6 +74,7 @@ public final class Charter extends JavaPlugin {
         this.getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, commands -> {
             commands.registrar().register(CharterCommand.buildCommand("charter"), "An all-purpose command for the Charter plugin!");
             commands.registrar().register(SettlementCommand.buildCommand("settlement"), "Manages settlement interactions!");
+            commands.registrar().register(TitleCommand.buildCommand("title"), "Manages vanity titles!");
             commands.registrar().register(ProfileCommand.buildCommand("profile"), "Manage profile interactions!");
             commands.registrar().register(ToggleRoleplayCommand.buildCommand("toggleroleplay"), "Toggle roleplay mode!");
         });

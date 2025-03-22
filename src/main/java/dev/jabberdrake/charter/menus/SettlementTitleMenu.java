@@ -158,7 +158,7 @@ public class SettlementTitleMenu extends SimpleJadeMenu {
         Component result;
         if (title.isLeader()) {
             return Component.text()
-                    .append(Component.text("Leader Title", TextUtils.MYTHIC_BLUE).decorate(TextDecoration.BOLD))
+                    .append(Component.text("Leader Title", TextUtils.LEGENDARY_ORANGE).decorate(TextDecoration.BOLD))
                     .build();
         } else if (title.canInvite() && title.canKick()) {
             return Component.text()

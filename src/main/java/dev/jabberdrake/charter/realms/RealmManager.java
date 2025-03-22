@@ -1,6 +1,7 @@
 package dev.jabberdrake.charter.realms;
 
 import dev.jabberdrake.charter.Charter;
+import dev.jabberdrake.charter.jade.players.PlayerManager;
 import org.bukkit.Chunk;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -30,6 +31,7 @@ public class RealmManager {
     private static List<Settlement> dirtySettlements = new ArrayList<>();
 
     private static Map<Integer, Settlement> cache = new HashMap<>();
+    private static Map<UUID, Settlement> activeStmInvites = new HashMap<>();
     // ADD NATION MAP
 
     private static Map<ChunkAnchor, Settlement> territoryMap = new HashMap<>();
@@ -76,6 +78,61 @@ public class RealmManager {
 
     public static List<Settlement> getAllSettlements() {
         return new ArrayList<>(cache.values());
+    }
+
+    public static boolean isUniqueSettlementName(String potentialStmName) {
+        for (Settlement settlement : getAllSettlements()) {
+            if (settlement.getName().equalsIgnoreCase(potentialStmName)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static Settlement createSettlement(String name, Player leader, ChunkAnchor land) {
+        Settlement settlement = new Settlement(name, leader, land);
+        RealmManager.cache.put(settlement.getId(), settlement);
+        RealmManager.markAsDirty(settlement);
+        return settlement;
+    }
+
+    public static void deleteSettlement(Settlement settlement) {
+        int stmID = settlement.getId();
+        RealmManager.cache.remove(stmID);
+
+        settlement.getPopulation().keySet()
+                .stream().map(PlayerManager::parsePlayer)
+                .forEach(jadePlayer -> jadePlayer.removeSettlement(settlement));
+
+        String matchingFilepath = RealmManager.getSettlementFilepath(stmID);
+        File matchingFile = new File(matchingFilepath);
+        if (!matchingFile.delete()) {
+            logger.warning("[RealmManager::deleteSettlement] Failed to delete file " + matchingFilepath);
+        }
+    }
+
+    public static Settlement getWhoInvitedPlayer(Player player) {
+        UUID playerID = player.getUniqueId();
+        if (!RealmManager.activeStmInvites.containsKey(playerID)) { return null; }
+
+        return RealmManager.activeStmInvites.get(playerID);
+    }
+
+    public static void registerInviteToSettlement(Player player, Settlement settlement) {
+        UUID playerID = player.getUniqueId();
+        if (!RealmManager.activeStmInvites.containsKey(playerID)) {
+            RealmManager.activeStmInvites.put(playerID, settlement);
+        }
+
+        RealmManager.markAsDirty(settlement);
+    }
+
+    public static void clearInviteToSettlement(Player player) {
+        UUID playerID = player.getUniqueId();
+        if (!RealmManager.activeStmInvites.containsKey(playerID)) { return; }
+
+        Settlement inviter = RealmManager.activeStmInvites.remove(playerID);
+        RealmManager.markAsDirty(inviter);
     }
 
     public static List<Settlement> getSettlementsForPlayer(Player player) {
@@ -163,7 +220,6 @@ public class RealmManager {
             return false;
         }
 
-        logger.info("[RealmManager::loadManifest] Found realm data manifest at '" + pathname + "'! Proceeding...");
         FileConfiguration data = YamlConfiguration.loadConfiguration(manifestFile);
         RealmManager.settlementCount = data.getInt("manifest.settlements.count");
         RealmManager.nationCount = data.getInt("manifest.nations.count");
@@ -191,7 +247,7 @@ public class RealmManager {
         FileConfiguration data = YamlConfiguration.loadConfiguration(manifestFile);
         data.set("manifest.settlements.count", RealmManager.getSettlementCount());
 
-        List<String> stmMap = new ArrayList<>(RealmManager.getSettlementCount());
+        List<String> stmMap = new ArrayList<>();
         for (int stmID : cache.keySet()) {
             String stmString = stmID + ";" + cache.get(stmID).getName();
             stmMap.add(stmString);

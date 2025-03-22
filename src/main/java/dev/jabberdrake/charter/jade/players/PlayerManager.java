@@ -32,6 +32,8 @@ public class PlayerManager {
         return cache.getOrDefault(uuid, null);
     }
 
+    public static List<JadePlayer> getAllOnlinePlayers() { return new ArrayList<>(cache.values()); }
+
     public static void handleLogin(UUID uuid) {
         PlayerManager.loadProfile(uuid);
         JadePlayer jadePlayer = parsePlayer(uuid);
@@ -80,7 +82,7 @@ public class PlayerManager {
 
         // If a matching profile file was found, compose the profile object from the data therein.
         FileConfiguration data = YamlConfiguration.loadConfiguration(profileFile);
-        JadeProfile profile = JadeProfile.load(data, "profile");
+        JadeProfile profile = JadeProfile.load(uuid, data, "profile");
 
         JadePlayer jadePlayer = new JadePlayer(uuid, profile);
         PlayerManager.cache.put(uuid, jadePlayer);
