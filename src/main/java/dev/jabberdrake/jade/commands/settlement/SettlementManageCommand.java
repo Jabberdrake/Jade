@@ -3,7 +3,7 @@ package dev.jabberdrake.jade.commands.settlement;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.LiteralCommandNode;
-import dev.jabberdrake.jade.jade.players.PlayerManager;
+import dev.jabberdrake.jade.players.PlayerManager;
 import dev.jabberdrake.jade.menus.SettlementTitleMenu;
 import dev.jabberdrake.jade.realms.Settlement;
 import dev.jabberdrake.jade.utils.TextUtils;
@@ -21,7 +21,7 @@ public class SettlementManageCommand {
 
     public static int runCommand(CommandContext<CommandSourceStack> context) {
         Player player = (Player) context.getSource().getSender();
-        Settlement settlement = PlayerManager.parsePlayer(player.getUniqueId()).getFocusSettlement();
+        Settlement settlement = PlayerManager.asJadePlayer(player.getUniqueId()).getFocusSettlement();
 
         if (!performBasicChecks(player, settlement)) { return Command.SINGLE_SUCCESS; }
 

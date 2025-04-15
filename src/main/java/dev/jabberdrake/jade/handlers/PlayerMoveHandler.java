@@ -1,7 +1,7 @@
 package dev.jabberdrake.jade.handlers;
 
-import dev.jabberdrake.jade.jade.players.JadePlayer;
-import dev.jabberdrake.jade.jade.players.PlayerManager;
+import dev.jabberdrake.jade.players.JadePlayer;
+import dev.jabberdrake.jade.players.PlayerManager;
 import dev.jabberdrake.jade.realms.ChunkAnchor;
 import dev.jabberdrake.jade.realms.RealmManager;
 import dev.jabberdrake.jade.realms.Settlement;
@@ -33,7 +33,7 @@ public class PlayerMoveHandler implements Listener {
         Settlement owner = RealmManager.getChunkOwner(toAnchor);
         if (owner == null) {
             // Handle autoclaiming
-            JadePlayer jadePlayer = PlayerManager.parsePlayer(player.getUniqueId());
+            JadePlayer jadePlayer = PlayerManager.asJadePlayer(player.getUniqueId());
             if (jadePlayer.isAutoclaiming()) {
                 if (RealmManager.claimChunk(jadePlayer.getFocusSettlement(), toAnchor)) {
                     player.clearTitle();
@@ -58,7 +58,7 @@ public class PlayerMoveHandler implements Listener {
             return;
         } else {
             // Handle autoclaiming
-            JadePlayer jadePlayer = PlayerManager.parsePlayer(player.getUniqueId());
+            JadePlayer jadePlayer = PlayerManager.asJadePlayer(player.getUniqueId());
             if (jadePlayer.isAutoclaiming()) {
                 player.clearTitle();
                 player.sendActionBar(TextUtils.composeErrorText("This chunk is already claimed!"));

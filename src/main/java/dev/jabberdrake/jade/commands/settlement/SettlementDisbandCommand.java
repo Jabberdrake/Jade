@@ -3,7 +3,7 @@ package dev.jabberdrake.jade.commands.settlement;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.LiteralCommandNode;
-import dev.jabberdrake.jade.jade.players.PlayerManager;
+import dev.jabberdrake.jade.players.PlayerManager;
 import dev.jabberdrake.jade.realms.CharterTitle;
 import dev.jabberdrake.jade.realms.RealmManager;
 import dev.jabberdrake.jade.realms.Settlement;
@@ -22,7 +22,7 @@ public class SettlementDisbandCommand {
 
     public static int runCommand(CommandContext<CommandSourceStack> context) {
         Player player = (Player) context.getSource().getSender();
-        Settlement focus = PlayerManager.parsePlayer(player.getUniqueId()).getFocusSettlement();
+        Settlement focus = PlayerManager.asJadePlayer(player.getUniqueId()).getFocusSettlement();
 
         CharterTitle title = focus.getTitleFromMember(player.getUniqueId());
         if (title == null) {

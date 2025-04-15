@@ -4,9 +4,8 @@ import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.LiteralCommandNode;
-import dev.jabberdrake.jade.commands.suggestions.CommonSettlementSuggestions;
-import dev.jabberdrake.jade.jade.players.JadePlayer;
-import dev.jabberdrake.jade.jade.players.PlayerManager;
+import dev.jabberdrake.jade.players.JadePlayer;
+import dev.jabberdrake.jade.players.PlayerManager;
 import dev.jabberdrake.jade.realms.ChunkAnchor;
 import dev.jabberdrake.jade.realms.RealmManager;
 import dev.jabberdrake.jade.realms.Settlement;
@@ -42,7 +41,7 @@ public class SettlementClaimCommand {
         Player player = (Player) context.getSource().getSender();
         Chunk currentChunk = player.getLocation().getChunk();
 
-        Settlement settlement = PlayerManager.parsePlayer(player.getUniqueId()).getFocusSettlement();
+        Settlement settlement = PlayerManager.asJadePlayer(player.getUniqueId()).getFocusSettlement();
         if (!performCommonChecks(player, settlement)) { return Command.SINGLE_SUCCESS; }
 
         if (RealmManager.claimChunk(settlement, currentChunk)) {
@@ -64,7 +63,7 @@ public class SettlementClaimCommand {
     public static int runCommandForSquare(CommandContext<CommandSourceStack> context) {
         Player player = (Player) context.getSource().getSender();
 
-        Settlement settlement = PlayerManager.parsePlayer(player.getUniqueId()).getFocusSettlement();
+        Settlement settlement = PlayerManager.asJadePlayer(player.getUniqueId()).getFocusSettlement();
         if (!performCommonChecks(player, settlement)) { return Command.SINGLE_SUCCESS; }
 
         Chunk currentChunk = player.getLocation().getChunk();
@@ -99,11 +98,11 @@ public class SettlementClaimCommand {
     public static int runCommandForAuto(CommandContext<CommandSourceStack> context) {
         Player player = (Player) context.getSource().getSender();
 
-        Settlement settlement = PlayerManager.parsePlayer(player.getUniqueId()).getFocusSettlement();
+        Settlement settlement = PlayerManager.asJadePlayer(player.getUniqueId()).getFocusSettlement();
         if (!performCommonChecks(player, settlement)) { return Command.SINGLE_SUCCESS; }
 
 
-        JadePlayer jadePlayer = PlayerManager.parsePlayer(player.getUniqueId());
+        JadePlayer jadePlayer = PlayerManager.asJadePlayer(player.getUniqueId());
 
         jadePlayer.toggleAutoclaim();
 
@@ -130,7 +129,7 @@ public class SettlementClaimCommand {
         Player player = (Player) context.getSource().getSender();
         ChunkAnchor anchor = new ChunkAnchor(player.getChunk());
 
-        Settlement settlement = PlayerManager.parsePlayer(player.getUniqueId()).getFocusSettlement();
+        Settlement settlement = PlayerManager.asJadePlayer(player.getUniqueId()).getFocusSettlement();
         if (!performCommonChecks(player, settlement)) { return Command.SINGLE_SUCCESS; }
 
         Set<ChunkAnchor> chunksToClaim = RealmManager.prepareRecursiveChunkClaim(settlement, anchor);

@@ -4,8 +4,7 @@ import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.LiteralCommandNode;
-import dev.jabberdrake.jade.commands.suggestions.CommonSettlementSuggestions;
-import dev.jabberdrake.jade.jade.players.PlayerManager;
+import dev.jabberdrake.jade.players.PlayerManager;
 import dev.jabberdrake.jade.realms.RealmManager;
 import dev.jabberdrake.jade.realms.Settlement;
 import dev.jabberdrake.jade.utils.TextUtils;
@@ -27,7 +26,7 @@ public class SettlementFocusCommand {
 
     public static int runCommandWithoutArgs(CommandContext<CommandSourceStack> context) {
         Player player = (Player) context.getSource().getSender();
-        Settlement focus = PlayerManager.parsePlayer(player.getUniqueId()).getFocusSettlement();
+        Settlement focus = PlayerManager.asJadePlayer(player.getUniqueId()).getFocusSettlement();
 
         if (focus == null) {
             player.sendMessage(TextUtils.composePlainInfoMessage("You are not focusing on any settlement..."));
@@ -56,7 +55,7 @@ public class SettlementFocusCommand {
             return Command.SINGLE_SUCCESS;
         }
 
-        PlayerManager.parsePlayer(player.getUniqueId()).setFocusSettlement(settlement);
+        PlayerManager.asJadePlayer(player.getUniqueId()).setFocusSettlement(settlement);
 
         player.sendMessage(TextUtils.composeSuccessPrefix()
                 .append(TextUtils.composeSuccessText("Now focusing on "))

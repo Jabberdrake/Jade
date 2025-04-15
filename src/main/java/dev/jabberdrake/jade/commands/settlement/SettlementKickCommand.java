@@ -4,9 +4,8 @@ import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.LiteralCommandNode;
-import dev.jabberdrake.jade.commands.suggestions.CommonSettlementSuggestions;
-import dev.jabberdrake.jade.jade.players.JadePlayer;
-import dev.jabberdrake.jade.jade.players.PlayerManager;
+import dev.jabberdrake.jade.players.JadePlayer;
+import dev.jabberdrake.jade.players.PlayerManager;
 import dev.jabberdrake.jade.realms.CharterTitle;
 import dev.jabberdrake.jade.realms.Settlement;
 import dev.jabberdrake.jade.utils.TextUtils;
@@ -30,7 +29,7 @@ public class SettlementKickCommand {
 
     public static int runCommand(CommandContext<CommandSourceStack> context) {
         Player player = (Player) context.getSource().getSender();
-        Settlement focus = PlayerManager.parsePlayer(player.getUniqueId()).getFocusSettlement();
+        Settlement focus = PlayerManager.asJadePlayer(player.getUniqueId()).getFocusSettlement();
 
         if (!performBasicChecks(player, focus)) { return Command.SINGLE_SUCCESS; }
 
@@ -61,7 +60,7 @@ public class SettlementKickCommand {
             return Command.SINGLE_SUCCESS;
         }
 
-        JadePlayer jadeTarget = PlayerManager.parsePlayer(targetUUID);
+        JadePlayer jadeTarget = PlayerManager.asJadePlayer(targetUUID);
         jadeTarget.removeSettlement(focus);
         focus.removeMember(targetUUID);
 

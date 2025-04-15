@@ -1,0 +1,6 @@
+generic:
+  gameworld: world
+  database: jade.db
+
+gamerules:
+  preventCoralFading: true

@@ -3,7 +3,6 @@ package dev.jabberdrake.jade.realms;
 import dev.jabberdrake.jade.Jade;
 import dev.jabberdrake.jade.utils.TextUtils;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -22,19 +21,19 @@ public class Settlement {
     private String displayName;
     private String description;
     private TextColor mapColor;
+    private Nation nation;
     private List<CharterTitle> titles;
-    private CharterTitle defaultTitle;
     private Map<UUID, CharterTitle> population;
     private Set<ChunkAnchor> territory;
 
-    public Settlement(int id, String name, String displayName, String description, TextColor mapColor, List<CharterTitle> titles, CharterTitle defaultTitle, Map<UUID, CharterTitle> population, Set<ChunkAnchor> territory) {
+    public Settlement(int id, String name, String displayName, String description, TextColor mapColor, Nation nation, List<CharterTitle> titles, Map<UUID, CharterTitle> population, Set<ChunkAnchor> territory) {
         this.id = id;
         this.name = name;
         this.displayName = displayName;
         this.description = description;
         this.mapColor = mapColor;
+        this.nation = nation;
         this.titles = titles;
-        this.defaultTitle = defaultTitle;
         this.population = population;
         this.territory = territory;
     }
@@ -45,12 +44,12 @@ public class Settlement {
         this.displayName = DEFAULT_NAME_DECORATION + name;
         this.description = DEFAULT_DESC + leader.getName();
         this.mapColor = DEFAULT_COLOR;
+        this.nation = null;
 
         this.titles = new ArrayList<>();
         titles.add(DefaultCharterTitle.leader(this));
         titles.add(DefaultCharterTitle.officer(this));
         titles.add(DefaultCharterTitle.peasant(this));
-        this.defaultTitle = titles.getLast();
 
         this.population = new HashMap<>();
         population.put(leader.getUniqueId(), titles.getFirst());
@@ -107,23 +106,40 @@ public class Settlement {
     }
 
     public TextColor getMapColor() {
-        return NamedTextColor.GOLD;
+        return this.mapColor;
     }
 
     public void setMapColor(TextColor color) { this.mapColor = color; }
+
+    public Nation getNation() { return nation; }
+
+    public void setNation(Nation nation) { this.nation = nation; }
+
+    public boolean isInNation() { return this.nation != null; }
+
+    public boolean isMemberOfNation(Nation nation) { return nation.containsSettlement(this); }
 
     public List<CharterTitle> getTitles() {
         return this.titles;
     }
 
     public CharterTitle getDefaultTitle() {
-        return this.defaultTitle;
+        for (CharterTitle title : this.getTitles()) {
+            if (title.isLeader()) {
+                return title;
+            }
+        }
+        return null;
     }
 
     public boolean setDefaultTitle(CharterTitle defaultTitle) {
         for (CharterTitle title : this.titles) {
             if (title.equals(defaultTitle)) {
-                this.defaultTitle = defaultTitle;
+                // If the specified title exists in this settlement,
+                // set the current default title to normal
+                // and set the specified title as default.
+                this.getDefaultTitle().setToNormal();
+                title.setToDefault();
                 return true;
             }
         }
@@ -233,21 +249,21 @@ public class Settlement {
 
         Settlement stm = new Settlement(stmID, stmName, stmDisplayName, stmDescription, stmMapColor);
 
+        // Parsing nations
+        int nationID = data.getInt(root + ".nation");
+        if (nationID > 0) {
+            Nation nation = RealmManager.getNation(nationID);
+            if (nation == null) {
+                Jade.getPlugin(Jade.class).getLogger().warning("[Settlement::load] Invalid nation ID detected while loading settlement ID=" + stmID + " (" + stmName + ")!");
+                stm.setNation(null);
+            } else stm.setNation(nation);
+        } else stm.setNation(null);
+
+
         // Building title list
         List<String> readTitles = data.getStringList(root + ".titles");
         for (String readTitle : readTitles) {
             stm.addTitle(CharterTitle.fromString(readTitle, stm));
-        }
-
-        // Setting default title
-        String stmDefaultTitleName = data.getString(root + ".defaultTitle");
-        for (CharterTitle title : stm.getTitles()) {
-            if (title.getName().equals(stmDefaultTitleName)) {
-                if (!stm.setDefaultTitle(title)) {
-                    Jade.getPlugin(Jade.class).getLogger().warning("[Settlement::load] Default title for " + stmName + " is not in the title list!");
-                    stm.setDefaultTitle(stm.getTitles().getFirst());
-                }
-            }
         }
 
         // Build population map
@@ -289,16 +305,15 @@ public class Settlement {
         data.set(root + ".description", settlement.getDescriptionAsString());
         data.set(root + ".mapColor", settlement.getMapColor().asHexString());
 
+        // Storing nation ID
+        data.set(root + ".nation", settlement.isInNation() ? -1 : settlement.getNation().getId());
+
         // Storing all internal titles
         List<String> preparedTitleStrings = new ArrayList<>();
         for (CharterTitle title : settlement.getTitles()) {
             preparedTitleStrings.add(title.serialize());
         }
         data.set(root + ".titles", preparedTitleStrings);
-
-        // Storing default title as name string
-        String defaultTitleName = settlement.getDefaultTitle().getName();
-        data.set(root + ".defaultTitle", defaultTitleName);
 
         // Storing population map
         List<String> preparedPopulationStrings = new ArrayList<>();

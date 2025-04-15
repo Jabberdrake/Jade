@@ -1,6 +1,6 @@
 package dev.jabberdrake.jade.handlers.renderers;
 
-import dev.jabberdrake.jade.jade.players.PlayerManager;
+import dev.jabberdrake.jade.players.PlayerManager;
 import dev.jabberdrake.jade.utils.TextUtils;
 import io.papermc.paper.chat.ChatRenderer;
 import net.kyori.adventure.audience.Audience;
@@ -40,7 +40,7 @@ public class RoleplayChatRenderer implements ChatRenderer {
         // Lastly, if the input starts with '*', but there is no subsequent ':', then the outgoing message
         // will be formatted similarly to the vanilla /me command:
         //    INPUT: '*kicks his feet and giggles.'       -->     <roleplayname> kicks his feet and giggles.
-        String roleplayNameAsString = PlayerManager.fetchProfile(source.getUniqueId()).getRoleplayName();
+        String roleplayNameAsString = PlayerManager.asJadePlayer(source.getUniqueId()).getRoleplayName();
         Component roleplayName = Component.text(roleplayNameAsString, TextUtils.LIGHT_BRASS);
 
         if (messageAsString.startsWith("*") && messageAsString.length() > 1) {

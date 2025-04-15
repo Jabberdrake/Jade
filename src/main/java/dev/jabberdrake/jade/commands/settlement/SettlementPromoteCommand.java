@@ -6,9 +6,8 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import com.mojang.brigadier.tree.LiteralCommandNode;
-import dev.jabberdrake.jade.commands.suggestions.CommonSettlementSuggestions;
-import dev.jabberdrake.jade.jade.players.PlayerManager;
-import dev.jabberdrake.jade.jade.titles.NamedTitle;
+import dev.jabberdrake.jade.players.PlayerManager;
+import dev.jabberdrake.jade.titles.NamedTitle;
 import dev.jabberdrake.jade.realms.CharterTitle;
 import dev.jabberdrake.jade.realms.Settlement;
 import dev.jabberdrake.jade.utils.TextUtils;
@@ -37,7 +36,7 @@ public class SettlementPromoteCommand {
     public static int runCommand(CommandContext<CommandSourceStack> context) {
         Player sender = (Player) context.getSource().getSender();
 
-        Settlement focus = PlayerManager.parsePlayer(sender.getUniqueId()).getFocusSettlement();
+        Settlement focus = PlayerManager.asJadePlayer(sender.getUniqueId()).getFocusSettlement();
         if (!performCommonChecks(sender, focus)) { return Command.SINGLE_SUCCESS; }
 
         String targetName = StringArgumentType.getString(context, "player");
@@ -82,7 +81,7 @@ public class SettlementPromoteCommand {
     public static int runCommandForTitle(CommandContext<CommandSourceStack> context) {
         Player sender = (Player) context.getSource().getSender();
 
-        Settlement focus = PlayerManager.parsePlayer(sender.getUniqueId()).getFocusSettlement();
+        Settlement focus = PlayerManager.asJadePlayer(sender.getUniqueId()).getFocusSettlement();
         if (!performCommonChecks(sender, focus)) { return Command.SINGLE_SUCCESS; }
 
         String targetName = StringArgumentType.getString(context, "player");
@@ -157,7 +156,7 @@ public class SettlementPromoteCommand {
 
     public static CompletableFuture<Suggestions> buildSuggestionsForTitlesBelow(final CommandContext<CommandSourceStack> context, final SuggestionsBuilder builder) {
         Player player = (Player) context.getSource().getSender();
-        Settlement focus = PlayerManager.parsePlayer(player.getUniqueId()).getFocusSettlement();
+        Settlement focus = PlayerManager.asJadePlayer(player.getUniqueId()).getFocusSettlement();
         if (!focus.containsPlayer(player.getUniqueId())) { return builder.buildFuture(); }
 
         CharterTitle playerTitle = focus.getTitleFromMember(player.getUniqueId());

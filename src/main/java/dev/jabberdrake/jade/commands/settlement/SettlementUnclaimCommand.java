@@ -3,7 +3,7 @@ package dev.jabberdrake.jade.commands.settlement;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.LiteralCommandNode;
-import dev.jabberdrake.jade.jade.players.PlayerManager;
+import dev.jabberdrake.jade.players.PlayerManager;
 import dev.jabberdrake.jade.realms.RealmManager;
 import dev.jabberdrake.jade.realms.Settlement;
 import dev.jabberdrake.jade.utils.TextUtils;
@@ -25,7 +25,7 @@ public class SettlementUnclaimCommand {
         Player player = (Player) context.getSource().getSender();
         Chunk currentChunk = player.getLocation().getChunk();
 
-        Settlement settlement = PlayerManager.parsePlayer(player.getUniqueId()).getFocusSettlement();
+        Settlement settlement = PlayerManager.asJadePlayer(player.getUniqueId()).getFocusSettlement();
         if (!performCommonChecks(player, settlement)) { return Command.SINGLE_SUCCESS; }
 
         if (RealmManager.unclaimChunk(settlement, currentChunk)) {

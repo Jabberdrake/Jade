@@ -2,7 +2,7 @@ package dev.jabberdrake.jade.handlers;
 
 import dev.jabberdrake.jade.handlers.renderers.GlobalChatRenderer;
 import dev.jabberdrake.jade.handlers.renderers.RoleplayChatRenderer;
-import dev.jabberdrake.jade.jade.players.PlayerManager;
+import dev.jabberdrake.jade.players.PlayerManager;
 import dev.jabberdrake.jade.utils.TextUtils;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import net.kyori.adventure.text.Component;
@@ -26,7 +26,7 @@ public class PlayerChatHandler implements Listener{
             return;
         }
 
-        if (PlayerManager.parsePlayer(sender.getUniqueId()).isInRoleplay()) {
+        if (PlayerManager.asJadePlayer(sender.getUniqueId()).isInRoleplay()) {
             // Roleplay channel acts as a 'local' chat channel of sorts, in the sense that only
             // players within a set distance of you receive your chat messages.
             //
@@ -48,12 +48,12 @@ public class PlayerChatHandler implements Listener{
         if (originalMessage.startsWith("g:")) {
 
             // Replace this with proper chat channel logic if it ever gets implemented
-            if (!PlayerManager.parsePlayer(sender.getUniqueId()).isInRoleplay()) {
+            if (!PlayerManager.asJadePlayer(sender.getUniqueId()).isInRoleplay()) {
                 sender.sendMessage(TextUtils.composePlainErrorMessage("You are already speaking in this channel!"));
 
                 return true;
             }
-            PlayerManager.parsePlayer(sender.getUniqueId()).toggleRoleplay();
+            PlayerManager.asJadePlayer(sender.getUniqueId()).toggleRoleplay();
 
 
             sender.sendMessage(TextUtils.composeSuccessPrefix()
@@ -64,11 +64,11 @@ public class PlayerChatHandler implements Listener{
             return true;
         } else if (originalMessage.startsWith("rp:")) {
             // Replace this with proper chat channel logic if it ever gets implemented
-            if (PlayerManager.parsePlayer(sender.getUniqueId()).isInRoleplay()) {
+            if (PlayerManager.asJadePlayer(sender.getUniqueId()).isInRoleplay()) {
                 sender.sendMessage(TextUtils.composePlainErrorMessage("You are already speaking in this channel!"));
                 return true;
             }
-            PlayerManager.parsePlayer(sender.getUniqueId()).toggleRoleplay();
+            PlayerManager.asJadePlayer(sender.getUniqueId()).toggleRoleplay();
 
             sender.sendMessage(TextUtils.composeSuccessPrefix()
                     .append(TextUtils.composeSuccessText("You are now speaking in the "))

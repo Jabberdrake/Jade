@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'dev.jabberdrake'
-version = '1.0.0'
+version = '0.7'
 
 repositories {
     mavenCentral()
@@ -24,6 +24,7 @@ repositories {
 }
 
 dependencies {
+    implementation("org.xerial:sqlite-jdbc:3.7.2")
     implementation("com.technicjelle:BMUtils:4.3.1")
     compileOnly("io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT")
     compileOnly("de.bluecolored:bluemap-api:2.7.3")

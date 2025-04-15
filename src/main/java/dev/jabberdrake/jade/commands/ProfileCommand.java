@@ -5,7 +5,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import dev.jabberdrake.jade.Jade;
 import dev.jabberdrake.jade.commands.profile.ProfileEditCommand;
-import dev.jabberdrake.jade.jade.players.PlayerManager;
+import dev.jabberdrake.jade.players.PlayerManager;
 import dev.jabberdrake.jade.utils.TextUtils;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
@@ -29,7 +29,7 @@ public class ProfileCommand {
         }
 
         Player player = (Player) sender;
-        String roleplayName = PlayerManager.fetchProfile(player.getUniqueId()).getRoleplayName();
+        String roleplayName = PlayerManager.asJadePlayer(player.getUniqueId()).getRoleplayName();
         player.sendMessage(TextUtils.composeInfoPrefix()
                 .append(TextUtils.composeInfoText("Roleplay name: \""))
                 .append(Component.text(roleplayName, TextUtils.LIGHT_BRASS))

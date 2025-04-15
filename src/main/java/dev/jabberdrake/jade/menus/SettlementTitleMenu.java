@@ -1,6 +1,5 @@
 package dev.jabberdrake.jade.menus;
 
-import dev.jabberdrake.jade.jade.menus.SimpleJadeMenu;
 import dev.jabberdrake.jade.realms.CharterTitle;
 import dev.jabberdrake.jade.realms.Settlement;
 import dev.jabberdrake.jade.utils.TextUtils;

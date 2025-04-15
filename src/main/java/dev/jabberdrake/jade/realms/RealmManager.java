@@ -1,7 +1,7 @@
 package dev.jabberdrake.jade.realms;
 
 import dev.jabberdrake.jade.Jade;
-import dev.jabberdrake.jade.jade.players.PlayerManager;
+import dev.jabberdrake.jade.players.PlayerManager;
 import org.bukkit.Chunk;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -29,10 +29,13 @@ public class RealmManager {
 
     // a "dirty" realm is a realm that has been edited, and whose edits have not been written on the disk
     private static List<Settlement> dirtySettlements = new ArrayList<>();
+    private static List<Nation> dirtyNations = new ArrayList<>();
 
-    private static Map<Integer, Settlement> cache = new HashMap<>();
+    private static Map<Integer, Settlement> stmCache = new HashMap<>();
     private static Map<UUID, Settlement> activeStmInvites = new HashMap<>();
-    // ADD NATION MAP
+
+    private static Map<Integer, Nation> natCache = new HashMap<>();
+    private static Map<Nation, Settlement> activeNatInvites = new HashMap<>();
 
     private static Map<ChunkAnchor, Settlement> territoryMap = new HashMap<>();
 
@@ -49,6 +52,11 @@ public class RealmManager {
         for (Settlement dirtySettlement : dirtySettlements) {
             RealmManager.storeSettlement(dirtySettlement);
         }
+
+        for (Nation dirtyNation: dirtyNations) {
+            RealmManager.storeNation(dirtyNation);
+        }
+
         // Since this is called when we do '/charter admin rebuild', maybe we should explicitly
         // wipe all internal data maps/caches?
 
@@ -77,7 +85,7 @@ public class RealmManager {
     }
 
     public static List<Settlement> getAllSettlements() {
-        return new ArrayList<>(cache.values());
+        return new ArrayList<>(stmCache.values());
     }
 
     public static boolean isUniqueSettlementName(String potentialStmName) {
@@ -91,17 +99,17 @@ public class RealmManager {
 
     public static Settlement createSettlement(String name, Player leader, ChunkAnchor land) {
         Settlement settlement = new Settlement(name, leader, land);
-        RealmManager.cache.put(settlement.getId(), settlement);
+        RealmManager.stmCache.put(settlement.getId(), settlement);
         RealmManager.markAsDirty(settlement);
         return settlement;
     }
 
     public static void deleteSettlement(Settlement settlement) {
         int stmID = settlement.getId();
-        RealmManager.cache.remove(stmID);
+        RealmManager.stmCache.remove(stmID);
 
         settlement.getPopulation().keySet()
-                .stream().map(PlayerManager::parsePlayer)
+                .stream().map(PlayerManager::asJadePlayer)
                 .forEach(jadePlayer -> jadePlayer.removeSettlement(settlement));
 
         String matchingFilepath = RealmManager.getSettlementFilepath(stmID);
@@ -139,7 +147,7 @@ public class RealmManager {
         UUID uuid = player.getUniqueId();
         List<Settlement> result = new ArrayList<>();
 
-        for (Settlement stm : cache.values()) {
+        for (Settlement stm : stmCache.values()) {
             if (stm.containsPlayer(uuid)) {
                 result.add(stm);
             }
@@ -174,7 +182,7 @@ public class RealmManager {
         Settlement settlement = Settlement.load(data, "settlement");
 
         // Cache it to avoid having to read the file again
-        RealmManager.cache.put(id, settlement);
+        RealmManager.stmCache.put(id, settlement);
 
         return settlement;
     }
@@ -191,6 +199,42 @@ public class RealmManager {
             logger.info("[RealmManager::storeSettlement] Successfully stored settlement ID=" + settlement.getId() + " (" + settlement.getName() + ")!");
         } catch (IOException e) {
             logger.warning("[RealmManager::storeSettlement] Failed to save data for settlement ID=" + settlement.getId() + " (" + settlement.getName() + ")!");
+            e.printStackTrace();
+        }
+    }
+
+    public static Nation loadNation(int id) {
+        // Get matching filepath for ID in argument, and attempt to read the file
+        // If no matching file is found, quit
+        String pathname = getNationFilepath(id);
+        File nationFile = new File(pathname);
+        if (!nationFile.exists()) {
+            logger.warning("[RealmManager::loadNation] Attempted to load non-existing polity for id=" + id + "!");
+            return null;
+        }
+
+        // Compose Settlement object from file data
+        FileConfiguration data = YamlConfiguration.loadConfiguration(nationFile);
+        Nation nation = Nation.load(data, "nation");
+
+        // Cache it to avoid having to read the file again
+        RealmManager.natCache.put(id, nation);
+
+        return nation;
+    }
+
+    public static void storeNation(Nation nation) {
+        String pathname = getNationFilepath(nation.getId());
+        File nationFile = new File(pathname);
+        FileConfiguration data = YamlConfiguration.loadConfiguration(nationFile);
+
+        Nation.store(nation, data, "nation");
+
+        try {
+            data.save(nationFile);
+            logger.info("[RealmManager::storeNation] Successfully stored nation ID=" + nation.getId() + " (" + nation.getName() + ")!");
+        } catch (IOException e) {
+            logger.warning("[RealmManager::storeNation] Failed to save data for nation ID=" + nation.getId() + " (" + nation.getName() + ")!");
             e.printStackTrace();
         }
     }
@@ -229,10 +273,21 @@ public class RealmManager {
             String[] parts = readSettlement.split(";");
             int readID = Integer.parseInt(parts[0]);
 
-            RealmManager.loadSettlement(readID);
+            if (!stmCache.containsKey(readID)) {
+                RealmManager.loadSettlement(readID);
+            }
         }
 
-        // ADD NATIONS LATER
+        List<String> readNations = data.getStringList("manifest.nations.map");
+        for (String readNation : readNations) {
+            String[] parts = readNation.split(";");
+            int readID = Integer.parseInt(parts[0]);
+
+            if (!natCache.containsKey(readID)) {
+                RealmManager.loadNation(readID);
+            }
+        }
+
         return true;
     }
 
@@ -248,13 +303,18 @@ public class RealmManager {
         data.set("manifest.settlements.count", RealmManager.getSettlementCount());
 
         List<String> stmMap = new ArrayList<>();
-        for (int stmID : cache.keySet()) {
-            String stmString = stmID + ";" + cache.get(stmID).getName();
+        for (int stmID : stmCache.keySet()) {
+            String stmString = stmID + ";" + stmCache.get(stmID).getName();
             stmMap.add(stmString);
         }
         data.set("manifest.settlements.map", stmMap);
 
-        // ADD NATIONS LATER
+        List<String> natMap = new ArrayList<>();
+        for (int natID : natCache.keySet()) {
+            String polString = natID + ";" + natCache.get(natID).getName();
+            natMap.add(polString);
+        }
+        data.set("manifest.nations.map", natMap);
 
         try {
             data.save(manifestFile);
@@ -266,20 +326,42 @@ public class RealmManager {
         return true;
     }
 
-    public static Settlement getSettlement(int id) { return cache.getOrDefault(id, null); }
+    public static Settlement getSettlement(int id) {
+        if (stmCache.containsKey(id)) {
+            return stmCache.get(id);
+        } else {
+            RealmManager.loadSettlement(id);
+            return stmCache.getOrDefault(id, null);
+        }
+    }
 
     public static Settlement getSettlement(String name) {
-        for (int ID : cache.keySet()) {
-            if (name.equals(cache.get(ID).getName())) {
-                return cache.get(ID);
+        for (int ID : stmCache.keySet()) {
+            if (name.equals(stmCache.get(ID).getName())) {
+                return stmCache.get(ID);
             }
         }
         return null;
     }
 
+    public static Nation getNation(int id) {
+        if (natCache.containsKey(id)) {
+            return natCache.get(id);
+        } else {
+            RealmManager.loadNation(id);
+            return natCache.getOrDefault(id, null);
+        }
+    }
+
     public static void markAsDirty(Settlement settlement) {
         if (!RealmManager.dirtySettlements.contains(settlement)) {
             RealmManager.dirtySettlements.add(settlement);
+        }
+    }
+
+    public static void markAsDirty(Nation nation) {
+        if (!RealmManager.dirtyNations.contains(nation)) {
+            RealmManager.dirtyNations.add(nation);
         }
     }
 

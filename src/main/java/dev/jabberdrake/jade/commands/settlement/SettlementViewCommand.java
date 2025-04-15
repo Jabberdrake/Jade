@@ -5,8 +5,8 @@ import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import dev.jabberdrake.jade.Jade;
-import dev.jabberdrake.jade.jade.players.JadePlayer;
-import dev.jabberdrake.jade.jade.players.PlayerManager;
+import dev.jabberdrake.jade.players.JadePlayer;
+import dev.jabberdrake.jade.players.PlayerManager;
 import dev.jabberdrake.jade.realms.ChunkAnchor;
 import dev.jabberdrake.jade.realms.RealmManager;
 import dev.jabberdrake.jade.realms.Settlement;
@@ -38,7 +38,7 @@ public class SettlementViewCommand {
 
     public static int runCommand(CommandContext<CommandSourceStack> context) {
         Player player = (Player) context.getSource().getSender();
-        JadePlayer jadePlayer = PlayerManager.parsePlayer(player.getUniqueId());
+        JadePlayer jadePlayer = PlayerManager.asJadePlayer(player.getUniqueId());
         ParticleBuilder borderParticle = claimParticleTemplate.clone().receivers(player);
 
         jadePlayer.toggleBorderview();

@@ -4,8 +4,7 @@ import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.LiteralCommandNode;
-import dev.jabberdrake.jade.commands.suggestions.CommonSettlementSuggestions;
-import dev.jabberdrake.jade.jade.players.PlayerManager;
+import dev.jabberdrake.jade.players.PlayerManager;
 import dev.jabberdrake.jade.realms.RealmManager;
 import dev.jabberdrake.jade.realms.Settlement;
 import dev.jabberdrake.jade.utils.TextUtils;
@@ -34,7 +33,7 @@ public class SettlementJoinCommand {
         }
 
         inviter.addMember(player.getUniqueId(), inviter.getDefaultTitle());
-        PlayerManager.parsePlayer(player.getUniqueId()).addSettlement(inviter);
+        PlayerManager.asJadePlayer(player.getUniqueId()).addSettlement(inviter);
 
         player.sendMessage(TextUtils.composeSuccessPrefix()
                 .append(TextUtils.composeSuccessText("You are now a member of "))
@@ -61,7 +60,7 @@ public class SettlementJoinCommand {
         }
 
         stmArg.addMember(player.getUniqueId(), stmArg.getDefaultTitle());
-        PlayerManager.parsePlayer(player.getUniqueId()).addSettlement(stmArg);
+        PlayerManager.asJadePlayer(player.getUniqueId()).addSettlement(stmArg);
         RealmManager.clearInviteToSettlement(player);
 
         player.sendMessage(TextUtils.composeSuccessPrefix()

@@ -1,7 +1,7 @@
 package dev.jabberdrake.jade.realms;
 
 import dev.jabberdrake.jade.Jade;
-import dev.jabberdrake.jade.jade.titles.NamedTitle;
+import dev.jabberdrake.jade.titles.NamedTitle;
 
 public class CharterTitle extends NamedTitle {
 
@@ -11,6 +11,7 @@ public class CharterTitle extends NamedTitle {
     private NamedTitle title;
     private Settlement settlement;
     private int authority;
+    private Type type;
     private boolean canInvite = false;
     private boolean canKick = false;
     private boolean canClaim = false;
@@ -18,12 +19,18 @@ public class CharterTitle extends NamedTitle {
     private boolean canPromote = false;
     private boolean canDemote = false;
     private boolean canEdit = false;
-    private boolean canDisband = false;
 
-    public CharterTitle(String name, String title, Settlement settlement, int authority) {
+    protected enum Type {
+        LEADER,
+        DEFAULT,
+        NORMAL
+    }
+
+    protected CharterTitle(String name, String title, Settlement settlement, Type type, int authority) {
         super(name, title);
         this.settlement = settlement;
         this.authority = authority;
+        this.type = type;
 
         generatePermissionsFromAuthority(authority);
     }
@@ -33,6 +40,7 @@ public class CharterTitle extends NamedTitle {
         super(defaultCharterTitle.getName(), defaultCharterTitle.getTitleAsString());
         this.settlement = settlement;
         this.authority = defaultCharterTitle.getAuthority();
+        this.type = defaultCharterTitle.getType();
 
         generatePermissionsFromAuthority(authority);
     }
@@ -43,9 +51,19 @@ public class CharterTitle extends NamedTitle {
         return this.authority;
     }
 
-    public boolean isLeader() { return this.authority == 8; }
+    protected Type getType() { return this.type; }
 
-    public boolean isDefault() { return this.equals(this.getSettlement().getDefaultTitle()); }
+    protected static Type parseFromString(String typeAsString) {
+        return switch (typeAsString) {
+            case "LEADER" -> Type.LEADER;
+            case "DEFAULT" -> Type.DEFAULT;
+            default -> Type.NORMAL;
+        };
+    }
+
+    public boolean isLeader() { return this.type == Type.LEADER; }
+
+    public boolean isDefault() { return this.type == Type.DEFAULT; }
 
     public boolean canInvite() {
         return this.canInvite;
@@ -75,10 +93,6 @@ public class CharterTitle extends NamedTitle {
         return this.canEdit;
     }
 
-    public boolean canDisband() {
-        return this.canDisband;
-    }
-
     public void generatePermissionsFromAuthority(int authority) {
 
         if (authority == MAX_AUTHORITY) {  // Leader
@@ -89,7 +103,6 @@ public class CharterTitle extends NamedTitle {
             this.canPromote = true;
             this.canDemote = true;
             this.canEdit = true;
-            this.canDisband = true;
         } else if (authority >= MAX_AUTHORITY / 2) { // Officer, or above
             this.canInvite = true;
             this.canKick = true;
@@ -98,7 +111,6 @@ public class CharterTitle extends NamedTitle {
             this.canPromote = false;
             this.canDemote = false;
             this.canEdit = false;
-            this.canDisband = false;
         } else {
             this.canInvite = false;
             this.canKick = false;
@@ -107,7 +119,6 @@ public class CharterTitle extends NamedTitle {
             this.canPromote = false;
             this.canDemote = false;
             this.canEdit = false;
-            this.canDisband = false;
         }
     }
 
@@ -134,25 +145,29 @@ public class CharterTitle extends NamedTitle {
             case "canEdit":
                 this.canEdit = value;
                 break;
-            case "canDisband":
-                this.canDisband = value;
-                break;
             default:
                 Jade.getPlugin(Jade.class).getLogger().warning("[PlayerTitle::setPermission] Unknown permission key: " + permissionName);
         }
     }
 
+    public void setToDefault() {
+        this.type = Type.DEFAULT;
+    }
+
+    public void setToNormal() {
+        this.type = Type.NORMAL;
+    }
+
     public static CharterTitle fromString(String str, Settlement settlement) {
         String[] parts = str.split(";");
-        CharterTitle title = new CharterTitle(parts[0], parts[1], settlement, Integer.parseInt(parts[2]));
-        title.setPermission("canInvite", Boolean.parseBoolean(parts[3]));
-        title.setPermission("canKick", Boolean.parseBoolean(parts[4]));
-        title.setPermission("canClaim", Boolean.parseBoolean(parts[5]));
-        title.setPermission("canUnclaim", Boolean.parseBoolean(parts[6]));
-        title.setPermission("canPromote", Boolean.parseBoolean(parts[7]));
-        title.setPermission("canDemote", Boolean.parseBoolean(parts[8]));
-        title.setPermission("canEdit", Boolean.parseBoolean(parts[9]));
-        title.setPermission("canDisband", Boolean.parseBoolean(parts[10]));
+        CharterTitle title = new CharterTitle(parts[0], parts[1], settlement, CharterTitle.parseFromString(parts[3]), Integer.parseInt(parts[2]));
+        title.setPermission("canInvite", Boolean.parseBoolean(parts[4]));
+        title.setPermission("canKick", Boolean.parseBoolean(parts[5]));
+        title.setPermission("canClaim", Boolean.parseBoolean(parts[6]));
+        title.setPermission("canUnclaim", Boolean.parseBoolean(parts[7]));
+        title.setPermission("canPromote", Boolean.parseBoolean(parts[8]));
+        title.setPermission("canDemote", Boolean.parseBoolean(parts[9]));
+        title.setPermission("canEdit", Boolean.parseBoolean(parts[10]));
         return title;
     }
 
@@ -171,11 +186,11 @@ public class CharterTitle extends NamedTitle {
                 + ";" + this.canInvite() + ";" + this.canKick()
                 + ";" + this.canClaim() + ";" + this.canUnclaim()
                 + ";" + this.canPromote() + ";" + this.canDemote()
-                + ";" + this.canEdit() + ";" + this.canDisband();
+                + ";" + this.canEdit();
     }
 
     @Override
     public String toString() {
-        return "PlayerTitle{" + this.serialize() + "}";
+        return "CharterTitle{" + this.serialize() + "}";
     }
 }

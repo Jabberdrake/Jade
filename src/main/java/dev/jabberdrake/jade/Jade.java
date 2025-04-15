@@ -13,13 +13,11 @@ import dev.jabberdrake.jade.commands.CharterCommand;
 import dev.jabberdrake.jade.commands.ProfileCommand;
 import dev.jabberdrake.jade.commands.SettlementCommand;
 import dev.jabberdrake.jade.commands.ToggleRoleplayCommand;
-import dev.jabberdrake.jade.handlers.PlayerChatHandler;
-import dev.jabberdrake.jade.handlers.PlayerMoveHandler;
-import dev.jabberdrake.jade.handlers.PlayerSessionHandler;
-import dev.jabberdrake.jade.jade.commands.TitleCommand;
-import dev.jabberdrake.jade.jade.handlers.JadeMenuHandler;
-import dev.jabberdrake.jade.jade.players.PlayerManager;
-import dev.jabberdrake.jade.jade.titles.TitleManager;
+import dev.jabberdrake.jade.database.DatabaseManager;
+import dev.jabberdrake.jade.handlers.*;
+import dev.jabberdrake.jade.commands.TitleCommand;
+import dev.jabberdrake.jade.players.PlayerManager;
+import dev.jabberdrake.jade.titles.TitleManager;
 import dev.jabberdrake.jade.realms.RealmManager;
 import dev.jabberdrake.jade.realms.Settlement;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
@@ -32,27 +30,41 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 public final class Jade extends JavaPlugin {
+    private Jade instance;
     private final Logger logger = this.getLogger();
 
-    private static String gameworldName = "world";
-
-    private Jade instance;
+    public Jade getInstance() {
+        return this.instance;
+    }
 
     @Override
     public void onEnable() {
-        instance = this;
+        this.instance = this;
         logger.info("Preparing to take over the world!");
+
+        if (!getDataFolder().exists()) {
+            logger.info("[Jade::onEnable] Data folder not found! Creating a new one...");
+            getDataFolder().mkdirs();
+        }
+
+
+
+        saveResource(JadeSettings.FILENAME, false);
+        logger.info("[Jade::onEnable] Loading settings...");
+        JadeSettings.load(this);
+
 
         registerCommands();
         registerHandlers();
 
+        DatabaseManager.initialize(this);
         RealmManager.initialize();
         TitleManager.initialize();
         PlayerManager.initialize();
 
-        logger.info("[Charter::onEnable] Looking for dependencies...");
+        logger.info("[Jade::onEnable] Looking for dependencies...");
         BlueMapAPI.onEnable(api -> {
-            logger.info("[Charter::onEnable] Bluemap found! Integrating...");
+            logger.info("[Jade::onEnable] Bluemap found! Integrating...");
 
             // sync realm claims every minute
             getServer().getScheduler().runTaskTimerAsynchronously(this, () -> syncRealms(api), 0, 60 * 20);
@@ -64,6 +76,7 @@ public final class Jade extends JavaPlugin {
         // Plugin shutdown logic
         logger.info("I'll be back...");
 
+        DatabaseManager.shutdown();
         RealmManager.shutdown();
         TitleManager.shutdown();
         PlayerManager.shutdown();
@@ -80,10 +93,13 @@ public final class Jade extends JavaPlugin {
     }
 
     private void registerHandlers() {
+        this.getServer().getPluginManager().registerEvents(new JadeMenuHandler(), this);
+
         this.getServer().getPluginManager().registerEvents(new PlayerSessionHandler(), this);
         this.getServer().getPluginManager().registerEvents(new PlayerMoveHandler(), this);
         this.getServer().getPluginManager().registerEvents(new PlayerChatHandler(), this);
-        this.getServer().getPluginManager().registerEvents(new JadeMenuHandler(), this);
+
+        this.getServer().getPluginManager().registerEvents(new BlockFadeHandler(), this);
     }
 
     private void syncRealms(BlueMapAPI api) {
@@ -93,7 +109,7 @@ public final class Jade extends JavaPlugin {
             blueMapWorlds.put(worldName, world);
         }
 
-        BlueMapWorld gameworld = blueMapWorlds.get(Jade.gameworldName);
+        BlueMapWorld gameworld = blueMapWorlds.get(JadeSettings.gameworld);
         Collection<BlueMapMap> blueMapMaps = gameworld.getMaps();
 
         MarkerSet settlementSet = MarkerSet.builder().label("Settlements").build();

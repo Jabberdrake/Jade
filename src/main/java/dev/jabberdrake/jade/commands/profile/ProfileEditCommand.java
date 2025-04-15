@@ -7,7 +7,7 @@ import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import dev.jabberdrake.jade.Jade;
-import dev.jabberdrake.jade.jade.players.PlayerManager;
+import dev.jabberdrake.jade.players.PlayerManager;
 import dev.jabberdrake.jade.utils.TextUtils;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
@@ -42,7 +42,7 @@ public class ProfileEditCommand {
 
         switch (attr) {
             case "roleplayName":
-                PlayerManager.fetchProfile(player.getUniqueId()).setRoleplayName(value);
+                PlayerManager.asJadePlayer(player.getUniqueId()).setRoleplayName(value);
                 player.sendMessage(TextUtils.composeSuccessPrefix()
                         .append(TextUtils.composeSuccessText("Your roleplay name is now \""))
                         .append(Component.text(value, TextUtils.LIGHT_BRASS))
