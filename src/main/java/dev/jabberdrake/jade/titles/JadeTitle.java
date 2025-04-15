@@ -30,7 +30,7 @@ public class JadeTitle extends NamedTitle {
         this.icon = icon;
         if (this.owner != null) {
             this.users = new ArrayList<>();
-            this.addUser(owner);
+            this.users.add(owner);
         } else {
             this.users = null;
         }
@@ -159,8 +159,7 @@ public class JadeTitle extends NamedTitle {
     public boolean equals(Object object) {
         if (object instanceof JadeTitle) {
             JadeTitle other = (JadeTitle) object;
-            return this.getName().equals(other.getName())
-                    && this.getOwner().equals(other.getOwner());
+            return this.getName().equals(other.getName());
         } else return false;
     }
 

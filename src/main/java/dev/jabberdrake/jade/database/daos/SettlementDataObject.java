@@ -14,7 +14,9 @@ public class SettlementDataObject implements DatabaseObject<Settlement, Integer>
     private Database database;
 
     public SettlementDataObject(Jade plugin, Database database) {
+        this.plugin = plugin;
         this.database = database;
+
         try {
             initialize();
         } catch (SQLException e) {

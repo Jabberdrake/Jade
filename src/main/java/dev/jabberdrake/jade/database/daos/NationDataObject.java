@@ -14,7 +14,9 @@ public class NationDataObject implements DatabaseObject<Nation, Integer> {
     private Database database;
 
     public NationDataObject(Jade plugin, Database database) {
+        this.plugin = plugin;
         this.database = database;
+
         try {
             initialize();
         } catch (SQLException e) {

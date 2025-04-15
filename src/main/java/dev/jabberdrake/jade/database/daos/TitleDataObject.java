@@ -18,7 +18,9 @@ public class TitleDataObject implements DatabaseObject<JadeTitle, Integer> {
     private Database database;
 
     public TitleDataObject(Jade plugin, Database database) {
+        this.plugin = plugin;
         this.database = database;
+
         try {
             initialize();
         } catch (SQLException e) {
@@ -57,13 +59,13 @@ public class TitleDataObject implements DatabaseObject<JadeTitle, Integer> {
 
         // Fetch user list
         if (title[0] != null) {
-            String sql2 = "SELECT user_id FROM title_users WHERE id = ?;";
+            String sql2 = "SELECT player_id FROM title_users WHERE title_id = ?;";
             try {
                 database.query(sql2, stmt -> {
                     stmt.setInt(1, id);
                 }, resultSet -> {
                     while (resultSet.next()) {
-                        String userID = resultSet.getString("user_id");
+                        String userID = resultSet.getString("player_id");
                         title[0].getUserList().add(UUID.fromString(userID));
                     }
                 });
@@ -85,7 +87,7 @@ public class TitleDataObject implements DatabaseObject<JadeTitle, Integer> {
     public void save(JadeTitle jadeTitle) {
         String sql = """
                 INSERT INTO titles (id, name, title, owner_id, sender_color, icon)
-                    VALUES (?, ?, ?, ?, ?)
+                    VALUES (?, ?, ?, ?, ?, ?)
                     ON CONFLICT DO UPDATE SET
                         name = excluded.name,
                         title = excluded.title,
@@ -104,6 +106,7 @@ public class TitleDataObject implements DatabaseObject<JadeTitle, Integer> {
                     stmt.setString(4, jadeTitle.getOwner().toString());
                 }
                 stmt.setString(5, jadeTitle.getSenderColor().asHexString());
+                stmt.setString(6, jadeTitle.getIconAsString());
             });
         } catch (SQLException e) {
             plugin.getLogger().warning("[TitleDataObject::save] Caught SQLException while saving title object: ");
@@ -184,71 +187,51 @@ public class TitleDataObject implements DatabaseObject<JadeTitle, Integer> {
         }
     }
 
-    public List<JadeTitle> fetchAllTitlesOwnedBy(UUID ownerID) {
-        List<JadeTitle> titlesList = new ArrayList<>();
-        String sql = "SELECT id, name, title, sender_color, icon FROM titles WHERE owner_id = ?;";
+    public List<Integer> fetchAllTitlesOwnedBy(UUID ownerID) {
+        List<Integer> titleIDList = new ArrayList<>();
+        String sql = "SELECT id FROM titles WHERE owner_id = ?;";
         try {
             database.query(sql, stmt -> {
                 stmt.setString(1, ownerID.toString());
             }, resultSet -> {
                 while (resultSet.next()) {
-                    int id = resultSet.getInt("id");
-                    String name = resultSet.getString("name");
-                    String serializedTitle = resultSet.getString("title");
-                    String senderColor = resultSet.getString("sender_color");
-                    String icon = resultSet.getString("icon");
-
-                    JadeTitle title = new JadeTitle(id, name, serializedTitle, ownerID, TextColor.fromHexString(senderColor), icon);
-                    titlesList.add(title);
+                    titleIDList.add(resultSet.getInt("id"));
                 }
             });
         } catch (SQLException e) {
             plugin.getLogger().warning("[TitleDataObject::fetchAllTitlesOwnedBy] Caught SQLException while fetching titles: ");
             e.printStackTrace();
         }
-        return titlesList;
+        return titleIDList;
     }
 
-    public List<JadeTitle> fetchAllTitlesAvailableTo(UUID playerID) {
-        List<JadeTitle> titlesList = new ArrayList<>();
+    public List<Integer> fetchAllTitlesAvailableTo(UUID playerID) {
+        List<Integer> titleIDList = new ArrayList<>();
         String sql = "SELECT title_id FROM title_users WHERE player_id = ?;";
         try {
             database.query(sql, stmt -> {
                 stmt.setString(1, playerID.toString());
             }, resultSet -> {
                 while (resultSet.next()) {
-                    int title_id = resultSet.getInt("title_id");
-                    JadeTitle title = fetch(title_id);
-                    if (title != null) {
-                        titlesList.add(title);
-                    } else {
-                        plugin.getLogger().warning("[TitleDataObject::fetchAllTitlesAvailableTo] Null title referenced in title_users: " + title_id);
-                    }
+                    titleIDList.add(resultSet.getInt("title_id"));
                 }
             });
         } catch (SQLException e) {
             plugin.getLogger().warning("[TitleDataObject::fetchAllTitlesOwnedBy] Caught SQLException while fetching titles: ");
             e.printStackTrace();
         }
-        return titlesList;
+        return titleIDList;
     }
 
-    public List<JadeTitle> fetchAllUniversalTitles() {
-        List<JadeTitle> titlesList = new ArrayList<>();
-        String sql = "SELECT id, name, title, sender_color, icon FROM titles WHERE owner_id = ?;";
+    public List<Integer> fetchAllUniversalTitles() {
+        List<Integer> titleIDList = new ArrayList<>();
+        String sql = "SELECT id FROM titles WHERE owner_id = ?;";
         try {
             database.query(sql, stmt -> {
                 stmt.setString(1, "universal");
             }, resultSet -> {
                 while (resultSet.next()) {
-                    int id = resultSet.getInt("id");
-                    String name = resultSet.getString("name");
-                    String serializedTitle = resultSet.getString("title");
-                    String senderColor = resultSet.getString("sender_color");
-                    String icon = resultSet.getString("icon");
-
-                    JadeTitle title = new JadeTitle(id, name, serializedTitle, null, TextColor.fromHexString(senderColor), icon);
-                    titlesList.add(title);
+                    titleIDList.add(resultSet.getInt("id"));
                 }
             });
         } catch (SQLException e) {
@@ -256,7 +239,7 @@ public class TitleDataObject implements DatabaseObject<JadeTitle, Integer> {
             e.printStackTrace();
         }
 
-        return titlesList;
+        return titleIDList;
     }
 
     public boolean checkForUniqueName(String name) {

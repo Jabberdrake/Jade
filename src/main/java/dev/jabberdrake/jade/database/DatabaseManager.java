@@ -62,7 +62,7 @@ public class DatabaseManager {
 
     // DATA OBJECT GETTERS
     public static PlayerDataObject getPlayerDao() {
-        return (PlayerDataObject) dataObjectRegistry.get(PlayerDataObject.class);
+        return (PlayerDataObject) dataObjectRegistry.get(JadePlayer.class);
     }
 
     public static TitleDataObject getTitleDao() {
@@ -103,15 +103,15 @@ public class DatabaseManager {
         getTitleDao().makeTitleUniversal(title.getId());
     }
 
-    public static List<JadeTitle> fetchAllTitlesOwnedBy(UUID ownerID) {
+    public static List<Integer> fetchAllTitlesOwnedBy(UUID ownerID) {
         return getTitleDao().fetchAllTitlesOwnedBy(ownerID);
     }
 
-    public static List<JadeTitle> fetchAllTitlesAvailableTo(UUID playerID) {
+    public static List<Integer> fetchAllTitlesAvailableTo(UUID playerID) {
         return getTitleDao().fetchAllTitlesAvailableTo(playerID);
     }
 
-    public static List<JadeTitle> fetchAllUniversalTitles() {
+    public static List<Integer> fetchAllUniversalTitles() {
         return getTitleDao().fetchAllUniversalTitles();
     }
 

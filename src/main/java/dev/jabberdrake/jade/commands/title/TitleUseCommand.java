@@ -34,6 +34,11 @@ public class TitleUseCommand {
             return Command.SINGLE_SUCCESS;
         }
 
+        if (jadePlayer.getTitleInUse().equals(title)) {
+            player.sendMessage(TextUtils.composePlainErrorMessage("You are already using that title!"));
+            return Command.SINGLE_SUCCESS;
+        }
+
         jadePlayer.setTitleInUse(title);
 
         player.sendMessage(TextUtils.composePlainInfoMessage("Now using the ")

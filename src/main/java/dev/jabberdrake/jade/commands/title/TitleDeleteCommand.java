@@ -40,7 +40,7 @@ public class TitleDeleteCommand {
 
         player.sendMessage(TextUtils.composePlainSuccessMessage("Successfully deleted the ")
                 .append(title.getTitleAsComponent())
-                .append(TextUtils.composePlainSuccessMessage(" title!"))
+                .append(TextUtils.composeSuccessText(" title!"))
         );
 
 

@@ -14,6 +14,5 @@ public class DefaultJadeTitle extends JadeTitle {
 
     private DefaultJadeTitle(final String name, final String title) {
         super(1, name, title, null, NamedTextColor.WHITE, "minecraft:wheat");
-        this.makeUniversal();
     }
 }

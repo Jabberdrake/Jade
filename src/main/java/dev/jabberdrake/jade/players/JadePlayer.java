@@ -1,10 +1,12 @@
 package dev.jabberdrake.jade.players;
 
 import dev.jabberdrake.jade.database.DatabaseManager;
+import dev.jabberdrake.jade.database.daos.TitleDataObject;
 import dev.jabberdrake.jade.realms.RealmManager;
 import dev.jabberdrake.jade.realms.Settlement;
 import dev.jabberdrake.jade.titles.DefaultJadeTitle;
 import dev.jabberdrake.jade.titles.JadeTitle;
+import dev.jabberdrake.jade.titles.TitleManager;
 import org.bukkit.Bukkit;
 
 import java.util.ArrayList;
@@ -58,12 +60,11 @@ public class JadePlayer {
     }
 
     public List<JadeTitle> getAvailableTitles() {
-        return Stream.concat(DatabaseManager.fetchAllTitlesAvailableTo(this.uuid).stream(), DatabaseManager.fetchAllUniversalTitles()).toList();
-        return DatabaseManager.fetchAllTitlesAvailableTo(this.uuid);
+        return Stream.concat(TitleManager.getAllTitlesAvailableTo(this.uuid).stream(), TitleManager.getAllUniversalTitles().stream()).toList();
     }
 
     public List<JadeTitle> getOwnedTitles() {
-        return DatabaseManager.fetchAllTitlesOwnedBy(this.uuid);
+        return TitleManager.getAllTitlesOwnedBy(this.uuid);
     }
 
     public JadeTitle getTitleFromName(String titleName) {

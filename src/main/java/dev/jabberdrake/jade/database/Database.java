@@ -59,6 +59,7 @@ public class Database {
     @SuppressWarnings("SqlSourceToSinkFlow")
     public long create(String sql, StatementCallback callback) throws SQLException {
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            callback.accept(stmt);
             stmt.executeUpdate();
             ResultSet keys = stmt.getGeneratedKeys();
             if (keys.next()) {

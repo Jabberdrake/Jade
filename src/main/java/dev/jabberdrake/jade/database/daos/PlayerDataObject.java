@@ -18,7 +18,9 @@ public class PlayerDataObject implements DatabaseObject<JadePlayer, UUID> {
     private Database database;
 
     public PlayerDataObject(Jade plugin, Database database) {
+        this.plugin = plugin;
         this.database = database;
+
         try {
             initialize();
         } catch (SQLException e) {
