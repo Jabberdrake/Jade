@@ -169,7 +169,7 @@ public class SettlementClaimCommand {
                     .append(TextUtils.composeErrorText("!"))
             );
             return false;
-        } else if (!settlement.getTitleFromMember(player.getUniqueId()).canClaim()) {
+        } else if (!settlement.getRoleFromMember(player.getUniqueId()).canClaim()) {
             player.sendMessage(TextUtils.composePlainErrorMessage("You are not allowed to claim chunks for ")
                     .append(settlement.getDisplayName())
                     .append(TextUtils.composeErrorText("!"))

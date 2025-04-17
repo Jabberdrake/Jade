@@ -8,7 +8,7 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import dev.jabberdrake.jade.players.PlayerManager;
 import dev.jabberdrake.jade.titles.NamedTitle;
-import dev.jabberdrake.jade.realms.CharterTitle;
+import dev.jabberdrake.jade.realms.SettlementRole;
 import dev.jabberdrake.jade.realms.Settlement;
 import dev.jabberdrake.jade.utils.TextUtils;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
@@ -53,15 +53,15 @@ public class SettlementDemoteCommand {
             return Command.SINGLE_SUCCESS;
         }
 
-        CharterTitle senderTitle = focus.getTitleFromMember(sender.getUniqueId());
+        SettlementRole senderTitle = focus.getRoleFromMember(sender.getUniqueId());
 
-        CharterTitle fromTitle = focus.getTitleFromMember(targetUUID);
+        SettlementRole fromTitle = focus.getRoleFromMember(targetUUID);
         if (fromTitle.getAuthority() >= senderTitle.getAuthority()) {
             sender.sendMessage(TextUtils.composePlainErrorMessage("Target player is of equal or higher authority than you!."));
             return Command.SINGLE_SUCCESS;
         }
 
-        CharterTitle toTitle = focus.getTitleBelow(fromTitle);
+        SettlementRole toTitle = focus.getRoleBelow(fromTitle);
         focus.setPlayerTitle(targetUUID, toTitle);
 
         sender.sendMessage(TextUtils.composeSuccessText("You have demoted ")
@@ -93,9 +93,9 @@ public class SettlementDemoteCommand {
             return Command.SINGLE_SUCCESS;
         }
 
-        CharterTitle senderTitle = focus.getTitleFromMember(sender.getUniqueId());
+        SettlementRole senderTitle = focus.getRoleFromMember(sender.getUniqueId());
 
-        CharterTitle fromTitle = focus.getTitleFromMember(targetUUID);
+        SettlementRole fromTitle = focus.getRoleFromMember(targetUUID);
         if (fromTitle.getAuthority() >= senderTitle.getAuthority()) {
             sender.sendMessage(TextUtils.composePlainErrorMessage("Target player is of equal or higher authority than you!"));
             return Command.SINGLE_SUCCESS;
@@ -103,7 +103,7 @@ public class SettlementDemoteCommand {
 
         String titleArgument = StringArgumentType.getString(context, "title");
 
-        CharterTitle toTitle = focus.getTitleFromName(titleArgument);
+        SettlementRole toTitle = focus.getRoleFromName(titleArgument);
         if (toTitle == null) {
             sender.sendMessage(TextUtils.composePlainErrorMessage("Could not find specified title!"));
             return Command.SINGLE_SUCCESS;
@@ -138,7 +138,7 @@ public class SettlementDemoteCommand {
                     .append(TextUtils.composeErrorText("!"))
             );
             return false;
-        } else if (!settlement.getTitleFromMember(player.getUniqueId()).canDemote()) {
+        } else if (!settlement.getRoleFromMember(player.getUniqueId()).canDemote()) {
             player.sendMessage(TextUtils.composePlainErrorMessage("You are not allowed to demote members in ")
                     .append(settlement.getDisplayName())
                     .append(TextUtils.composeErrorText("!"))
@@ -154,8 +154,8 @@ public class SettlementDemoteCommand {
         Settlement focus = PlayerManager.asJadePlayer(player.getUniqueId()).getFocusSettlement();
         if (!focus.containsPlayer(player.getUniqueId())) { return builder.buildFuture(); }
 
-        CharterTitle playerTitle = focus.getTitleFromMember(player.getUniqueId());
-        focus.getTitles().stream()
+        SettlementRole playerTitle = focus.getRoleFromMember(player.getUniqueId());
+        focus.getRoles().stream()
                 .filter(title -> title.getAuthority() < playerTitle.getAuthority())
                 .map(NamedTitle::getName)
                 .filter(entry -> entry.toLowerCase().startsWith(builder.getRemainingLowerCase()))

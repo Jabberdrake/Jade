@@ -4,7 +4,7 @@ import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import dev.jabberdrake.jade.players.PlayerManager;
-import dev.jabberdrake.jade.realms.CharterTitle;
+import dev.jabberdrake.jade.realms.SettlementRole;
 import dev.jabberdrake.jade.realms.RealmManager;
 import dev.jabberdrake.jade.realms.Settlement;
 import dev.jabberdrake.jade.utils.TextUtils;
@@ -24,7 +24,7 @@ public class SettlementDisbandCommand {
         Player player = (Player) context.getSource().getSender();
         Settlement focus = PlayerManager.asJadePlayer(player.getUniqueId()).getFocusSettlement();
 
-        CharterTitle title = focus.getTitleFromMember(player.getUniqueId());
+        SettlementRole title = focus.getRoleFromMember(player.getUniqueId());
         if (title == null) {
             player.sendMessage(TextUtils.composePlainErrorMessage("Could not find a matching title for command sender. Please report this to a developer!"));
             return Command.SINGLE_SUCCESS;

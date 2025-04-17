@@ -32,7 +32,7 @@ public class SettlementJoinCommand {
             return Command.SINGLE_SUCCESS;
         }
 
-        inviter.addMember(player.getUniqueId(), inviter.getDefaultTitle());
+        inviter.addMember(player.getUniqueId(), inviter.getDefaultRole());
         PlayerManager.asJadePlayer(player.getUniqueId()).addSettlement(inviter);
 
         player.sendMessage(TextUtils.composeSuccessPrefix()
@@ -59,7 +59,7 @@ public class SettlementJoinCommand {
             );
         }
 
-        stmArg.addMember(player.getUniqueId(), stmArg.getDefaultTitle());
+        stmArg.addMember(player.getUniqueId(), stmArg.getDefaultRole());
         PlayerManager.asJadePlayer(player.getUniqueId()).addSettlement(stmArg);
         RealmManager.clearInviteToSettlement(player);
 

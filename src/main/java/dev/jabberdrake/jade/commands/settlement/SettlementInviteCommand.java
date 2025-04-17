@@ -6,7 +6,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import dev.jabberdrake.jade.commands.CommonArgumentSuggestions;
 import dev.jabberdrake.jade.players.PlayerManager;
-import dev.jabberdrake.jade.realms.CharterTitle;
+import dev.jabberdrake.jade.realms.SettlementRole;
 import dev.jabberdrake.jade.realms.RealmManager;
 import dev.jabberdrake.jade.realms.Settlement;
 import dev.jabberdrake.jade.utils.TextUtils;
@@ -34,7 +34,7 @@ public class SettlementInviteCommand {
 
         if (!performBasicChecks(player, focus)) { return Command.SINGLE_SUCCESS; }
 
-        CharterTitle senderTitle = focus.getTitleFromMember(player.getUniqueId());
+        SettlementRole senderTitle = focus.getRoleFromMember(player.getUniqueId());
         if (senderTitle == null) {
             player.sendMessage(TextUtils.composePlainErrorMessage("Could not find a matching title for command sender. Please report this to a developer!"));
             return Command.SINGLE_SUCCESS;

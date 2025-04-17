@@ -6,7 +6,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import dev.jabberdrake.jade.players.JadePlayer;
 import dev.jabberdrake.jade.players.PlayerManager;
-import dev.jabberdrake.jade.realms.CharterTitle;
+import dev.jabberdrake.jade.realms.SettlementRole;
 import dev.jabberdrake.jade.realms.Settlement;
 import dev.jabberdrake.jade.utils.TextUtils;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
@@ -33,7 +33,7 @@ public class SettlementKickCommand {
 
         if (!performBasicChecks(player, focus)) { return Command.SINGLE_SUCCESS; }
 
-        CharterTitle senderTitle = focus.getTitleFromMember(player.getUniqueId());
+        SettlementRole senderTitle = focus.getRoleFromMember(player.getUniqueId());
         if (senderTitle == null) {
             player.sendMessage(TextUtils.composePlainErrorMessage("Could not find a matching title for command sender. Please report this to a developer!"));
             return Command.SINGLE_SUCCESS;
@@ -45,7 +45,7 @@ public class SettlementKickCommand {
         String targetName = StringArgumentType.getString(context, "player");
         Player target = Bukkit.getPlayer(targetName);
         UUID targetUUID = target.getUniqueId();
-        CharterTitle charterTitle = focus.getTitleFromMember(targetUUID);
+        SettlementRole settlementRole = focus.getRoleFromMember(targetUUID);
         if (Bukkit.getPlayer(targetName) == null) {
             player.sendMessage(TextUtils.composePlainErrorMessage("Could not find the specified player."));
             return Command.SINGLE_SUCCESS;
@@ -55,7 +55,7 @@ public class SettlementKickCommand {
         } else if (!focus.containsPlayer(targetUUID)) {
             player.sendMessage(TextUtils.composePlainErrorMessage("The specified player is not a member of your focus settlement."));
             return Command.SINGLE_SUCCESS;
-        } else if (charterTitle.getAuthority() >= senderTitle.getAuthority()) {
+        } else if (settlementRole.getAuthority() >= senderTitle.getAuthority()) {
             player.sendMessage(TextUtils.composePlainErrorMessage("The specified player has a higher authority title than you!."));
             return Command.SINGLE_SUCCESS;
         }

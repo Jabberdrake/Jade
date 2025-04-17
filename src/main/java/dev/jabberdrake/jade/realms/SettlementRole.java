@@ -2,13 +2,17 @@ package dev.jabberdrake.jade.realms;
 
 import dev.jabberdrake.jade.Jade;
 import dev.jabberdrake.jade.titles.NamedTitle;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.TextColor;
 
-public class CharterTitle extends NamedTitle {
+public class SettlementRole {
 
     public static final int MIN_AUTHORITY = 0;
     public static final int MAX_AUTHORITY = 8;
 
-    private NamedTitle title;
+    private int id;
+    private String name;
+    private TextColor color;
     private Settlement settlement;
     private int authority;
     private Type type;
@@ -20,14 +24,36 @@ public class CharterTitle extends NamedTitle {
     private boolean canDemote = false;
     private boolean canEdit = false;
 
-    protected enum Type {
+    public enum Type {
         LEADER,
         DEFAULT,
         NORMAL
     }
 
-    protected CharterTitle(String name, String title, Settlement settlement, Type type, int authority) {
-        super(name, title);
+    // Used by DatabaseManager when composing runtime object from persistent data
+    public SettlementRole(int id, String name, TextColor color, Settlement settlement, int authority, Type type,
+        boolean canInvite, boolean canKick, boolean canClaim, boolean canUnclaim, boolean canPromote, boolean canDemote, boolean canEdit) {
+        this.id = id;
+        this.name = name;
+        this.color = color;
+        this.settlement = settlement;
+        this.authority = authority;
+        this.type = type;
+
+        // I should probably see if I can make this a bit more elegant...
+        this.canInvite = canInvite;
+        this.canKick = canKick;
+        this.canClaim = canClaim;
+        this.canUnclaim = canUnclaim;
+        this.canPromote = canPromote;
+        this.canDemote = canDemote;
+        this.canEdit = canEdit;
+    }
+
+    // Used by DefaultSettlementRole to generate preset roles
+    protected SettlementRole(String name, TextColor color, Settlement settlement, int authority, Type type) {
+        this.name = name;
+        this.color = color;
         this.settlement = settlement;
         this.authority = authority;
         this.type = type;
@@ -35,14 +61,42 @@ public class CharterTitle extends NamedTitle {
         generatePermissionsFromAuthority(authority);
     }
 
-    // used during settlement creation
-    public CharterTitle(Settlement settlement, DefaultCharterTitle defaultCharterTitle) {
+    /*
+    public SettlementRole(Settlement settlement, DefaultSettlementRole defaultSettlementRole) {
         super(defaultCharterTitle.getName(), defaultCharterTitle.getTitleAsString());
         this.settlement = settlement;
         this.authority = defaultCharterTitle.getAuthority();
         this.type = defaultCharterTitle.getType();
 
         generatePermissionsFromAuthority(authority);
+    }*/
+
+    public int getId() {
+        return this.id;
+    }
+
+    public String getName() {
+        return this.name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public TextColor getColor() {
+        return this.color;
+    }
+
+    public void setColor(TextColor color) {
+        this.color = color;
+    }
+
+    public String getDisplayAsString() {
+        return "<" + this.getColor().asHexString() + ">" + this.getName();
+    }
+
+    public Component getDisplayAsComponent() {
+        return Component.text(this.getName(), this.getColor());
     }
 
     public Settlement getSettlement() { return this.settlement; }
@@ -51,9 +105,17 @@ public class CharterTitle extends NamedTitle {
         return this.authority;
     }
 
-    protected Type getType() { return this.type; }
+    public Type getType() { return this.type; }
 
-    protected static Type parseFromString(String typeAsString) {
+    public String getTypeAsString() {
+        return switch (this.type) {
+            case LEADER -> "LEADER";
+            case DEFAULT -> "DEFAULT";
+            default -> "NORMAL";
+        };
+    }
+
+    public static Type parseTypeFromString(String typeAsString) {
         return switch (typeAsString) {
             case "LEADER" -> Type.LEADER;
             case "DEFAULT" -> Type.DEFAULT;
@@ -146,7 +208,7 @@ public class CharterTitle extends NamedTitle {
                 this.canEdit = value;
                 break;
             default:
-                Jade.getPlugin(Jade.class).getLogger().warning("[PlayerTitle::setPermission] Unknown permission key: " + permissionName);
+                Jade.getPlugin(Jade.class).getLogger().warning("[SettlementRole::setPermission] Unknown permission key: " + permissionName);
         }
     }
 
@@ -158,39 +220,17 @@ public class CharterTitle extends NamedTitle {
         this.type = Type.NORMAL;
     }
 
-    public static CharterTitle fromString(String str, Settlement settlement) {
-        String[] parts = str.split(";");
-        CharterTitle title = new CharterTitle(parts[0], parts[1], settlement, CharterTitle.parseFromString(parts[3]), Integer.parseInt(parts[2]));
-        title.setPermission("canInvite", Boolean.parseBoolean(parts[4]));
-        title.setPermission("canKick", Boolean.parseBoolean(parts[5]));
-        title.setPermission("canClaim", Boolean.parseBoolean(parts[6]));
-        title.setPermission("canUnclaim", Boolean.parseBoolean(parts[7]));
-        title.setPermission("canPromote", Boolean.parseBoolean(parts[8]));
-        title.setPermission("canDemote", Boolean.parseBoolean(parts[9]));
-        title.setPermission("canEdit", Boolean.parseBoolean(parts[10]));
-        return title;
-    }
-
     @Override
     public boolean equals(Object object) {
-        if (object instanceof CharterTitle) {
-            CharterTitle other = (CharterTitle) object;
+        if (object instanceof SettlementRole) {
+            SettlementRole other = (SettlementRole) object;
             return this.getName().equals(other.getName()) &&
                     this.getSettlement().getName().equals(other.getSettlement().getName());
         } else return false;
     }
 
     @Override
-    public String serialize() {
-        return this.getName() + ";" + this.getTitleAsString() + ";" + this.getAuthority()
-                + ";" + this.canInvite() + ";" + this.canKick()
-                + ";" + this.canClaim() + ";" + this.canUnclaim()
-                + ";" + this.canPromote() + ";" + this.canDemote()
-                + ";" + this.canEdit();
-    }
-
-    @Override
     public String toString() {
-        return "CharterTitle{" + this.serialize() + "}";
+        return "SettlementRole{" + this.getName() + "@" + this.getSettlement().getName() + "}";
     }
 }

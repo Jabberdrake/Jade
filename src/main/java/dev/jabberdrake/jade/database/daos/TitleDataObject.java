@@ -85,7 +85,8 @@ public class TitleDataObject implements DatabaseObject<JadeTitle, Integer> {
 
     @Override
     public void save(JadeTitle jadeTitle) {
-        String sql = """
+        /*
+                """
                 INSERT INTO titles (id, name, title, owner_id, sender_color, icon)
                     VALUES (?, ?, ?, ?, ?, ?)
                     ON CONFLICT DO UPDATE SET
@@ -94,19 +95,21 @@ public class TitleDataObject implements DatabaseObject<JadeTitle, Integer> {
                         owner_id = excluded.owner_id,
                         sender_color = excluded.sender_color,
                         icon = excluded.icon;
-                """;
+                """
+         */
+        String sql = "UPDATE titles SET name = ?, title = ?, owner_id = ?, sender_color = ?, icon = ? WHERE id = ?";
         try {
             database.execute(sql, stmt -> {
-                stmt.setInt(1, jadeTitle.getId());
-                stmt.setString(2, jadeTitle.getName());
-                stmt.setString(3, jadeTitle.getTitleAsString());
+                stmt.setString(1, jadeTitle.getName());
+                stmt.setString(2, jadeTitle.getTitleAsString());
                 if (jadeTitle.isUniversal()) {
-                    stmt.setString(4, "universal");
+                    stmt.setString(3, "universal");
                 } else {
-                    stmt.setString(4, jadeTitle.getOwner().toString());
+                    stmt.setString(3, jadeTitle.getOwner().toString());
                 }
-                stmt.setString(5, jadeTitle.getSenderColor().asHexString());
-                stmt.setString(6, jadeTitle.getIconAsString());
+                stmt.setString(4, jadeTitle.getSenderColor().asHexString());
+                stmt.setString(5, jadeTitle.getIconAsString());
+                stmt.setInt(6, jadeTitle.getId());
             });
         } catch (SQLException e) {
             plugin.getLogger().warning("[TitleDataObject::save] Caught SQLException while saving title object: ");
@@ -134,7 +137,7 @@ public class TitleDataObject implements DatabaseObject<JadeTitle, Integer> {
                 stmt.setString(5, title.getIconAsString());
             }));
         } catch (SQLException e) {
-            plugin.getLogger().warning("[TitleDataObject::create] Caught SQLException while creating title object: ");
+            plugin.getLogger().warning("[TitleDataObject::create] Caught SQLException while creating title object for " + title.getName() + ": ");
             e.printStackTrace();
         }
         return id[0];
@@ -149,9 +152,12 @@ public class TitleDataObject implements DatabaseObject<JadeTitle, Integer> {
                 stmt.setInt(1, id);
             });
         } catch (SQLException e) {
-            plugin.getLogger().warning("[TitleDataObject::delete] Caught SQLException while deleting title object: ");
+            plugin.getLogger().warning("[TitleDataObject::delete] Caught SQLException while deleting title object for ID= " + id + ": ");
             e.printStackTrace();
         }
+
+
+        // NOTE: This should, in theory, be obsolete, due to the ON CASCADE effect. I should test it and see if it is.
 
         // Deleting user list, if applicable
         String sql2 = "DELETE FROM title_users WHERE title_id = ?;";

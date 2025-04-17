@@ -1,58 +1,70 @@
 package dev.jabberdrake.jade.realms;
 
-import dev.jabberdrake.jade.Jade;
 import dev.jabberdrake.jade.utils.TextUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.*;
 
 public class Settlement {
 
-    private static final String DEFAULT_NAME_DECORATION = "<gold><bold> ";
+    private static final String DEFAULT_NAME_DECORATION = "<gold><bold>";
     private static final String DEFAULT_DESC = "<green>Settlement of <gold>";
-    private static final TextColor DEFAULT_COLOR = TextUtils.ZORBA;
+    private static final TextColor DEFAULT_MAP_COLOR = TextUtils.ZORBA;
 
     private int id;
     private String name;
     private String displayName;
     private String description;
     private TextColor mapColor;
+    private String icon;
+    private long creationTime;
     private Nation nation;
-    private List<CharterTitle> titles;
-    private Map<UUID, CharterTitle> population;
+    private List<SettlementRole> roles;
+    private Map<UUID, SettlementRole> population;
     private Set<ChunkAnchor> territory;
 
-    public Settlement(int id, String name, String displayName, String description, TextColor mapColor, Nation nation, List<CharterTitle> titles, Map<UUID, CharterTitle> population, Set<ChunkAnchor> territory) {
+    // Used by DatabaseManager when composing runtime object from persistent data
+    public Settlement(int id, String name, String displayName, String description, TextColor mapColor, String icon, long creationTime, Nation nation) {
         this.id = id;
         this.name = name;
         this.displayName = displayName;
         this.description = description;
         this.mapColor = mapColor;
+        this.icon = icon;
+        this.creationTime = creationTime;
         this.nation = nation;
-        this.titles = titles;
-        this.population = population;
-        this.territory = territory;
+        this.roles = new ArrayList<>();
+        this.population = new HashMap<>();
+        this.territory = new HashSet<>();
     }
 
+    // Used by RealmManager when creating new settlement
     public Settlement(String name, Player leader, ChunkAnchor startingChunk) {
-        this.id = RealmManager.incrementSettlementCount();
         this.name = name;
         this.displayName = DEFAULT_NAME_DECORATION + name;
         this.description = DEFAULT_DESC + leader.getName();
-        this.mapColor = DEFAULT_COLOR;
+        this.mapColor = DEFAULT_MAP_COLOR;
         this.nation = null;
+        this.icon = "minecraft:oak_planks";
+        this.creationTime = System.currentTimeMillis() / 1000L;
 
-        this.titles = new ArrayList<>();
-        titles.add(DefaultCharterTitle.leader(this));
-        titles.add(DefaultCharterTitle.officer(this));
-        titles.add(DefaultCharterTitle.peasant(this));
+        this.id = RealmManager.incrementSettlementCount(); //TODO
+
+        this.roles = new ArrayList<>();
+        roles.add(DefaultSettlementRole.leader(this));
+        roles.add(DefaultSettlementRole.officer(this));
+        roles.add(DefaultSettlementRole.peasant(this));
 
         this.population = new HashMap<>();
-        population.put(leader.getUniqueId(), titles.getFirst());
+        population.put(leader.getUniqueId(), roles.getFirst());
 
         this.territory = new LinkedHashSet<>();
         territory.add(startingChunk);
@@ -64,7 +76,7 @@ public class Settlement {
         this.displayName = displayName;
         this.description = description;
         this.mapColor = mapColor;
-        this.titles = new ArrayList<>();
+        this.roles = new ArrayList<>();
         this.population = new HashMap<>();
         this.territory = new HashSet<>();
     }
@@ -111,6 +123,18 @@ public class Settlement {
 
     public void setMapColor(TextColor color) { this.mapColor = color; }
 
+    public String getIconAsString() { return this.icon; }
+
+    public void setIcon(String icon) { this.icon = icon; }
+
+    public long getCreationTimeAsLong() { return this.creationTime; }
+
+    public String getCreationTimeAsString() {
+        ZonedDateTime dateTime = Instant.ofEpochMilli(this.creationTime).atZone(ZoneId.of("UTC"));
+        DateTimeFormatter formatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.LONG);
+        return dateTime.format(formatter);
+    }
+
     public Nation getNation() { return nation; }
 
     public void setNation(Nation nation) { this.nation = nation; }
@@ -119,38 +143,55 @@ public class Settlement {
 
     public boolean isMemberOfNation(Nation nation) { return nation.containsSettlement(this); }
 
-    public List<CharterTitle> getTitles() {
-        return this.titles;
+    public List<SettlementRole> getRoles() {
+        return this.roles;
     }
 
-    public CharterTitle getDefaultTitle() {
-        for (CharterTitle title : this.getTitles()) {
-            if (title.isLeader()) {
-                return title;
+    public void setRoles(List<SettlementRole> roles) {
+        this.roles = roles;
+    }
+
+    public SettlementRole getRoleForId(int id) {
+        for (SettlementRole role : this.getRoles()) {
+            if (role.getId() == id) {
+                return role;
             }
         }
         return null;
     }
 
-    public boolean setDefaultTitle(CharterTitle defaultTitle) {
-        for (CharterTitle title : this.titles) {
-            if (title.equals(defaultTitle)) {
-                // If the specified title exists in this settlement,
-                // set the current default title to normal
-                // and set the specified title as default.
-                this.getDefaultTitle().setToNormal();
-                title.setToDefault();
+    public SettlementRole getDefaultRole() {
+        for (SettlementRole role : this.getRoles()) {
+            if (role.isDefault()) {
+                return role;
+            }
+        }
+        return null;
+    }
+
+    public boolean setDefaultRole(SettlementRole defaultRole) {
+        for (SettlementRole role : this.roles) {
+            if (role.equals(defaultRole)) {
+                // If the specified role exists in this settlement,
+                // set the current default role to normal
+                // and set the specified role as default.
+                this.getDefaultRole().setToNormal();
+                role.setToDefault();
                 return true;
             }
         }
         return false;
     }
 
-    public Map<UUID, CharterTitle> getPopulation() {
+    public Map<UUID, SettlementRole> getPopulation() {
         return this.population;
     }
 
     public Set<UUID> getPopulationAsIDSet() { return this.population.keySet(); }
+
+    public void setPopulation(Map<UUID, SettlementRole> population) {
+        this.population = population;
+    }
 
     public boolean containsPlayer(UUID uuid) {
         return this.population.containsKey(uuid);
@@ -160,12 +201,16 @@ public class Settlement {
         return this.territory;
     }
 
-    public void addTitle(CharterTitle title) {
-        this.titles.add(title);
+    public void setTerritory(Set<ChunkAnchor> territory) {
+        this.territory = territory;
     }
 
-    public void addMember(UUID playerID, CharterTitle title) {
-        this.population.put(playerID, title);
+    public void addRole(SettlementRole role) {
+        this.roles.add(role);
+    }
+
+    public void addMember(UUID playerID, SettlementRole role) {
+        this.population.put(playerID, role);
     }
 
     public void removeMember(UUID playerID) {
@@ -182,61 +227,62 @@ public class Settlement {
         this.territory.remove(anchor);
     }
 
-    public CharterTitle getTitleFromName(String titleName) {
-        for (CharterTitle title : this.titles) {
-            if (title.getName().equals(titleName)) {
-                return title;
+    public SettlementRole getRoleFromName(String roleName) {
+        for (SettlementRole role : this.roles) {
+            if (role.getName().equals(roleName)) {
+                return role;
             }
         }
         return null;
     }
 
-    public CharterTitle getTitleFromMember(UUID memberID) {
+    public SettlementRole getRoleFromMember(UUID memberID) {
         return this.population.getOrDefault(memberID, null);
     }
 
-    public CharterTitle getTitleForAuthority(int authority) {
-        for (CharterTitle title : this.titles) {
-            if (title.getAuthority() == authority) {
-                return title;
+    public SettlementRole getRoleForAuthority(int authority) {
+        for (SettlementRole role : this.roles) {
+            if (role.getAuthority() == authority) {
+                return role;
             }
         }
         return null;
     }
 
-    public CharterTitle getTitleAbove(CharterTitle title) {
-        int referenceAuthority = title.getAuthority();
-        for (int a = referenceAuthority + 1; a < CharterTitle.MAX_AUTHORITY; a++) {
-            CharterTitle titleAtAuthority = this.getTitleForAuthority(a);
-            if (titleAtAuthority != null) { return titleAtAuthority; }
+    public SettlementRole getRoleAbove(SettlementRole role) {
+        int referenceAuthority = role.getAuthority();
+        for (int a = referenceAuthority + 1; a < SettlementRole.MAX_AUTHORITY; a++) {
+            SettlementRole roleAtAuthority = this.getRoleForAuthority(a);
+            if (roleAtAuthority != null) { return roleAtAuthority; }
         }
         return null;
     }
 
-    public CharterTitle getTitleBelow(CharterTitle title) {
-        int referenceAuthority = title.getAuthority();
-        for (int a = referenceAuthority - 1; a >= CharterTitle.MIN_AUTHORITY; a--) {
-            CharterTitle titleAtAuthority = this.getTitleForAuthority(a);
-            if (titleAtAuthority != null) { return titleAtAuthority; }
+    public SettlementRole getRoleBelow(SettlementRole role) {
+        int referenceAuthority = role.getAuthority();
+        for (int a = referenceAuthority - 1; a >= SettlementRole.MIN_AUTHORITY; a--) {
+            SettlementRole roleAtAuthority = this.getRoleForAuthority(a);
+            if (roleAtAuthority != null) { return roleAtAuthority; }
         }
         return null;
     }
 
-    public boolean canManageTitle(CharterTitle reference, CharterTitle target) {
+    public boolean canManageRole(SettlementRole reference, SettlementRole target) {
         return reference.getAuthority() > target.getAuthority();
     }
 
-    public boolean setPlayerTitle(UUID playerID, CharterTitle title) {
+    public boolean setPlayerTitle(UUID playerID, SettlementRole role) {
         if (!this.containsPlayer(playerID)) { return false; }
 
         this.getPopulation().remove(playerID);
-        this.getPopulation().put(playerID, title);
+        this.getPopulation().put(playerID, role);
 
         RealmManager.markAsDirty(this);
 
         return true;
     }
 
+    /*
     public static Settlement load(FileConfiguration data, String root) {
         // Obtaining basic attributes
         int stmID = data.getInt(root + ".id");
@@ -263,7 +309,7 @@ public class Settlement {
         // Building title list
         List<String> readTitles = data.getStringList(root + ".titles");
         for (String readTitle : readTitles) {
-            stm.addTitle(CharterTitle.fromString(readTitle, stm));
+            stm.addTitle(SettlementRole.fromString(readTitle, stm));
         }
 
         // Build population map
@@ -271,7 +317,7 @@ public class Settlement {
         for (String readCitizen : readPopulation) {
             String[] parts = readCitizen.split(";");
             UUID convertedUUID = UUID.fromString(parts[0]);
-            CharterTitle fetchedTitle = stm.getTitleFromName(parts[1]);
+            SettlementRole fetchedTitle = stm.getRoleFromName(parts[1]);
 
             stm.addMember(convertedUUID, fetchedTitle);
         }
@@ -310,7 +356,7 @@ public class Settlement {
 
         // Storing all internal titles
         List<String> preparedTitleStrings = new ArrayList<>();
-        for (CharterTitle title : settlement.getTitles()) {
+        for (SettlementRole title : settlement.getTitles()) {
             preparedTitleStrings.add(title.serialize());
         }
         data.set(root + ".titles", preparedTitleStrings);
@@ -328,7 +374,7 @@ public class Settlement {
             preparedTerritoryStrings.add(chunk.getX() + ";" + chunk.getZ());
         }
         data.set(root + ".territory", preparedTerritoryStrings);
-    }
+    }*/
 
     @Override
     public boolean equals(Object object) {

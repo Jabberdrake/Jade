@@ -21,13 +21,13 @@ public class JadeTitle extends NamedTitle {
     private List<UUID> users;
 
     // Used by DatabaseManager when composing runtime object from persistent data
-    public JadeTitle(int id, String name, String title, UUID owner, TextColor senderColor, String icon) {
+    public JadeTitle(int id, String name, String title, UUID owner, TextColor senderColor, String iconAsString) {
         super(name, title);
 
         this.id = id;
         this.owner = owner;
         this.senderColor = senderColor;
-        this.icon = icon;
+        this.icon = iconAsString;
         if (this.owner != null) {
             this.users = new ArrayList<>();
             this.users.add(owner);
@@ -37,13 +37,13 @@ public class JadeTitle extends NamedTitle {
 
     }
 
-    // Used by TitleManager when generating new title
-    public JadeTitle(String name, String title, UUID owner, TextColor senderColor, String icon) {
+    // Used by TitleManager when creating new title
+    public JadeTitle(String name, String title, UUID owner, TextColor senderColor, String iconAsString) {
         super(name, title);
 
         this.owner = owner;
         this.senderColor = senderColor;
-        this.icon = icon;
+        this.icon = iconAsString;
 
         this.id = DatabaseManager.createTitle(this);
 

@@ -1,6 +1,6 @@
 package dev.jabberdrake.jade.menus;
 
-import dev.jabberdrake.jade.realms.CharterTitle;
+import dev.jabberdrake.jade.realms.SettlementRole;
 import dev.jabberdrake.jade.realms.Settlement;
 import dev.jabberdrake.jade.utils.TextUtils;
 import net.kyori.adventure.text.Component;
@@ -26,13 +26,13 @@ public class SettlementTitleMenu extends SimpleJadeMenu {
 
     @Override
     public void composeMenu(Player player) {
-        int titleCount = this.settlement.getTitles().size();
+        int titleCount = this.settlement.getRoles().size();
         if (titleCount == 0 || titleCount > 9) {
             composeErrorMenu(player, "Invalid number of titles " + titleCount + " in " + settlement.getName() + "!");
             return;
         }
 
-        for (CharterTitle title : this.settlement.getTitles()) {
+        for (SettlementRole title : this.settlement.getRoles()) {
             ItemStack titleItem = new ItemStack(getTitleMaterial(title));
             ItemMeta titleMeta = titleItem.getItemMeta();
 
@@ -55,7 +55,7 @@ public class SettlementTitleMenu extends SimpleJadeMenu {
 
             if (title.isDefault()) lore.add(Component.text("Default Title", TextUtils.LIVINGMETAL));
 
-            CharterTitle viewerTitle = this.settlement.getTitleFromMember(player.getUniqueId());
+            SettlementRole viewerTitle = this.settlement.getRoleFromMember(player.getUniqueId());
             if (viewerTitle.isLeader() || viewerTitle.canPromote() || viewerTitle.canDemote()) {
                 lore.add(Component.empty());
                 if (viewerTitle.canPromote() && !title.isLeader()) {
@@ -96,7 +96,7 @@ public class SettlementTitleMenu extends SimpleJadeMenu {
         }
     }
 
-    public static Component composeComponentForTitlePermission(CharterTitle title, String permissionKey) {
+    public static Component composeComponentForTitlePermission(SettlementRole title, String permissionKey) {
         Component base = Component.text("— ", TextUtils.LIGHT_ROSEMETAL);
         switch (permissionKey) {
             case "canInvite":
@@ -153,7 +153,7 @@ public class SettlementTitleMenu extends SimpleJadeMenu {
         }
     }
 
-    public static Component composeComponentForTitleType(CharterTitle title) {
+    public static Component composeComponentForTitleType(SettlementRole title) {
         Component result;
         if (title.isLeader()) {
             return Component.text()
@@ -170,7 +170,7 @@ public class SettlementTitleMenu extends SimpleJadeMenu {
         }
     }
 
-    public static Material getTitleMaterial(CharterTitle title) {
+    public static Material getTitleMaterial(SettlementRole title) {
         if (title.isLeader()) {
             return Material.GLOWSTONE_DUST;
         } else if (title.canInvite() && title.canKick()) {
@@ -181,6 +181,6 @@ public class SettlementTitleMenu extends SimpleJadeMenu {
     }
 
     public static int getSlotForAuthority(int authority) {
-        return (CharterTitle.MAX_AUTHORITY-authority);
+        return (SettlementRole.MAX_AUTHORITY-authority);
     }
 }

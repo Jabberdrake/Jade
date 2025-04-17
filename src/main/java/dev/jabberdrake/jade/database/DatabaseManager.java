@@ -7,8 +7,10 @@ import dev.jabberdrake.jade.database.daos.PlayerDataObject;
 import dev.jabberdrake.jade.database.daos.SettlementDataObject;
 import dev.jabberdrake.jade.database.daos.TitleDataObject;
 import dev.jabberdrake.jade.players.JadePlayer;
+import dev.jabberdrake.jade.realms.ChunkAnchor;
 import dev.jabberdrake.jade.realms.Nation;
 import dev.jabberdrake.jade.realms.Settlement;
+import dev.jabberdrake.jade.realms.SettlementRole;
 import dev.jabberdrake.jade.titles.JadeTitle;
 import net.kyori.adventure.text.format.TextColor;
 import org.sqlite.SQLiteDataSource;
@@ -67,6 +69,10 @@ public class DatabaseManager {
 
     public static TitleDataObject getTitleDao() {
         return (TitleDataObject) dataObjectRegistry.get(JadeTitle.class);
+    }
+
+    public static SettlementDataObject getSettlementDao() {
+        return (SettlementDataObject) dataObjectRegistry.get(Settlement.class);
     }
 
     // PLAYER METHODS
@@ -129,6 +135,63 @@ public class DatabaseManager {
 
     public static void deleteTitle(int id) {
         getTitleDao().delete(id);
+    }
+
+    // SETTLEMENT METHODS
+    public static int createSettlement(Settlement settlement) {
+        return getSettlementDao().create(settlement);
+    }
+
+    public static Settlement fetchSettlementById(int id) {
+        return getSettlementDao().fetch(id);
+    }
+
+    public static List<Settlement> fetchAllSettlements() {
+        return getSettlementDao().fetchAll();
+    }
+
+    public static void saveSettlement(Settlement settlement) {
+        getSettlementDao().save(settlement);
+    }
+
+    public static void deleteSettlement(int id) {
+        getSettlementDao().delete(id);
+    }
+
+    public static int createSettlementRole(SettlementRole role) {
+        return getSettlementDao().createSettlementRole(role);
+    }
+
+    public static void saveSettlementRole(SettlementRole role) {
+        getSettlementDao().saveSettlementRole(role);
+    }
+
+    public static void deleteSettlementRole(SettlementRole role) {
+        getSettlementDao().deleteSettlementRole(role);
+    }
+
+    public static void addPlayerToSettlement(UUID playerID, Settlement settlement, SettlementRole role) {
+        getSettlementDao().addPlayerToSettlement(playerID, settlement, role);
+    }
+
+    public static void removePlayerFromSettlement(UUID playerID, Settlement settlement) {
+        getSettlementDao().removePlayerFromSettlement(playerID, settlement);
+    }
+
+    public static void alterPlayerForSettlement(UUID playerID, Settlement settlement, SettlementRole role) {
+        getSettlementDao().alterPlayerForSettlement(playerID, settlement, role);
+    }
+
+    public static void addChunkToSettlement(ChunkAnchor anchor, Settlement settlement) {
+        getSettlementDao().addChunkToSettlement(anchor, settlement);
+    }
+
+    public static void removeChunkFromSettlement(ChunkAnchor anchor, Settlement settlement) {
+        getSettlementDao().removeChunkFromSettlement(anchor, settlement);
+    }
+
+    public static Map<ChunkAnchor, Settlement> fetchTerritoryMap(List<Settlement> settlements) {
+        return getSettlementDao().fetchTerritoryMap(settlements);
     }
 
     public static void shutdown() {

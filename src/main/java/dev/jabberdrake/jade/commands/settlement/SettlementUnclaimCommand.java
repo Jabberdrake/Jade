@@ -57,7 +57,7 @@ public class SettlementUnclaimCommand {
                     .append(TextUtils.composeErrorText("!"))
             );
             return false;
-        } else if (!settlement.getTitleFromMember(player.getUniqueId()).canUnclaim()) {
+        } else if (!settlement.getRoleFromMember(player.getUniqueId()).canUnclaim()) {
             player.sendMessage(TextUtils.composePlainErrorMessage("You are not allowed to unclaim chunks for ")
                     .append(settlement.getDisplayName())
                     .append(TextUtils.composeErrorText("!"))
