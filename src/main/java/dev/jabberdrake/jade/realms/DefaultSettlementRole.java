@@ -25,7 +25,7 @@ public class DefaultSettlementRole extends SettlementRole {
         return new DefaultSettlementRole(OFFICER_NAME, OFFICER_COLOR, settlement, 4, Type.NORMAL);
     }
 
-    public static DefaultSettlementRole peasant(Settlement settlement) {
+    public static DefaultSettlementRole member(Settlement settlement) {
         return new DefaultSettlementRole(MEMBER_NAME, MEMBER_COLOR, settlement, 0, Type.DEFAULT);
     }
 }

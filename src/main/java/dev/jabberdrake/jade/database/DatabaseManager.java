@@ -75,6 +75,10 @@ public class DatabaseManager {
         return (SettlementDataObject) dataObjectRegistry.get(Settlement.class);
     }
 
+    public static NationDataObject getNationDao() {
+        return (NationDataObject) dataObjectRegistry.get(Nation.class);
+    }
+
     // PLAYER METHODS
     public static void createPlayer(JadePlayer player) {
         getPlayerDao().create(player);
@@ -146,6 +150,10 @@ public class DatabaseManager {
         return getSettlementDao().fetch(id);
     }
 
+    public static Settlement fetchSettlementByName(String name) {
+        return getSettlementDao().fetchByName(name);
+    }
+
     public static List<Settlement> fetchAllSettlements() {
         return getSettlementDao().fetchAll();
     }
@@ -192,6 +200,39 @@ public class DatabaseManager {
 
     public static Map<ChunkAnchor, Settlement> fetchTerritoryMap(List<Settlement> settlements) {
         return getSettlementDao().fetchTerritoryMap(settlements);
+    }
+
+    // NATION METHODS
+    public static int createNation(Nation nation) {
+        return getNationDao().create(nation);
+    }
+
+    public static Nation fetchNationById(int id) {
+        return getNationDao().fetch(id);
+    }
+
+    public static Nation fetchNationByName(String name) {
+        return getNationDao().fetchByName(name);
+    }
+
+    public static void saveNation(Nation nation) {
+        getNationDao().save(nation);
+    }
+
+    public static void deleteNation(int id) {
+        getNationDao().delete(id);
+    }
+
+    public static void addMemberToNation(Settlement settlement, Nation nation) {
+        getNationDao().addMemberToNation(settlement, nation);
+    }
+
+    public static void removeMemberFromNation(Settlement settlement, Nation nation) {
+        getNationDao().removeMemberFromNation(settlement, nation);
+    }
+
+    public static void alterCapitalForNation(Settlement settlement, Nation nation) {
+        getNationDao().alterCapitalForNation(settlement, nation);
     }
 
     public static void shutdown() {

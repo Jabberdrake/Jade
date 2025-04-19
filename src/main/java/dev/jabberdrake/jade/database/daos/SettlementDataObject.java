@@ -68,6 +68,42 @@ public class SettlementDataObject implements DatabaseObject<Settlement, Integer>
         return result[0];
     }
 
+    public Settlement fetchByName(String name) {
+        Settlement[] result = {null};
+        String sql = "SELECT id, display_name, description, map_color, icon, creation_time, nation_id FROM settlements WHERE name = ?";
+        try {
+            database.query(sql, stmt -> {
+                stmt.setString(1, name);
+            }, resultSet -> {
+                if (resultSet.next()) {
+                    int id = resultSet.getInt("id");
+                    String displayName = resultSet.getString("display_name");
+                    String description = resultSet.getString("description");
+                    String mapColor = resultSet.getString("map_color");
+                    String icon = resultSet.getString("icon");
+                    long creationTime = resultSet.getLong("creation_time");
+                    int nationId = resultSet.getInt("nation_id");
+                    result[0] = new Settlement(id, name, displayName, description, TextColor.fromHexString(mapColor), icon, creationTime, RealmManager.getNation(nationId));
+                }
+            });
+        } catch (SQLException e) {
+            plugin.getLogger().warning("[SettlementDataObject::fetchByName] Caught SQLException while fetching settlement object: ");
+            e.printStackTrace();
+        }
+
+        // If there is no matching record in the main settlement table, quit;
+        // otherwise, fetch remaining attributes from auxiliary tables
+        if (result[0] == null) {
+            return null;
+        }
+
+        result[0].setRoles(this.fetchRoles(result[0]));
+        result[0].setPopulation(this.fetchPopulation(result[0]));
+        result[0].setTerritory(this.fetchTerritory(result[0]));
+
+        return result[0];
+    }
+
     public List<SettlementRole> fetchRoles(Settlement settlement) {
         List<SettlementRole> roles = new ArrayList<>();
         String sql = "SELECT id, name, color, authority, type, can_invite, can_kick, can_claim, can_unclaim, can_promote, can_demote, can_edit FROM settlement_roles WHERE settlement_id = ?;";
@@ -157,7 +193,7 @@ public class SettlementDataObject implements DatabaseObject<Settlement, Integer>
                     String mapColor = resultSet.getString("map_color");
                     String icon = resultSet.getString("icon");
                     long creationTime = resultSet.getLong("creation_date");
-                    int nationId = resultSet.getInt("nation_id");
+                    int nationId = resultSet.getInt("nation_id"); // If this settlement is not part of any nation (nation_id is set to NULL), this int is set to 0 due to how java.sql works
 
                     Settlement stm = new Settlement(id, name, displayName, description, TextColor.fromHexString(mapColor), icon, creationTime, RealmManager.getNation(nationId));
 
@@ -419,8 +455,8 @@ public class SettlementDataObject implements DatabaseObject<Settlement, Integer>
                   name TEXT NOT NULL,
                   display_name TEXT NOT NULL,
                   description TEXT NOT NULL,
-                  map_color TEXT(7) DEFAULT 'FFAA00' NOT NULL,
-                  icon TEXT NOT NULL,
+                  map_color TEXT(7) DEFAULT '#FFAA00' NOT NULL,
+                  icon TEXT DEFAULT 'minecraft:oak_planks' NOT NULL,
                   creation_time INTEGER DEFAULT CURRENT_TIMESTAMP NOT NULL,
                   nation_id INTEGER DEFAULT NULL,
                     CONSTRAINT stms_nation_id_fk

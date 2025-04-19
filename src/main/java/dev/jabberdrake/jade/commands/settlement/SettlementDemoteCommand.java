@@ -62,7 +62,7 @@ public class SettlementDemoteCommand {
         }
 
         SettlementRole toTitle = focus.getRoleBelow(fromTitle);
-        focus.setPlayerTitle(targetUUID, toTitle);
+        focus.setPlayerRole(targetUUID, toTitle);
 
         sender.sendMessage(TextUtils.composeSuccessText("You have demoted ")
                 .append(TextUtils.composeSuccessHighlight(targetName))
@@ -114,7 +114,7 @@ public class SettlementDemoteCommand {
             return Command.SINGLE_SUCCESS;
         }
 
-        focus.setPlayerTitle(targetUUID, toTitle);
+        focus.setPlayerRole(targetUUID, toTitle);
 
         sender.sendMessage(TextUtils.composeSuccessText("You have demote ")
                 .append(TextUtils.composeSuccessHighlight(targetName))

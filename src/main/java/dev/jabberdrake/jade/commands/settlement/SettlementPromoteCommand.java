@@ -67,7 +67,7 @@ public class SettlementPromoteCommand {
             return Command.SINGLE_SUCCESS;
         }
 
-        focus.setPlayerTitle(targetUUID, toTitle);
+        focus.setPlayerRole(targetUUID, toTitle);
 
         sender.sendMessage(TextUtils.composeSuccessText("You have promoted ")
                 .append(TextUtils.composeSuccessHighlight(targetName))
@@ -119,7 +119,7 @@ public class SettlementPromoteCommand {
             return Command.SINGLE_SUCCESS;
         }
 
-        focus.setPlayerTitle(targetUUID, toTitle);
+        focus.setPlayerRole(targetUUID, toTitle);
 
         sender.sendMessage(TextUtils.composeSuccessText("You have promoted ")
                 .append(TextUtils.composeSuccessHighlight(targetName))

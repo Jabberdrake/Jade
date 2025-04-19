@@ -18,13 +18,11 @@ public class PlayerManager {
     private static Map<UUID, JadePlayer> cache = new HashMap<>();
 
     public static void initialize() {
-
+        // Nothing
     }
 
     public static void shutdown() {
-        for (UUID uuid : cache.keySet()) {
-            //PlayerManager.storeProfile(uuid);
-        }
+        // Nothing
     }
 
     public static JadePlayer asJadePlayer(UUID uuid) {
@@ -71,13 +69,5 @@ public class PlayerManager {
 
         // Handle offline players + register changes in DB
         DatabaseManager.unsetTitleForAllPlayers(title);
-    }
-
-    public static void unfocusAllPlayersForSettlement(int settlementID) {
-        for (JadePlayer player : getAllOnlinePlayers()) {
-            if (player.getFocusSettlementAsID() == settlementID) {
-                player.setFocusSettlement(-1);
-            }
-        }
     }
 }

@@ -136,9 +136,9 @@ public class JadePlayer {
         return this.settlements;
     }
 
-    public boolean isInSettlement(Settlement settlement) {
+    public boolean isInSettlement(int settlementID) {
         for (int stmID : settlements) {
-            if (stmID == settlement.getId()) {
+            if (stmID == settlementID) {
                 return true;
             }
         }

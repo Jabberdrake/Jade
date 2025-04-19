@@ -21,13 +21,9 @@ public class AdminRebuildCommand {
     public static int runCommand(CommandContext<CommandSourceStack> context) {
         CommandSender sender = context.getSource().getSender();
         Bukkit.broadcast(TextUtils.composePlainOperatorMessage("An administrator is now rebuilding internal data structures. This might lag for a bit..."));
-        RealmManager.shutdown();
 
-        sender.sendMessage(TextUtils.composePlainOperatorMessage("Rebuilding realm data from manifest..."));
-        if (!RealmManager.loadManifest()) {
-            sender.sendMessage(TextUtils.composePlainErrorMessage("Could not load manifest! Quiting..."));
-            return Command.SINGLE_SUCCESS;
-        }
+        sender.sendMessage(TextUtils.composePlainOperatorMessage("Rebuilding realm data from database..."));
+        RealmManager.reload();
 
         int settlementCount = RealmManager.getSettlementCount();
         int nationCount = RealmManager.getNationCount();
