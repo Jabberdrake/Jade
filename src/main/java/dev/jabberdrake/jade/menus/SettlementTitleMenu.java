@@ -165,7 +165,7 @@ public class SettlementTitleMenu extends SimpleJadeMenu {
                     .build();
         } else {
             return Component.text()
-                    .append(Component.text("Member Title", TextUtils.UNCOMMON_YELLOW).decorate(TextDecoration.BOLD))
+                    .append(Component.text("Member Title", TextUtils.UNCOMMON_GREEN).decorate(TextDecoration.BOLD))
                     .build();
         }
     }

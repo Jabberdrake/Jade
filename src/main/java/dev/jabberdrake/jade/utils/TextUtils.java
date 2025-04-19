@@ -32,10 +32,10 @@ public class TextUtils {
 
     public static final TextColor LIVINGMETAL = TextColor.color(0x5afc9f);
 
-    public static final TextColor MYTHIC_BLUE = NamedTextColor.AQUA;
+    public static final TextColor MYTHIC_BLUE = TextColor.color(0x30eeb4);
     public static final TextColor LEGENDARY_ORANGE = NamedTextColor.GOLD;
     public static final TextColor RARE_PURPLE = NamedTextColor.DARK_PURPLE;
-    public static final TextColor UNCOMMON_YELLOW = NamedTextColor.YELLOW;
+    public static final TextColor UNCOMMON_GREEN = NamedTextColor.GREEN;
     public static final TextColor COMMON_WHITE = NamedTextColor.WHITE;
 
     public static final Component SYMBOL_ACCEPTED = Component.text("✔", NamedTextColor.GREEN);
