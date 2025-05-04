@@ -40,13 +40,6 @@ public class PlayerManager {
 
         cache.put(uuid, player);
 
-        for (int stmID = 1; stmID <= RealmManager.getSettlementCount(); stmID++) {
-            Settlement stm = RealmManager.getSettlement(stmID);
-            if (stm != null && stm.containsPlayer(uuid)) {
-                player.addSettlement(stmID);
-            }
-        }
-
         logger.info("[PlayerManager::handleLogin] Successfully composed internal data structures for player " + plugin.getServer().getPlayer(uuid).getName() + "!");
     }
 

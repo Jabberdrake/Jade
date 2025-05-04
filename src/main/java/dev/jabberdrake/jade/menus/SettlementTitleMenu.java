@@ -36,7 +36,7 @@ public class SettlementTitleMenu extends SimpleJadeMenu {
             ItemStack titleItem = new ItemStack(getTitleMaterial(title));
             ItemMeta titleMeta = titleItem.getItemMeta();
 
-            titleMeta.customName(title.getTitleAsComponent().decoration(TextDecoration.ITALIC, false));
+            titleMeta.customName(title.getDisplayAsComponent().decoration(TextDecoration.ITALIC, false));
             List<Component> lore = new ArrayList<>(List.of(
                     Component.text("Title in ", TextUtils.ZORBA)
                             .append(settlement.getDisplayName()),

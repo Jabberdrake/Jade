@@ -25,7 +25,7 @@ public class TitleDisallowCommand {
                         .then(Commands.argument("player", StringArgumentType.word())
                                 .suggests(CommonArgumentSuggestions::suggestAllOnlinePlayers)
                                 .requires(sender -> sender.getExecutor() instanceof Player)
-                                .executes(TitleAllowCommand::runCommand)))
+                                .executes(TitleDisallowCommand::runCommand)))
                 .build();
     }
 

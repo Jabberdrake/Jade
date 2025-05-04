@@ -60,8 +60,6 @@ public class SettlementKickCommand {
             return Command.SINGLE_SUCCESS;
         }
 
-        JadePlayer jadeTarget = PlayerManager.asJadePlayer(targetUUID);
-        jadeTarget.removeSettlement(focus);
         focus.removeMember(targetUUID);
 
         player.sendMessage(TextUtils.composeSuccessPrefix()

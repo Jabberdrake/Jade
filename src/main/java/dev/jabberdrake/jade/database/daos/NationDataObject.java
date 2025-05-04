@@ -31,20 +31,22 @@ public class NationDataObject implements DatabaseObject<Nation, Integer> {
     @Override
     public Nation fetch(Integer id) {
         Nation[] result = {null};
-        String sql = "SELECT name, display_name, description, map_color, icon, creation_time, capital_id FROM nation WHERE id = ?;";
+        String sql = "SELECT name, display_name, description, map_color, icon, creation_time, capital_id FROM nations WHERE id = ?;";
         try {
             database.query(sql, stmt -> {
                 stmt.setInt(1, id);
             }, resultSet -> {
-                String name = resultSet.getString("name");
-                String displayName = resultSet.getString("display_name");
-                String description = resultSet.getString("description");
-                String mapColor = resultSet.getString("map_color");
-                String icon = resultSet.getString("icon");
-                long creationTime = resultSet.getLong("creation_time");
-                int capitalId = resultSet.getInt("capital_id");
+                if (resultSet.next()) {
+                    String name = resultSet.getString("name");
+                    String displayName = resultSet.getString("display_name");
+                    String description = resultSet.getString("description");
+                    String mapColor = resultSet.getString("map_color");
+                    String icon = resultSet.getString("icon");
+                    long creationTime = resultSet.getLong("creation_time");
+                    int capitalId = resultSet.getInt("capital_id");
 
-                result[0] = new Nation(id, name, displayName, description, TextColor.fromHexString(mapColor), icon, creationTime, capitalId);
+                    result[0] = new Nation(id, name, displayName, description, TextColor.fromHexString(mapColor), icon, creationTime, capitalId);
+                }
             });
         } catch (SQLException e) {
             plugin.getLogger().warning("[NationDataObject::fetch] Caught SQLException while fetching nation object: ");
@@ -69,15 +71,17 @@ public class NationDataObject implements DatabaseObject<Nation, Integer> {
             database.query(sql, stmt -> {
                 stmt.setString(1, name);
             }, resultSet -> {
-                int id = resultSet.getInt("id");
-                String displayName = resultSet.getString("display_name");
-                String description = resultSet.getString("description");
-                String mapColor = resultSet.getString("map_color");
-                String icon = resultSet.getString("icon");
-                long creationTime = resultSet.getLong("creation_time");
-                int capitalId = resultSet.getInt("capital_id");
+                if (resultSet.next()) {
+                    int id = resultSet.getInt("id");
+                    String displayName = resultSet.getString("display_name");
+                    String description = resultSet.getString("description");
+                    String mapColor = resultSet.getString("map_color");
+                    String icon = resultSet.getString("icon");
+                    long creationTime = resultSet.getLong("creation_time");
+                    int capitalId = resultSet.getInt("capital_id");
 
-                result[0] = new Nation(id, name, displayName, description, TextColor.fromHexString(mapColor), icon, creationTime, capitalId);
+                    result[0] = new Nation(id, name, displayName, description, TextColor.fromHexString(mapColor), icon, creationTime, capitalId);
+                }
             });
         } catch (SQLException e) {
             plugin.getLogger().warning("[SettlementDataObject::fetchByName] Caught SQLException while fetching nation object: ");

@@ -67,7 +67,7 @@ public class SettlementDemoteCommand {
         sender.sendMessage(TextUtils.composeSuccessText("You have demoted ")
                 .append(TextUtils.composeSuccessHighlight(targetName))
                 .append(TextUtils.composeSuccessText(" to the title of "))
-                .append(toTitle.getTitleAsComponent())
+                .append(toTitle.getDisplayAsComponent())
                 .append(TextUtils.composeSuccessText("!"))
         );
         return Command.SINGLE_SUCCESS;
@@ -119,7 +119,7 @@ public class SettlementDemoteCommand {
         sender.sendMessage(TextUtils.composeSuccessText("You have demote ")
                 .append(TextUtils.composeSuccessHighlight(targetName))
                 .append(TextUtils.composeSuccessText(" to the title of "))
-                .append(toTitle.getTitleAsComponent())
+                .append(toTitle.getDisplayAsComponent())
                 .append(TextUtils.composeSuccessText("!"))
         );
         return Command.SINGLE_SUCCESS;
@@ -157,7 +157,7 @@ public class SettlementDemoteCommand {
         SettlementRole playerTitle = focus.getRoleFromMember(player.getUniqueId());
         focus.getRoles().stream()
                 .filter(title -> title.getAuthority() < playerTitle.getAuthority())
-                .map(NamedTitle::getName)
+                .map(SettlementRole::getName)
                 .filter(entry -> entry.toLowerCase().startsWith(builder.getRemainingLowerCase()))
                 .forEach(builder::suggest);
 

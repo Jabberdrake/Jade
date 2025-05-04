@@ -132,7 +132,11 @@ public class TitleDataObject implements DatabaseObject<JadeTitle, Integer> {
             id[0] = Math.toIntExact(database.create(sql, stmt -> {
                 stmt.setString(1, title.getName());
                 stmt.setString(2, title.getTitleAsString());
-                stmt.setString(3, title.getOwner().toString());
+                if (title.isUniversal()) {
+                    stmt.setString(3, "universal");
+                } else {
+                    stmt.setString(3, title.getOwner().toString());
+                }
                 stmt.setString(4, title.getSenderColor().asHexString());
                 stmt.setString(5, title.getIconAsString());
             }));
@@ -324,7 +328,7 @@ public class TitleDataObject implements DatabaseObject<JadeTitle, Integer> {
 
         JadeTitle firstTitle = this.fetch(1);
         if (firstTitle == null) {
-            this.save(DefaultJadeTitle.PEASANT);
+            this.create(DefaultJadeTitle.PEASANT);
             plugin.getLogger().info("[TitleDataObject::initialize] Could not find default universal title. Creating!");
         }
     }

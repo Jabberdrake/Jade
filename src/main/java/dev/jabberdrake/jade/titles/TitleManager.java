@@ -27,6 +27,18 @@ public class TitleManager {
 
         // Plus, there is no point in loading *every single title*, as we will only need
         // to handle those available to online players.
+
+        //Load all universal titles.
+        List<Integer> universalTitleIDList = DatabaseManager.fetchAllUniversalTitles();
+        for (Integer universalTitleID : universalTitleIDList) {
+            // This approach *does* imply unnecessary loop checks, as it
+            // checks whether every universal title is in the cache, and
+            // none of them will be because this is the only place where
+            // universal titles are fetched. That being said, it does
+            // keep the access format universal and pretty AND this only
+            // runs doing startup so its fiiiiiine.
+            getTitle(universalTitleID);
+        }
     }
 
     public static void shutdown() {

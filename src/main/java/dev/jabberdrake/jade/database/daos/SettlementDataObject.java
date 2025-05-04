@@ -47,7 +47,16 @@ public class SettlementDataObject implements DatabaseObject<Settlement, Integer>
                     String icon = resultSet.getString("icon");
                     long creationTime = resultSet.getLong("creation_time");
                     int nationId = resultSet.getInt("nation_id");
-                    result[0] = new Settlement(id, name, displayName, description, TextColor.fromHexString(mapColor), icon, creationTime, RealmManager.getNation(nationId));
+
+                    // If the nationID value is set to 0, then the requested settlement
+                    // does not belong to any nation. As a result, we'll simply return null.
+                    // Otherwise, we'll request the RealmManager to hand over the relevant
+                    // nation object.
+                    if (nationId == 0) {
+                        result[0] = new Settlement(id, name, displayName, description, TextColor.fromHexString(mapColor), icon, creationTime, null);
+                    } else {
+                        result[0] = new Settlement(id, name, displayName, description, TextColor.fromHexString(mapColor), icon, creationTime, RealmManager.getNation(nationId));
+                    }
                 }
             });
         } catch (SQLException e) {
@@ -83,7 +92,16 @@ public class SettlementDataObject implements DatabaseObject<Settlement, Integer>
                     String icon = resultSet.getString("icon");
                     long creationTime = resultSet.getLong("creation_time");
                     int nationId = resultSet.getInt("nation_id");
-                    result[0] = new Settlement(id, name, displayName, description, TextColor.fromHexString(mapColor), icon, creationTime, RealmManager.getNation(nationId));
+
+                    // If the nationID value is set to 0, then the requested settlement
+                    // does not belong to any nation. As a result, we'll simply return null.
+                    // Otherwise, we'll request the RealmManager to hand over the relevant
+                    // nation object.
+                    if (nationId == 0) {
+                        result[0] = new Settlement(id, name, displayName, description, TextColor.fromHexString(mapColor), icon, creationTime, null);
+                    } else {
+                        result[0] = new Settlement(id, name, displayName, description, TextColor.fromHexString(mapColor), icon, creationTime, RealmManager.getNation(nationId));
+                    }
                 }
             });
         } catch (SQLException e) {
@@ -192,10 +210,19 @@ public class SettlementDataObject implements DatabaseObject<Settlement, Integer>
                     String description = resultSet.getString("description");
                     String mapColor = resultSet.getString("map_color");
                     String icon = resultSet.getString("icon");
-                    long creationTime = resultSet.getLong("creation_date");
+                    long creationTime = resultSet.getLong("creation_time");
                     int nationId = resultSet.getInt("nation_id"); // If this settlement is not part of any nation (nation_id is set to NULL), this int is set to 0 due to how java.sql works
 
-                    Settlement stm = new Settlement(id, name, displayName, description, TextColor.fromHexString(mapColor), icon, creationTime, RealmManager.getNation(nationId));
+                    // If the nationID value is set to 0, then the requested settlement
+                    // does not belong to any nation. As a result, we'll simply return null.
+                    // Otherwise, we'll request the RealmManager to hand over the relevant
+                    // nation object.
+                    Settlement stm;
+                    if (nationId == 0) {
+                        stm = new Settlement(id, name, displayName, description, TextColor.fromHexString(mapColor), icon, creationTime, null);
+                    } else {
+                        stm = new Settlement(id, name, displayName, description, TextColor.fromHexString(mapColor), icon, creationTime, RealmManager.getNation(nationId));
+                    }
 
                     stm.setRoles(this.fetchRoles(stm));
                     stm.setPopulation(this.fetchPopulation(stm));
@@ -360,7 +387,7 @@ public class SettlementDataObject implements DatabaseObject<Settlement, Integer>
     public void addPlayerToSettlement(UUID playerId, Settlement settlement, SettlementRole role) {
         String sql = "INSERT INTO settlement_members (settlement_id, player_id, role_id) VALUES (?, ?, ?);";
         try {
-            database.execute(sql, stmt -> {
+            database.create(sql, stmt -> {
                 stmt.setInt(1, settlement.getId());
                 stmt.setString(2, playerId.toString());
                 stmt.setInt(3, role.getId());
@@ -498,7 +525,6 @@ public class SettlementDataObject implements DatabaseObject<Settlement, Integer>
                       ON DELETE CASCADE,
                     CONSTRAINT stmpopulation_role_id_fk
                       FOREIGN KEY (role_id) REFERENCES settlement_roles (id)
-                      ON DELETE DO NOTHING
                 );
                 """;
         String SQL_INIT_SETTLEMENT_CHUNKS =

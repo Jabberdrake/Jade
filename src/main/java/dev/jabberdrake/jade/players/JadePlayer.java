@@ -119,56 +119,6 @@ public class JadePlayer {
     }
 
     public void setFocusSettlement(int settlementID) {
-        if (this.settlements.contains(settlementID)) {
-            this.stmFocus = settlementID;
-        }
-    }
-
-    public List<Settlement> getSettlements() {
-        List<Settlement> stmList = new ArrayList<>();
-        for (int settlementID : settlements) {
-            stmList.add(RealmManager.getSettlement(settlementID));
-        }
-        return stmList;
-    }
-
-    public List<Integer> getSettlementsAsIntegerList() {
-        return this.settlements;
-    }
-
-    public boolean isInSettlement(int settlementID) {
-        for (int stmID : settlements) {
-            if (stmID == settlementID) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public void addSettlement(Settlement settlement) {
-        this.settlements.add(settlement.getId());
-    }
-
-    public void addSettlement(int settlementID) {
-        this.settlements.add(settlementID);
-    }
-
-    public void removeSettlement(Settlement settlement) {
-        int stmID = settlement.getId();
-        this.removeSettlement(stmID);
-    }
-
-    public void removeSettlement(int settlementID) {
-        if (this.settlements.contains(settlementID)) {
-            this.settlements.remove(settlementID);
-        }
-
-        if (this.stmFocus == settlementID) {
-            if (this.settlements.isEmpty()) {
-                this.stmFocus = -1;
-            } else {
-                this.stmFocus = this.settlements.getFirst();
-            }
-        }
+        this.stmFocus = settlementID;
     }
 }

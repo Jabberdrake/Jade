@@ -68,7 +68,7 @@ public class Settlement {
         this.addMember(leader.getUniqueId(), this.getLeaderRole());
 
         this.territory = new LinkedHashSet<>();
-        this.addChunk(startingChunk);
+        RealmManager.claimChunk(this, startingChunk); //This will call Settlement::addChunk
     }
 
     public Settlement(int id, String name, String displayName, String description, TextColor mapColor) {
@@ -234,7 +234,8 @@ public class Settlement {
 
     public void addRole(SettlementRole role) {
         this.roles.add(role);
-        DatabaseManager.createSettlementRole(role);
+        int roleID = DatabaseManager.createSettlementRole(role);
+        role.setId(roleID);
     }
 
     public void removeRole(SettlementRole role) {
@@ -262,11 +263,13 @@ public class Settlement {
         }
     }
 
+    // Called by RealmManager during claimChunk()
     public void addChunk(ChunkAnchor anchor) {
         this.territory.add(anchor);
         DatabaseManager.addChunkToSettlement(anchor, this);
     }
 
+    // Called by RealmManager during unclaimChunk()
     public void removeChunk(ChunkAnchor anchor) {
         this.territory.remove(anchor);
         DatabaseManager.removeChunkFromSettlement(anchor, this);

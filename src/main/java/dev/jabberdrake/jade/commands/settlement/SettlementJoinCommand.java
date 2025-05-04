@@ -33,7 +33,6 @@ public class SettlementJoinCommand {
         }
 
         inviter.addMember(player.getUniqueId(), inviter.getDefaultRole());
-        PlayerManager.asJadePlayer(player.getUniqueId()).addSettlement(inviter);
 
         player.sendMessage(TextUtils.composeSuccessPrefix()
                 .append(TextUtils.composeSuccessText("You are now a member of "))
@@ -60,7 +59,6 @@ public class SettlementJoinCommand {
         }
 
         stmArg.addMember(player.getUniqueId(), stmArg.getDefaultRole());
-        PlayerManager.asJadePlayer(player.getUniqueId()).addSettlement(stmArg);
         RealmManager.clearInviteToSettlement(player);
 
         player.sendMessage(TextUtils.composeSuccessPrefix()

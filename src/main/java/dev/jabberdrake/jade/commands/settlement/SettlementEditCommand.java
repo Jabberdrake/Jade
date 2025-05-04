@@ -55,7 +55,7 @@ public class SettlementEditCommand {
                 context.getSource().getSender().sendPlainMessage("Unknown settlement field!");
         }
 
-        RealmManager.storeSettlement(settlement);
+        //RealmManager.storeSettlement(settlement);
         return Command.SINGLE_SUCCESS;
     }
 

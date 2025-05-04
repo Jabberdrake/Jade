@@ -46,8 +46,10 @@ public class Nation {
         this.mapColor = mapColor;
         this.icon = icon;
         this.creationTime = creationTime;
+
         this.capitalId = capitalId;
         this.capital = null;
+
         this.memberIds = null;
         this.members = null;
     }
@@ -73,7 +75,10 @@ public class Nation {
 
     public String getName() { return this.name; }
 
-    public void setName(String name) { this.name = name; }
+    public void setName(String name) {
+        this.name = name;
+        DatabaseManager.saveNation(this);
+    }
 
     public String getDisplayNameAsString() { return this.displayName; }
 
@@ -81,6 +86,7 @@ public class Nation {
 
     public void setDisplayName(String displayName) {
         this.displayName = displayName;
+        DatabaseManager.saveNation(this);
     }
 
     public String getDescriptionAsString() {
@@ -93,15 +99,22 @@ public class Nation {
 
     public void setDescription(String description) {
         this.description = description;
+        DatabaseManager.saveNation(this);
     }
 
     public TextColor getMapColor() { return this.mapColor; }
 
-    public void setMapColor(TextColor mapColor) { this.mapColor = mapColor; }
+    public void setMapColor(TextColor mapColor) {
+        this.mapColor = mapColor;
+        DatabaseManager.saveNation(this);
+    }
 
     public String getIconAsString() { return this.icon; }
 
-    public void setIcon(String icon) { this.icon = icon; }
+    public void setIcon(String icon) {
+        this.icon = icon;
+        DatabaseManager.saveNation(this);
+    }
 
     public long getCreationTimeAsLong() { return this.creationTime; }
 
@@ -121,6 +134,7 @@ public class Nation {
     public void setCapital(Settlement capital) {
         this.capital = capital;
         this.capitalId = capital.getId();
+        DatabaseManager.saveNation(this);
     }
 
     public List<Settlement> getMembers() {
@@ -140,26 +154,19 @@ public class Nation {
     }
 
     public void addSettlement(Settlement settlement) {
-        if (!this.members.contains(settlement)) {
-            this.members.add(settlement);
+        if (!this.getMembers().contains(settlement)) {
+            this.getMembers().add(settlement);
+            DatabaseManager.addMemberToNation(settlement, this);
         }
     }
 
     public void removeSettlement(Settlement settlement) {
-        this.members.remove(settlement);
+        this.getMembers().remove(settlement);
+        DatabaseManager.removeMemberFromNation(settlement, this);
     }
 
     public boolean containsSettlement(Settlement settlement) {
-        return this.members.contains(settlement);
+        return this.getMembers().contains(settlement);
     }
-
-    public static Nation load(FileConfiguration data, String root) {
-        return null;
-    }
-
-    public static void store(Nation nation, FileConfiguration data, String root) {
-
-    }
-
 
 }

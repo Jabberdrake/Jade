@@ -33,7 +33,8 @@ public class SettlementInfoCommand {
         Settlement settlement = RealmManager.getSettlement(stmString);
         context.getSource().getSender().sendPlainMessage("Found settlement with an ID of " + settlement.getId() + "!");
         context.getSource().getSender().sendPlainMessage("    Settlement name: " + settlement.getName());
-        context.getSource().getSender().sendPlainMessage("    Settlement description: " + settlement.getDescription());
+        context.getSource().getSender().sendPlainMessage("    Settlement display: " + settlement.getDisplayName());
+        context.getSource().getSender().sendPlainMessage("    Settlement description: " + settlement.getDescriptionAsString());
         Jade.getPlugin(Jade.class).getLogger().info(settlement.getPopulation().toString());
         for (UUID uuid : settlement.getPopulation().keySet()) {
             String citizenName = Bukkit.getOfflinePlayer(uuid).getName();
