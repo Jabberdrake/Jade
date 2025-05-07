@@ -119,7 +119,7 @@ public class TitleManager {
         return true;
     }
 
-    public static boolean disallowUseOfTitle(JadeTitle title, UUID owner, UUID target) {
+    public static boolean revokeUseOfTitle(JadeTitle title, UUID owner, UUID target) {
         JadePlayer targetPlayer = PlayerManager.asJadePlayer(target);
         if (!title.getOwner().equals(owner)) {
             return false;

@@ -4,8 +4,9 @@ import dev.jabberdrake.jade.Jade;
 import dev.jabberdrake.jade.titles.NamedTitle;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
+import org.jetbrains.annotations.NotNull;
 
-public class SettlementRole {
+public class SettlementRole implements Comparable<SettlementRole> {
 
     public static final int MIN_AUTHORITY = 0;
     public static final int MAX_AUTHORITY = 8;
@@ -23,6 +24,11 @@ public class SettlementRole {
     private boolean canPromote = false;
     private boolean canDemote = false;
     private boolean canEdit = false;
+
+    @Override
+    public int compareTo(@NotNull SettlementRole o) {
+        return Integer.compare(this.authority, o.authority);
+    }
 
     public enum Type {
         LEADER,

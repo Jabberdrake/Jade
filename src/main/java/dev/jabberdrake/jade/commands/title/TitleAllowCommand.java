@@ -37,6 +37,8 @@ public class TitleAllowCommand {
         if (title == null) {
             player.sendMessage(TextUtils.composePlainErrorMessage("Could not find the specified title!"));
             return Command.SINGLE_SUCCESS;
+        } else if (title.isUniversal()) {
+            player.sendMessage(TextUtils.composePlainErrorMessage("You cannot allow access to universal titles!"));
         } else if (!title.getOwner().equals(player.getUniqueId())) {
             player.sendMessage(TextUtils.composePlainErrorMessage("You do not own this title!"));
             return Command.SINGLE_SUCCESS;

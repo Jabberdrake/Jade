@@ -17,7 +17,7 @@ public class TitleCommand {
                 .then(TitleEditCommand.buildCommand("edit"))
                 .then(TitleUseCommand.buildCommand("use"))
                 .then(TitleAllowCommand.buildCommand("allow"))
-                .then(TitleDisallowCommand.buildCommand("disallow"))
+                .then(TitleRevokeCommand.buildCommand("revoke"))
                 .build();
     }
 

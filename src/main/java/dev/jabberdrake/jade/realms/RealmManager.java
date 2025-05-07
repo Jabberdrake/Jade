@@ -24,8 +24,13 @@ public class RealmManager {
 
     public static void initialize() {
         List<Settlement> settlements = DatabaseManager.fetchAllSettlements();
-        // List<Nation> nations = DatabaseManager.fetchAllNations();
+        for (Settlement settlement : settlements) {
+            settlementCache.put(settlement.getId(), settlement);
+        }
         logger.info("[RealmManager::initialize] Successfully loaded " + settlements.size() + " settlements and " + "0" + " nations!");
+
+        // List<Nation> nations = DatabaseManager.fetchAllNations();
+
 
         RealmManager.territoryMap = DatabaseManager.fetchTerritoryMap(settlements);
         logger.info("[RealmManager::initialize] Successfully loaded the territory map!");
@@ -240,6 +245,8 @@ public class RealmManager {
 
     // Used by DatabaseManager when composing settlement objects from persistent data
     public static Nation getNation(int id) {
+        if (id == 0) return null;
+
         if (nationCache.containsKey(id)) {
             return nationCache.get(id);
         } else {
@@ -247,16 +254,10 @@ public class RealmManager {
             if (nation != null) {
                 nationCache.put(id, nation);
                 return nation;
-            } else if (id != 0) {
-                // Normally, this code block would only trigger whenever
-                // we tried to fetch an object from an invalid ID argument,
-                // hence the error message below.
-                // However, with Nations, there's an edge case: if we request
-                // a nation with ID=0, then we're effectively dealing with
-                // a call for a non-existing nation, hence we return null.
+            } else {
                 plugin.getLogger().warning("[RealmManager::getNation(id)] Attempted to fetch unknown nation for ID=" + id);
                 return null;
-            } else return null;
+            }
         }
     }
 

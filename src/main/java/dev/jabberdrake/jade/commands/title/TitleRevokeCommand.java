@@ -16,7 +16,7 @@ import org.bukkit.entity.Player;
 
 import java.util.UUID;
 
-public class TitleDisallowCommand {
+public class TitleRevokeCommand {
 
     public static LiteralCommandNode<CommandSourceStack> buildCommand(final String label) {
         return Commands.literal(label)
@@ -25,7 +25,7 @@ public class TitleDisallowCommand {
                         .then(Commands.argument("player", StringArgumentType.word())
                                 .suggests(CommonArgumentSuggestions::suggestAllOnlinePlayers)
                                 .requires(sender -> sender.getExecutor() instanceof Player)
-                                .executes(TitleDisallowCommand::runCommand)))
+                                .executes(TitleRevokeCommand::runCommand)))
                 .build();
     }
 
@@ -36,6 +36,9 @@ public class TitleDisallowCommand {
         JadeTitle title = PlayerManager.asJadePlayer(player.getUniqueId()).getTitleFromName(titleAsString);
         if (title == null) {
             player.sendMessage(TextUtils.composePlainErrorMessage("Could not find the specified title!"));
+            return Command.SINGLE_SUCCESS;
+        } else if (title.isUniversal()) {
+            player.sendMessage(TextUtils.composePlainErrorMessage("You cannot revoke access to universal titles!"));
             return Command.SINGLE_SUCCESS;
         } else if (!title.getOwner().equals(player.getUniqueId())) {
             player.sendMessage(TextUtils.composePlainErrorMessage("You do not own this title!"));
@@ -49,14 +52,14 @@ public class TitleDisallowCommand {
             player.sendMessage(TextUtils.composePlainErrorMessage("Could not find the specified player."));
             return Command.SINGLE_SUCCESS;
         } else if (targetName.equals(player.getName())) {
-            player.sendMessage(TextUtils.composePlainErrorMessage("You can't disallow yourself!"));
+            player.sendMessage(TextUtils.composePlainErrorMessage("You can't revoke yourself!"));
             return Command.SINGLE_SUCCESS;
         } else if (!title.isAvailableTo(targetUUID)) {
-            player.sendMessage(TextUtils.composePlainErrorMessage("This player is not allowed to use this title!!"));
+            player.sendMessage(TextUtils.composePlainErrorMessage("This player is already not allowed to use this title!"));
             return Command.SINGLE_SUCCESS;
         }
 
-        TitleManager.disallowUseOfTitle(title, player.getUniqueId(), targetUUID);
+        TitleManager.revokeUseOfTitle(title, player.getUniqueId(), targetUUID);
 
         player.sendMessage(TextUtils.composeSuccessPrefix()
                 .append(TextUtils.composeSuccessHighlight(player.getName()))

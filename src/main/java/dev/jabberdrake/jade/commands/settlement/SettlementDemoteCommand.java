@@ -7,7 +7,6 @@ import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import dev.jabberdrake.jade.players.PlayerManager;
-import dev.jabberdrake.jade.titles.NamedTitle;
 import dev.jabberdrake.jade.realms.SettlementRole;
 import dev.jabberdrake.jade.realms.Settlement;
 import dev.jabberdrake.jade.utils.TextUtils;
@@ -27,7 +26,7 @@ public class SettlementDemoteCommand {
                         .requires(sender -> sender.getExecutor() instanceof Player)
                         .executes(SettlementDemoteCommand::runCommand)
                         .then(Commands.argument("title", StringArgumentType.string())
-                                .suggests(SettlementDemoteCommand::buildSuggestionsForTitlesBelow)
+                                .suggests(SettlementDemoteCommand::buildSuggestionsForRolesBelow)
                                 .requires(sender -> sender.getExecutor() instanceof Player)
                                 .executes(SettlementDemoteCommand::runCommandForTitle)))
                 .build();
@@ -149,14 +148,14 @@ public class SettlementDemoteCommand {
         return true;
     }
 
-    public static CompletableFuture<Suggestions> buildSuggestionsForTitlesBelow(final CommandContext<CommandSourceStack> context, final SuggestionsBuilder builder) {
+    public static CompletableFuture<Suggestions> buildSuggestionsForRolesBelow(final CommandContext<CommandSourceStack> context, final SuggestionsBuilder builder) {
         Player player = (Player) context.getSource().getSender();
         Settlement focus = PlayerManager.asJadePlayer(player.getUniqueId()).getFocusSettlement();
         if (!focus.containsPlayer(player.getUniqueId())) { return builder.buildFuture(); }
 
-        SettlementRole playerTitle = focus.getRoleFromMember(player.getUniqueId());
+        SettlementRole playerRole = focus.getRoleFromMember(player.getUniqueId());
         focus.getRoles().stream()
-                .filter(title -> title.getAuthority() < playerTitle.getAuthority())
+                .filter(role -> role.getAuthority() < playerRole.getAuthority())
                 .map(SettlementRole::getName)
                 .filter(entry -> entry.toLowerCase().startsWith(builder.getRemainingLowerCase()))
                 .forEach(builder::suggest);

@@ -27,7 +27,7 @@ public class SettlementPromoteCommand {
                         .requires(sender -> sender.getExecutor() instanceof Player)
                         .executes(SettlementPromoteCommand::runCommand)
                         .then(Commands.argument("title", StringArgumentType.string())
-                                .suggests(SettlementPromoteCommand::buildSuggestionsForTitlesBelow)
+                                .suggests(SettlementPromoteCommand::buildSuggestionsForRolesAbove)
                                 .requires(sender -> sender.getExecutor() instanceof Player)
                                 .executes(SettlementPromoteCommand::runCommandForTitle)))
                 .build();
@@ -154,14 +154,14 @@ public class SettlementPromoteCommand {
         return true;
     }
 
-    public static CompletableFuture<Suggestions> buildSuggestionsForTitlesBelow(final CommandContext<CommandSourceStack> context, final SuggestionsBuilder builder) {
+    public static CompletableFuture<Suggestions> buildSuggestionsForRolesAbove(final CommandContext<CommandSourceStack> context, final SuggestionsBuilder builder) {
         Player player = (Player) context.getSource().getSender();
         Settlement focus = PlayerManager.asJadePlayer(player.getUniqueId()).getFocusSettlement();
         if (!focus.containsPlayer(player.getUniqueId())) { return builder.buildFuture(); }
 
-        SettlementRole playerTitle = focus.getRoleFromMember(player.getUniqueId());
+        SettlementRole playerRole = focus.getRoleFromMember(player.getUniqueId());
         focus.getRoles().stream()
-                .filter(title -> title.getAuthority() < playerTitle.getAuthority())
+                .filter(role -> role.getAuthority() > playerRole.getAuthority())
                 .map(SettlementRole::getName)
                 .filter(entry -> entry.toLowerCase().startsWith(builder.getRemainingLowerCase()))
                 .forEach(builder::suggest);
