@@ -45,7 +45,7 @@ public class SettlementDemoteCommand {
             sender.sendMessage(TextUtils.composePlainErrorMessage("Could not find the specified player."));
             return Command.SINGLE_SUCCESS;
         } else if (targetName.equals(sender.getName())) {
-            sender.sendMessage(TextUtils.composePlainErrorMessage("You can't promote yourself!"));
+            sender.sendMessage(TextUtils.composePlainErrorMessage("You can't demote yourself!"));
             return Command.SINGLE_SUCCESS;
         } else if (!focus.containsPlayer(targetUUID)) {
             sender.sendMessage(TextUtils.composePlainErrorMessage("The specified player is not a member of your focus settlement!."));
@@ -85,7 +85,7 @@ public class SettlementDemoteCommand {
             sender.sendMessage(TextUtils.composePlainErrorMessage("Could not find the specified player."));
             return Command.SINGLE_SUCCESS;
         } else if (targetName.equals(sender.getName())) {
-            sender.sendMessage(TextUtils.composePlainErrorMessage("You can't promote yourself!"));
+            sender.sendMessage(TextUtils.composePlainErrorMessage("You can't demote yourself!"));
             return Command.SINGLE_SUCCESS;
         } else if (!focus.containsPlayer(targetUUID)) {
             sender.sendMessage(TextUtils.composePlainErrorMessage("The specified player is not a member of your focus settlement!"));

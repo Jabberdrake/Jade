@@ -23,6 +23,8 @@ import java.util.stream.Collectors;
 
 public class SettlementInfoCommand {
 
+    private static final String INDENT = "       ";
+
     public static LiteralCommandNode<CommandSourceStack> buildCommand(final String label) {
         return Commands.literal(label)
                 .then(Commands.argument("settlement", StringArgumentType.greedyString())
@@ -41,24 +43,30 @@ public class SettlementInfoCommand {
             return Command.SINGLE_SUCCESS;
         }
 
-        player.sendMessage(TextUtils.composePlainInfoMessage("Information on settlement ").append(settlement.getDisplayName()));
-        player.sendMessage(Component.text("    ").append(settlement.getDescription()));
+        player.sendMessage(TextUtils.composePlainInfoMessage("Settlement ").append(TextUtils.composeSettlementDisplay(settlement)));
+        player.sendMessage(Component.text(INDENT).append(settlement.getDescription()));
         player.sendMessage(Component.text());
-        player.sendMessage(Component.text("    Nation: ").color(TextUtils.LIGHT_BRASS)
-                .append(Component.text(settlement.isInNation() ? settlement.getNation().getName() : "None").color(TextUtils.ZORBA)));
-        player.sendMessage(Component.text("    Members:").color(TextUtils.LIGHT_BRASS));
+        if (settlement.isInNation()) {
+            player.sendMessage(Component.text(INDENT + "Nation: ", TextUtils.LIGHT_BRASS)
+                    .append(settlement.getNation().getDisplayName()));
+        } else {
+            player.sendMessage(Component.text(INDENT + "Nation: ", TextUtils.LIGHT_BRASS)
+                    .append(Component.text("None", TextUtils.ZORBA)));
+        }
+
+        player.sendMessage(Component.text(INDENT + "Members:", TextUtils.LIGHT_BRASS));
         settlement.getPopulation().entrySet().stream()
                 .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
                 .limit(10)
                 .forEach(entry -> {
-                    player.sendMessage(Component.text("    - ").color(TextUtils.LIGHT_BRASS)
+                    player.sendMessage(Component.text(INDENT + "- ", TextUtils.LIGHT_BRASS)
                             .append(entry.getValue().getDisplayAsComponent())
                             .append(Component.space())
-                            .append(Component.text(Bukkit.getPlayer(entry.getKey()).getName()).color(TextUtils.ZORBA))
+                            .append(Component.text(Bukkit.getPlayer(entry.getKey()).getName(), TextUtils.LIGHT_ZORBA))
                     );
                 });
         if (settlement.getPopulation().size() > 10) {
-            player.sendMessage(Component.text("    - ").color(TextUtils.BRASS)
+            player.sendMessage(Component.text(INDENT + "- ", TextUtils.LIGHT_BRASS)
                 .append(Component.text("...").color(TextUtils.ZORBA))
             );
         }

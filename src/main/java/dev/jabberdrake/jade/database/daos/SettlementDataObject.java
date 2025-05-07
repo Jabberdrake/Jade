@@ -255,6 +255,7 @@ public class SettlementDataObject implements DatabaseObject<Settlement, Integer>
                 } else {
                     stmt.setInt(7, settlement.getNation().getId());
                 }
+                stmt.setInt(8, settlement.getId());
             });
         } catch (SQLException e) {
             plugin.getLogger().warning("[SettlementDataObject::save] Caught SQLException while saving data object for settlement" + settlement.getName() + ": ");

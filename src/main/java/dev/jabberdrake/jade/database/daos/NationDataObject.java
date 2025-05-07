@@ -135,6 +135,7 @@ public class NationDataObject implements DatabaseObject<Nation, Integer> {
                 stmt.setString(5, nation.getIconAsString());
                 stmt.setLong(6, nation.getCreationTimeAsLong());
                 stmt.setInt(7, nation.getCapital().getId());
+                stmt.setInt(8, nation.getId());
             });
         } catch (SQLException e) {
             plugin.getLogger().warning("[NationDataObject::save] Caught SQLException while saving data object for nation " + nation.getName() + ": ");

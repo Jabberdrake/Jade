@@ -1,5 +1,6 @@
 package dev.jabberdrake.jade.utils;
 
+import dev.jabberdrake.jade.realms.Settlement;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
@@ -126,6 +127,13 @@ public class TextUtils {
         return Component.text()
                 .append(TextUtils.SYMBOL_DENIED)
                 .append(Component.text(" " + content, TextUtils.DARK_CHROME))
+                .build();
+    }
+
+    public static Component composeSettlementDisplay(Settlement stm) {
+        return Component.text()
+                .append(stm.getDisplayName())
+                .append(Component.text(" (" + stm.getName() + ")", TextUtils.LIGHT_ZORBA))
                 .build();
     }
 
