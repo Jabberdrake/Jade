@@ -42,13 +42,13 @@ public class SettlementDemoteCommand {
         Player target = Bukkit.getPlayer(targetName);
         UUID targetUUID = target.getUniqueId();
         if (Bukkit.getPlayer(targetName) == null) {
-            sender.sendMessage(TextUtils.composePlainErrorMessage("Could not find the specified player."));
+            sender.sendMessage(TextUtils.composeSimpleErrorMessage("Could not find the specified player."));
             return Command.SINGLE_SUCCESS;
         } else if (targetName.equals(sender.getName())) {
-            sender.sendMessage(TextUtils.composePlainErrorMessage("You can't demote yourself!"));
+            sender.sendMessage(TextUtils.composeSimpleErrorMessage("You can't demote yourself!"));
             return Command.SINGLE_SUCCESS;
         } else if (!focus.containsPlayer(targetUUID)) {
-            sender.sendMessage(TextUtils.composePlainErrorMessage("The specified player is not a member of your focus settlement!."));
+            sender.sendMessage(TextUtils.composeSimpleErrorMessage("The specified player is not a member of your focus settlement!."));
             return Command.SINGLE_SUCCESS;
         }
 
@@ -56,7 +56,7 @@ public class SettlementDemoteCommand {
 
         SettlementRole fromTitle = focus.getRoleFromMember(targetUUID);
         if (fromTitle.getAuthority() >= senderTitle.getAuthority()) {
-            sender.sendMessage(TextUtils.composePlainErrorMessage("Target player is of equal or higher authority than you!."));
+            sender.sendMessage(TextUtils.composeSimpleErrorMessage("Target player is of equal or higher authority than you!."));
             return Command.SINGLE_SUCCESS;
         }
 
@@ -82,13 +82,13 @@ public class SettlementDemoteCommand {
         Player target = Bukkit.getPlayer(targetName);
         UUID targetUUID = target.getUniqueId();
         if (Bukkit.getPlayer(targetName) == null) {
-            sender.sendMessage(TextUtils.composePlainErrorMessage("Could not find the specified player."));
+            sender.sendMessage(TextUtils.composeSimpleErrorMessage("Could not find the specified player."));
             return Command.SINGLE_SUCCESS;
         } else if (targetName.equals(sender.getName())) {
-            sender.sendMessage(TextUtils.composePlainErrorMessage("You can't demote yourself!"));
+            sender.sendMessage(TextUtils.composeSimpleErrorMessage("You can't demote yourself!"));
             return Command.SINGLE_SUCCESS;
         } else if (!focus.containsPlayer(targetUUID)) {
-            sender.sendMessage(TextUtils.composePlainErrorMessage("The specified player is not a member of your focus settlement!"));
+            sender.sendMessage(TextUtils.composeSimpleErrorMessage("The specified player is not a member of your focus settlement!"));
             return Command.SINGLE_SUCCESS;
         }
 
@@ -96,7 +96,7 @@ public class SettlementDemoteCommand {
 
         SettlementRole fromTitle = focus.getRoleFromMember(targetUUID);
         if (fromTitle.getAuthority() >= senderTitle.getAuthority()) {
-            sender.sendMessage(TextUtils.composePlainErrorMessage("Target player is of equal or higher authority than you!"));
+            sender.sendMessage(TextUtils.composeSimpleErrorMessage("Target player is of equal or higher authority than you!"));
             return Command.SINGLE_SUCCESS;
         }
 
@@ -104,12 +104,12 @@ public class SettlementDemoteCommand {
 
         SettlementRole toTitle = focus.getRoleFromName(titleArgument);
         if (toTitle == null) {
-            sender.sendMessage(TextUtils.composePlainErrorMessage("Could not find specified title!"));
+            sender.sendMessage(TextUtils.composeSimpleErrorMessage("Could not find specified title!"));
             return Command.SINGLE_SUCCESS;
         }
 
         if (toTitle.getAuthority() >= senderTitle.getAuthority()) {
-            sender.sendMessage(TextUtils.composePlainErrorMessage("You can only demote members to titles of lower authority than yours!"));
+            sender.sendMessage(TextUtils.composeSimpleErrorMessage("You can only demote members to titles of lower authority than yours!"));
             return Command.SINGLE_SUCCESS;
         }
 
@@ -128,17 +128,17 @@ public class SettlementDemoteCommand {
 
         if (settlement == null) {
             // NOTE: Since it just uses whichever settlement you're focusing on, this shouldn't ever happen.
-            player.sendMessage(TextUtils.composePlainErrorMessage("You are not focusing on any settlement."));
+            player.sendMessage(TextUtils.composeSimpleErrorMessage("You are not focusing on any settlement."));
             return false;
         } else if (!settlement.containsPlayer(player.getUniqueId())) {
             // NOTE: Since it just uses whichever settlement you're focusing on, this shouldn't ever happen.
-            player.sendMessage(TextUtils.composePlainErrorMessage("You are not a member of ")
+            player.sendMessage(TextUtils.composeSimpleErrorMessage("You are not a member of ")
                     .append(settlement.getDisplayName())
                     .append(TextUtils.composeErrorText("!"))
             );
             return false;
         } else if (!settlement.getRoleFromMember(player.getUniqueId()).canDemote()) {
-            player.sendMessage(TextUtils.composePlainErrorMessage("You are not allowed to demote members in ")
+            player.sendMessage(TextUtils.composeSimpleErrorMessage("You are not allowed to demote members in ")
                     .append(settlement.getDisplayName())
                     .append(TextUtils.composeErrorText("!"))
             );

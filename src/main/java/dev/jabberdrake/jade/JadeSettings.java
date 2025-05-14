@@ -16,6 +16,7 @@ public class JadeSettings {
     // GENERIC
     public static String gameworld = "world";
     public static String database = "jade.db";
+    public static int chunkCost = 20;
 
     // GAMERULES
     public static boolean preventCoralFade = true;
@@ -29,6 +30,7 @@ public class JadeSettings {
         // Load generics
         gameworld = config.getString("generic.gameworld");
         database = config.getString("generic.database");
+        chunkCost = config.getInt("generic.chunkCost");
 
         // Load gamerules
         preventCoralFade = config.getBoolean("gamerules.preventCoralFade");

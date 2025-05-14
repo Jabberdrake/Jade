@@ -38,13 +38,13 @@ public class AdminGameruleCommand {
 
         boolean result = JadeSettings.setGamerule(gameruleArg, valueArg);
         if (result == true) {
-            player.sendMessage(TextUtils.composePlainSuccessMessage("Gamerule ")
+            player.sendMessage(TextUtils.composeSimpleSuccessMessage("Gamerule ")
                     .append(TextUtils.composeSuccessHighlight(gameruleArg))
                     .append(TextUtils.composeSuccessText(" is now set to "))
                     .append(TextUtils.composeSuccessHighlight(valueArg.toString()).decorate(TextDecoration.ITALIC))
             );
         } else {
-            player.sendMessage(TextUtils.composePlainErrorMessage("That gamerule does not exist!"));
+            player.sendMessage(TextUtils.composeSimpleErrorMessage("That gamerule does not exist!"));
         }
 
         return Command.SINGLE_SUCCESS;

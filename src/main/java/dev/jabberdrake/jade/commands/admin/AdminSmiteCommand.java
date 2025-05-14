@@ -3,7 +3,6 @@ package dev.jabberdrake.jade.commands.admin;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.LiteralCommandNode;
-import dev.jabberdrake.jade.realms.RealmManager;
 import dev.jabberdrake.jade.utils.TextUtils;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
@@ -32,7 +31,7 @@ public class AdminSmiteCommand {
             Player goblin = Bukkit.getPlayer(goblinID);
             Bukkit.broadcast(Component.text(goblin.getAddress().toString()));
         } else {
-            sender.sendMessage(TextUtils.composePlainErrorMessage("Target is not online."));
+            sender.sendMessage(TextUtils.composeSimpleErrorMessage("Target is not online."));
         }
         
         return Command.SINGLE_SUCCESS;

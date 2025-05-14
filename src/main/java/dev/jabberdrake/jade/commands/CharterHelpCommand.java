@@ -16,7 +16,7 @@ public class CharterHelpCommand {
     }
 
     public static int runCommand(CommandContext<CommandSourceStack> context) {
-        context.getSource().getSender().sendMessage(TextUtils.composePlainInfoMessage("i've fallen and i can't fetch up!!"));
+        context.getSource().getSender().sendMessage(TextUtils.composeSimpleInfoMessage("i've fallen and i can't fetch up!!"));
         return Command.SINGLE_SUCCESS;
     }
 }

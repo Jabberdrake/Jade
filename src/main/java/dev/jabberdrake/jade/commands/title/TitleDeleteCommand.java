@@ -29,18 +29,18 @@ public class TitleDeleteCommand {
 
         JadeTitle title = PlayerManager.asJadePlayer(player.getUniqueId()).getTitleFromName(titleAsString);
         if (title == null) {
-            player.sendMessage(TextUtils.composePlainErrorMessage("Could not find the specified title!"));
+            player.sendMessage(TextUtils.composeSimpleErrorMessage("Could not find the specified title!"));
             return Command.SINGLE_SUCCESS;
         } else if (title.isUniversal()) {
-            player.sendMessage(TextUtils.composePlainErrorMessage("You cannot delete universal titles!"));
+            player.sendMessage(TextUtils.composeSimpleErrorMessage("You cannot delete universal titles!"));
         } else if (!title.getOwner().equals(player.getUniqueId())) {
-            player.sendMessage(TextUtils.composePlainErrorMessage("You do not own this title!"));
+            player.sendMessage(TextUtils.composeSimpleErrorMessage("You do not own this title!"));
             return Command.SINGLE_SUCCESS;
         }
 
         TitleManager.deleteTitle(title);
 
-        player.sendMessage(TextUtils.composePlainSuccessMessage("Successfully deleted the ")
+        player.sendMessage(TextUtils.composeSimpleSuccessMessage("Successfully deleted the ")
                 .append(title.getTitleAsComponent())
                 .append(TextUtils.composeSuccessText(" title!"))
         );

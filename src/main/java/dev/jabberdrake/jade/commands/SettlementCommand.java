@@ -13,8 +13,8 @@ public class SettlementCommand {
         return Commands.literal(label)
                     .executes(SettlementCommand::runCommand)
                 .then(SettlementListCommand.buildCommand("list")) //NEEDS WORK
-                .then(SettlementInfoCommand.buildCommand("info")) //NEEDS WORK
-                .then(SettlementCreateCommand.buildCommand("create")) //NEEDS WORK
+                .then(SettlementInfoCommand.buildCommand("info"))
+                .then(SettlementCreateCommand.buildCommand("create"))
                 .then(SettlementInviteCommand.buildCommand("invite"))
                 .then(SettlementKickCommand.buildCommand("kick"))
                 .then(SettlementJoinCommand.buildCommand("join"))
@@ -23,9 +23,10 @@ public class SettlementCommand {
                 .then(SettlementManageCommand.buildCommand("manage")) //NEEDS WORK
                 .then(SettlementPromoteCommand.buildCommand("promote"))
                 .then(SettlementDemoteCommand.buildCommand("demote"))
-                .then(SettlementEditCommand.buildCommand("edit")) //NEEDS WORK
+                .then(SettlementEditCommand.buildCommand("edit"))
                 .then(SettlementDisbandCommand.buildCommand("disband"))
                 .then(SettlementMapCommand.buildCommand("map"))
+                .then(SettlementFoodCommand.buildCommand("food"))
                 .then(SettlementViewCommand.buildCommand("view"))
                 .then(SettlementFocusCommand.buildCommand("focus"))
                 .build();

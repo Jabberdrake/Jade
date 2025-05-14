@@ -5,7 +5,9 @@ import dev.jabberdrake.jade.utils.TextUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 import java.time.Instant;
 import java.time.ZoneId;
@@ -19,6 +21,7 @@ public class Settlement {
     private static final String DEFAULT_NAME_DECORATION = "<gold><bold>";
     private static final String DEFAULT_DESC = "<green>Settlement of <gold>";
     private static final TextColor DEFAULT_MAP_COLOR = TextUtils.ZORBA;
+    private static final int DEFAULT_MAX_FOOD = 1000;
 
     private int id;
     private String name;
@@ -26,6 +29,8 @@ public class Settlement {
     private String description;
     private TextColor mapColor;
     private String icon;
+    private int food;
+    private int foodCapacity;
     private long creationTime;
     private Nation nation;
     private List<SettlementRole> roles;
@@ -33,18 +38,21 @@ public class Settlement {
     private Set<ChunkAnchor> territory;
 
     // Used by DatabaseManager when composing runtime object from persistent data
-    public Settlement(int id, String name, String displayName, String description, TextColor mapColor, String icon, long creationTime, Nation nation) {
+    public Settlement(int id, String name, String displayName, String description, TextColor mapColor, String icon, int food, long creationTime, Nation nation) {
         this.id = id;
         this.name = name;
         this.displayName = displayName;
         this.description = description;
         this.mapColor = mapColor;
         this.icon = icon;
+        this.food = food;
         this.creationTime = creationTime;
         this.nation = nation;
         this.roles = new ArrayList<>();
         this.population = new HashMap<>();
         this.territory = new HashSet<>();
+
+        calculateFoodCapacity();
     }
 
     // Used by RealmManager when creating new settlement
@@ -53,9 +61,11 @@ public class Settlement {
         this.displayName = DEFAULT_NAME_DECORATION + name;
         this.description = DEFAULT_DESC + leader.getName();
         this.mapColor = DEFAULT_MAP_COLOR;
-        this.nation = null;
         this.icon = "minecraft:oak_planks";
+        this.food = 20;
+        this.calculateFoodCapacity();
         this.creationTime = System.currentTimeMillis() / 1000L;
+        this.nation = null;
 
         this.id = DatabaseManager.createSettlement(this);
 
@@ -71,6 +81,7 @@ public class Settlement {
         RealmManager.claimChunk(this, startingChunk); //This will call Settlement::addChunk
     }
 
+    /*
     public Settlement(int id, String name, String displayName, String description, TextColor mapColor) {
         this.id = id;
         this.name = name;
@@ -80,7 +91,7 @@ public class Settlement {
         this.roles = new ArrayList<>();
         this.population = new HashMap<>();
         this.territory = new HashSet<>();
-    }
+    }*/
 
     public int getId() {
         return this.id;
@@ -135,6 +146,40 @@ public class Settlement {
     public void setIcon(String icon) {
         this.icon = icon;
         DatabaseManager.saveSettlement(this);
+    }
+
+    public int getFood() {
+        return this.food;
+    }
+
+    public void setFood(int food) {
+        this.food = food;
+        DatabaseManager.saveSettlement(this);
+    }
+
+    public boolean hasFood() {
+        return this.hasFood(0);
+    }
+
+    public boolean hasFood(int threshold) {
+        return this.getFood() >= threshold;
+    }
+
+    public boolean canHandleFoodDeposit(int amount) {
+        return this.getFoodCapacity() - this.getFood() >= amount;
+    }
+
+    public void addFood(int amount) {
+        this.setFood(this.getFood() + amount);
+    }
+
+    public int getFoodCapacity() {
+        return this.foodCapacity;
+    }
+
+    public void calculateFoodCapacity() {
+        //TODO: make this not dumb as shit
+        this.foodCapacity = DEFAULT_MAX_FOOD;
     }
 
     public long getCreationTimeAsLong() { return this.creationTime; }
@@ -335,6 +380,17 @@ public class Settlement {
             Settlement other = (Settlement) object;
             return this.getId() == other.getId();
         } else return false;
+    }
+
+    public Component asTextComponent() {
+        return Component.text()
+                .append(this.getDisplayName())
+                .append(Component.text(" (" + this.getName() + ")", TextUtils.LIGHT_ZORBA))
+                .build();
+    }
+
+    public ItemStack asDisplayItem() {
+        return ItemStack.of(Material.BARRIER);
     }
 
     @Override

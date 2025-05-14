@@ -4,7 +4,6 @@ import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.LiteralCommandNode;
-import dev.jabberdrake.jade.players.JadePlayer;
 import dev.jabberdrake.jade.players.PlayerManager;
 import dev.jabberdrake.jade.realms.SettlementRole;
 import dev.jabberdrake.jade.realms.Settlement;
@@ -35,10 +34,10 @@ public class SettlementKickCommand {
 
         SettlementRole senderTitle = focus.getRoleFromMember(player.getUniqueId());
         if (senderTitle == null) {
-            player.sendMessage(TextUtils.composePlainErrorMessage("Could not find a matching title for command sender. Please report this to a developer!"));
+            player.sendMessage(TextUtils.composeSimpleErrorMessage("Could not find a matching title for command sender. Please report this to a developer!"));
             return Command.SINGLE_SUCCESS;
         } else if (!senderTitle.canKick()) {
-            player.sendMessage(TextUtils.composePlainErrorMessage("You do not have the permission to kick a member."));
+            player.sendMessage(TextUtils.composeSimpleErrorMessage("You do not have the permission to kick a member."));
             return Command.SINGLE_SUCCESS;
         }
 
@@ -47,16 +46,16 @@ public class SettlementKickCommand {
         UUID targetUUID = target.getUniqueId();
         SettlementRole settlementRole = focus.getRoleFromMember(targetUUID);
         if (Bukkit.getPlayer(targetName) == null) {
-            player.sendMessage(TextUtils.composePlainErrorMessage("Could not find the specified player."));
+            player.sendMessage(TextUtils.composeSimpleErrorMessage("Could not find the specified player."));
             return Command.SINGLE_SUCCESS;
         } else if (targetName.equals(player.getName())) {
-            player.sendMessage(TextUtils.composePlainErrorMessage("You can't kick yourself! To leave the settlement, do /settlement leave."));
+            player.sendMessage(TextUtils.composeSimpleErrorMessage("You can't kick yourself! To leave the settlement, do /settlement leave."));
             return Command.SINGLE_SUCCESS;
         } else if (!focus.containsPlayer(targetUUID)) {
-            player.sendMessage(TextUtils.composePlainErrorMessage("The specified player is not a member of your focus settlement."));
+            player.sendMessage(TextUtils.composeSimpleErrorMessage("The specified player is not a member of your focus settlement."));
             return Command.SINGLE_SUCCESS;
         } else if (settlementRole.getAuthority() >= senderTitle.getAuthority()) {
-            player.sendMessage(TextUtils.composePlainErrorMessage("The specified player has a higher authority title than you!."));
+            player.sendMessage(TextUtils.composeSimpleErrorMessage("The specified player has a higher authority title than you!."));
             return Command.SINGLE_SUCCESS;
         }
 
@@ -69,7 +68,7 @@ public class SettlementKickCommand {
                 .append((TextUtils.composeSuccessHighlight("!")))
         );
 
-        target.sendMessage(TextUtils.composePlainInfoMessage("You have been kicked from ")
+        target.sendMessage(TextUtils.composeSimpleInfoMessage("You have been kicked from ")
                 .append(focus.getDisplayName())
                 .append(TextUtils.composeInfoText("!"))
         );
@@ -81,11 +80,11 @@ public class SettlementKickCommand {
 
         if (settlement == null) {
             // NOTE: Since it just uses whichever settlement you're focusing on, this shouldn't ever happen.
-            player.sendMessage(TextUtils.composePlainErrorMessage("You are not focusing on any settlement."));
+            player.sendMessage(TextUtils.composeSimpleErrorMessage("You are not focusing on any settlement."));
             return false;
         } else if (!settlement.containsPlayer(player.getUniqueId())) {
             // NOTE: Since it just uses whichever settlement you're focusing on, this shouldn't ever happen.
-            player.sendMessage(TextUtils.composePlainErrorMessage("You are not a member of ")
+            player.sendMessage(TextUtils.composeSimpleErrorMessage("You are not a member of ")
                     .append(settlement.getDisplayName())
                     .append(TextUtils.composeErrorText("!"))
             );

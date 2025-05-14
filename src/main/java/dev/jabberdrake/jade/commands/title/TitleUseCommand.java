@@ -30,18 +30,18 @@ public class TitleUseCommand {
         JadePlayer jadePlayer = PlayerManager.asJadePlayer(player.getUniqueId());
         JadeTitle title = jadePlayer.getTitleFromName(titleAsString);
         if (title == null) {
-            player.sendMessage(TextUtils.composePlainErrorMessage("Could not find the specified title!"));
+            player.sendMessage(TextUtils.composeSimpleErrorMessage("Could not find the specified title!"));
             return Command.SINGLE_SUCCESS;
         }
 
         if (jadePlayer.getTitleInUse().equals(title)) {
-            player.sendMessage(TextUtils.composePlainErrorMessage("You are already using that title!"));
+            player.sendMessage(TextUtils.composeSimpleErrorMessage("You are already using that title!"));
             return Command.SINGLE_SUCCESS;
         }
 
         jadePlayer.setTitleInUse(title);
 
-        player.sendMessage(TextUtils.composePlainInfoMessage("Now using the ")
+        player.sendMessage(TextUtils.composeSimpleInfoMessage("Now using the ")
                 .append(title.getTitleAsComponent())
                 .append(TextUtils.composeInfoText(" title!"))
         );

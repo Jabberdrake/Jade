@@ -84,7 +84,7 @@ public final class Jade extends JavaPlugin {
 
     private void registerCommands() {
         this.getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, commands -> {
-            commands.registrar().register(CharterCommand.buildCommand("charter"), "An all-purpose command for the Charter plugin!");
+            commands.registrar().register(CharterCommand.buildCommand("jade"), "An all-purpose command for the Jade plugin!");
             commands.registrar().register(SettlementCommand.buildCommand("settlement"), "Manages settlement interactions!");
             commands.registrar().register(TitleCommand.buildCommand("title"), "Manages vanity titles!");
             commands.registrar().register(ProfileCommand.buildCommand("profile"), "Manage profile interactions!");
@@ -139,7 +139,7 @@ public final class Jade extends JavaPlugin {
                         .build();
 
                 stmMarker.setMinDistance(50);
-                settlementSet.put("charter.settlements." + settlement.getName().toLowerCase() + ".segment-" + i++, stmMarker);
+                settlementSet.put("jade.settlements." + settlement.getName().toLowerCase() + ".segment-" + i++, stmMarker);
             }
         }
 

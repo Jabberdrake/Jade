@@ -35,12 +35,12 @@ public class TitleAllowCommand {
 
         JadeTitle title = PlayerManager.asJadePlayer(player.getUniqueId()).getTitleFromName(titleAsString);
         if (title == null) {
-            player.sendMessage(TextUtils.composePlainErrorMessage("Could not find the specified title!"));
+            player.sendMessage(TextUtils.composeSimpleErrorMessage("Could not find the specified title!"));
             return Command.SINGLE_SUCCESS;
         } else if (title.isUniversal()) {
-            player.sendMessage(TextUtils.composePlainErrorMessage("You cannot allow access to universal titles!"));
+            player.sendMessage(TextUtils.composeSimpleErrorMessage("You cannot allow access to universal titles!"));
         } else if (!title.getOwner().equals(player.getUniqueId())) {
-            player.sendMessage(TextUtils.composePlainErrorMessage("You do not own this title!"));
+            player.sendMessage(TextUtils.composeSimpleErrorMessage("You do not own this title!"));
             return Command.SINGLE_SUCCESS;
         }
 
@@ -48,13 +48,13 @@ public class TitleAllowCommand {
         Player target = Bukkit.getPlayer(targetName);
         UUID targetUUID = target.getUniqueId();
         if (Bukkit.getPlayer(targetName) == null) {
-            player.sendMessage(TextUtils.composePlainErrorMessage("Could not find the specified player."));
+            player.sendMessage(TextUtils.composeSimpleErrorMessage("Could not find the specified player."));
             return Command.SINGLE_SUCCESS;
         } else if (targetName.equals(player.getName())) {
-            player.sendMessage(TextUtils.composePlainErrorMessage("You already own the title, silly!"));
+            player.sendMessage(TextUtils.composeSimpleErrorMessage("You already own the title, silly!"));
             return Command.SINGLE_SUCCESS;
         } else if (title.isAvailableTo(targetUUID)) {
-            player.sendMessage(TextUtils.composePlainErrorMessage("This player can already use the specified title!"));
+            player.sendMessage(TextUtils.composeSimpleErrorMessage("This player can already use the specified title!"));
             return Command.SINGLE_SUCCESS;
         }
 

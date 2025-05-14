@@ -20,15 +20,15 @@ public class AdminRebuildCommand {
 
     public static int runCommand(CommandContext<CommandSourceStack> context) {
         CommandSender sender = context.getSource().getSender();
-        Bukkit.broadcast(TextUtils.composePlainOperatorMessage("An administrator is now rebuilding internal data structures. This might lag for a bit..."));
+        Bukkit.broadcast(TextUtils.composeSimpleOperatorMessage("An administrator is now rebuilding internal data structures. This might lag for a bit..."));
 
-        sender.sendMessage(TextUtils.composePlainOperatorMessage("Rebuilding realm data from database..."));
+        sender.sendMessage(TextUtils.composeSimpleOperatorMessage("Rebuilding realm data from database..."));
         RealmManager.reload();
 
         int settlementCount = RealmManager.getSettlementCount();
         int nationCount = RealmManager.getNationCount();
         sender.sendMessage(
-                TextUtils.composePlainSuccessMessage("Successfully loaded ")
+                TextUtils.composeSimpleSuccessMessage("Successfully loaded ")
                         .append(TextUtils.composeSuccessHighlight(String.valueOf(settlementCount)))
                         .append(TextUtils.composeSuccessText(" settlements and "))
                         .append(TextUtils.composeSuccessHighlight(String.valueOf(nationCount)))

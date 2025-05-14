@@ -1,6 +1,7 @@
 package dev.jabberdrake.jade.realms;
 
 import dev.jabberdrake.jade.Jade;
+import dev.jabberdrake.jade.JadeSettings;
 import dev.jabberdrake.jade.database.DatabaseManager;
 import dev.jabberdrake.jade.players.PlayerManager;
 import org.bukkit.Chunk;
@@ -191,7 +192,7 @@ public class RealmManager {
     }
 
     public static boolean claimChunk(Settlement settlement, ChunkAnchor anchor) {
-        if (RealmManager.getChunkOwner(anchor) == null) {
+        if (RealmManager.getChunkOwner(anchor) == null && settlement.getFood() > JadeSettings.chunkCost) {
             settlement.addChunk(anchor);
 
             territoryMap.put(anchor, settlement);

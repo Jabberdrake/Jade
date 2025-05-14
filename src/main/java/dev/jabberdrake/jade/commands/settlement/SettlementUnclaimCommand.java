@@ -35,7 +35,7 @@ public class SettlementUnclaimCommand {
                     .append(TextUtils.composeSuccessText("!"))
             );
         } else {
-            player.sendMessage(TextUtils.composePlainErrorMessage("This chunk is not claimed by ")
+            player.sendMessage(TextUtils.composeSimpleErrorMessage("This chunk is not claimed by ")
                     .append(TextUtils.composeErrorHighlight(RealmManager.getChunkOwner(currentChunk).getName()))
                     .append(TextUtils.composeErrorText("!"))
             );
@@ -48,17 +48,17 @@ public class SettlementUnclaimCommand {
 
         if (settlement == null) {
             // NOTE: Since it just uses whichever settlement you're focusing on, this shouldn't ever happen.
-            player.sendMessage(TextUtils.composePlainErrorMessage("You are not focusing on any settlement."));
+            player.sendMessage(TextUtils.composeSimpleErrorMessage("You are not focusing on any settlement."));
             return false;
         } else if (!settlement.containsPlayer(player.getUniqueId())) {
             // NOTE: Since it just uses whichever settlement you're focusing on, this shouldn't ever happen.
-            player.sendMessage(TextUtils.composePlainErrorMessage("You are not a member of ")
+            player.sendMessage(TextUtils.composeSimpleErrorMessage("You are not a member of ")
                     .append(settlement.getDisplayName())
                     .append(TextUtils.composeErrorText("!"))
             );
             return false;
         } else if (!settlement.getRoleFromMember(player.getUniqueId()).canUnclaim()) {
-            player.sendMessage(TextUtils.composePlainErrorMessage("You are not allowed to unclaim chunks for ")
+            player.sendMessage(TextUtils.composeSimpleErrorMessage("You are not allowed to unclaim chunks for ")
                     .append(settlement.getDisplayName())
                     .append(TextUtils.composeErrorText("!"))
             );

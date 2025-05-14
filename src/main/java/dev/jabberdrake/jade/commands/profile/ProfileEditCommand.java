@@ -50,7 +50,7 @@ public class ProfileEditCommand {
                 );
                 break;
             default:
-                player.sendMessage(TextUtils.composePlainErrorMessage("Unknown profile attribute!"));
+                player.sendMessage(TextUtils.composeSimpleErrorMessage("Unknown profile attribute!"));
         }
         return Command.SINGLE_SUCCESS;
     }

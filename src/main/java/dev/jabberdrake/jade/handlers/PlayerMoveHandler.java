@@ -1,5 +1,6 @@
 package dev.jabberdrake.jade.handlers;
 
+import dev.jabberdrake.jade.JadeSettings;
 import dev.jabberdrake.jade.players.JadePlayer;
 import dev.jabberdrake.jade.players.PlayerManager;
 import dev.jabberdrake.jade.realms.ChunkAnchor;
@@ -41,6 +42,8 @@ public class PlayerMoveHandler implements Listener {
                             .append(jadePlayer.getFocusSettlement().getDisplayName())
                             .append(TextUtils.composeSuccessText("!"))
                     );
+                } else if (jadePlayer.getFocusSettlement().getFood() < JadeSettings.chunkCost) {
+                    player.sendActionBar(TextUtils.composeErrorText("Not enough food!"));
                 }
 
             } else {

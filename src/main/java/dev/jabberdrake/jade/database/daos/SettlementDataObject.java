@@ -34,7 +34,7 @@ public class SettlementDataObject implements DatabaseObject<Settlement, Integer>
     @Override
     public Settlement fetch(Integer id) {
         Settlement[] result = {null};
-        String sql = "SELECT name, display_name, description, map_color, icon, creation_time, nation_id FROM settlements WHERE id = ?";
+        String sql = "SELECT name, display_name, description, map_color, icon, food, creation_time, nation_id FROM settlements WHERE id = ?";
         try {
             database.query(sql, stmt -> {
                 stmt.setInt(1, id);
@@ -45,6 +45,7 @@ public class SettlementDataObject implements DatabaseObject<Settlement, Integer>
                     String description = resultSet.getString("description");
                     String mapColor = resultSet.getString("map_color");
                     String icon = resultSet.getString("icon");
+                    int food = resultSet.getInt("food");
                     long creationTime = resultSet.getLong("creation_time");
                     int nationId = resultSet.getInt("nation_id");
 
@@ -53,9 +54,9 @@ public class SettlementDataObject implements DatabaseObject<Settlement, Integer>
                     // Otherwise, we'll request the RealmManager to hand over the relevant
                     // nation object.
                     if (nationId == 0) {
-                        result[0] = new Settlement(id, name, displayName, description, TextColor.fromHexString(mapColor), icon, creationTime, null);
+                        result[0] = new Settlement(id, name, displayName, description, TextColor.fromHexString(mapColor), icon, food, creationTime, null);
                     } else {
-                        result[0] = new Settlement(id, name, displayName, description, TextColor.fromHexString(mapColor), icon, creationTime, RealmManager.getNation(nationId));
+                        result[0] = new Settlement(id, name, displayName, description, TextColor.fromHexString(mapColor), icon, food, creationTime, RealmManager.getNation(nationId));
                     }
                 }
             });
@@ -79,7 +80,7 @@ public class SettlementDataObject implements DatabaseObject<Settlement, Integer>
 
     public Settlement fetchByName(String name) {
         Settlement[] result = {null};
-        String sql = "SELECT id, display_name, description, map_color, icon, creation_time, nation_id FROM settlements WHERE name = ?";
+        String sql = "SELECT id, display_name, description, map_color, icon, food, creation_time, nation_id FROM settlements WHERE name = ?";
         try {
             database.query(sql, stmt -> {
                 stmt.setString(1, name);
@@ -90,6 +91,7 @@ public class SettlementDataObject implements DatabaseObject<Settlement, Integer>
                     String description = resultSet.getString("description");
                     String mapColor = resultSet.getString("map_color");
                     String icon = resultSet.getString("icon");
+                    int food = resultSet.getInt("food");
                     long creationTime = resultSet.getLong("creation_time");
                     int nationId = resultSet.getInt("nation_id");
 
@@ -98,9 +100,9 @@ public class SettlementDataObject implements DatabaseObject<Settlement, Integer>
                     // Otherwise, we'll request the RealmManager to hand over the relevant
                     // nation object.
                     if (nationId == 0) {
-                        result[0] = new Settlement(id, name, displayName, description, TextColor.fromHexString(mapColor), icon, creationTime, null);
+                        result[0] = new Settlement(id, name, displayName, description, TextColor.fromHexString(mapColor), icon, food, creationTime, null);
                     } else {
-                        result[0] = new Settlement(id, name, displayName, description, TextColor.fromHexString(mapColor), icon, creationTime, RealmManager.getNation(nationId));
+                        result[0] = new Settlement(id, name, displayName, description, TextColor.fromHexString(mapColor), icon, food, creationTime, RealmManager.getNation(nationId));
                     }
                 }
             });
@@ -200,7 +202,7 @@ public class SettlementDataObject implements DatabaseObject<Settlement, Integer>
     @Override
     public List<Settlement> fetchAll() {
         List<Settlement> settlements = new ArrayList<>();
-        String sql = "SELECT id, name, display_name, description, map_color, icon, creation_time, nation_id FROM settlements";
+        String sql = "SELECT id, name, display_name, description, map_color, icon, food, creation_time, nation_id FROM settlements";
         try {
             database.query(sql,resultSet -> {
                 while (resultSet.next()) {
@@ -210,6 +212,7 @@ public class SettlementDataObject implements DatabaseObject<Settlement, Integer>
                     String description = resultSet.getString("description");
                     String mapColor = resultSet.getString("map_color");
                     String icon = resultSet.getString("icon");
+                    int food = resultSet.getInt("food");
                     long creationTime = resultSet.getLong("creation_time");
                     int nationId = resultSet.getInt("nation_id"); // If this settlement is not part of any nation (nation_id is set to NULL), this int is set to 0 due to how java.sql works
 
@@ -219,9 +222,9 @@ public class SettlementDataObject implements DatabaseObject<Settlement, Integer>
                     // nation object.
                     Settlement stm;
                     if (nationId == 0) {
-                        stm = new Settlement(id, name, displayName, description, TextColor.fromHexString(mapColor), icon, creationTime, null);
+                        stm = new Settlement(id, name, displayName, description, TextColor.fromHexString(mapColor), icon, food, creationTime, null);
                     } else {
-                        stm = new Settlement(id, name, displayName, description, TextColor.fromHexString(mapColor), icon, creationTime, RealmManager.getNation(nationId));
+                        stm = new Settlement(id, name, displayName, description, TextColor.fromHexString(mapColor), icon, food, creationTime, RealmManager.getNation(nationId));
                     }
 
                     stm.setRoles(this.fetchRoles(stm));
@@ -241,7 +244,7 @@ public class SettlementDataObject implements DatabaseObject<Settlement, Integer>
 
     @Override
     public void save(Settlement settlement) {
-        String sql = "UPDATE settlements SET name = ?, display_name = ?, description = ?, map_color = ?, icon = ?, creation_time = ?, nation_id = ? WHERE id = ?;";
+        String sql = "UPDATE settlements SET name = ?, display_name = ?, description = ?, map_color = ?, icon = ?, food = ?, creation_time = ?, nation_id = ? WHERE id = ?;";
         try {
             database.execute(sql, stmt -> {
                 stmt.setString(1, settlement.getName());
@@ -249,13 +252,14 @@ public class SettlementDataObject implements DatabaseObject<Settlement, Integer>
                 stmt.setString(3, settlement.getDescriptionAsString());
                 stmt.setString(4, settlement.getMapColor().asHexString());
                 stmt.setString(5, settlement.getIconAsString());
-                stmt.setLong(6, settlement.getCreationTimeAsLong());
+                stmt.setInt(6, settlement.getFood());
+                stmt.setLong(7, settlement.getCreationTimeAsLong());
                 if (settlement.getNation() == null) {
-                    stmt.setNull(7, Types.INTEGER);
+                    stmt.setNull(8, Types.INTEGER);
                 } else {
-                    stmt.setInt(7, settlement.getNation().getId());
+                    stmt.setInt(8, settlement.getNation().getId());
                 }
-                stmt.setInt(8, settlement.getId());
+                stmt.setInt(9, settlement.getId());
             });
         } catch (SQLException e) {
             plugin.getLogger().warning("[SettlementDataObject::save] Caught SQLException while saving data object for settlement" + settlement.getName() + ": ");
@@ -274,7 +278,7 @@ public class SettlementDataObject implements DatabaseObject<Settlement, Integer>
     @Override
     public Integer create(Settlement settlement) {
         final Integer[] id = {null};
-        String sql = "INSERT INTO settlements (name, display_name, description, map_color, icon, creation_time, nation_id) VALUES (?, ?, ?, ?, ?, ?, ?);";
+        String sql = "INSERT INTO settlements (name, display_name, description, map_color, icon, food, creation_time, nation_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
         try {
             id[0] = Math.toIntExact(database.create(sql, stmt -> {
                 stmt.setString(1, settlement.getName());
@@ -282,8 +286,9 @@ public class SettlementDataObject implements DatabaseObject<Settlement, Integer>
                 stmt.setString(3, settlement.getDescriptionAsString());
                 stmt.setString(4, settlement.getMapColor().asHexString());
                 stmt.setString(5, settlement.getIconAsString());
-                stmt.setLong(6, settlement.getCreationTimeAsLong());
-                stmt.setNull(7, Types.INTEGER);     // This code is run whenever the settlement is created, so it's safe to assume that it doesn't belong to a nation yet.
+                stmt.setInt(6, settlement.getFood());
+                stmt.setLong(7, settlement.getCreationTimeAsLong());
+                stmt.setNull(8, Types.INTEGER);     // This code is run whenever the settlement is created, so it's safe to assume that it doesn't belong to a nation yet.
             }));
         } catch (SQLException e) {
             plugin.getLogger().warning("[SettlementDataObject::create] Caught SQLException while creating settlement object for " + settlement.getName() + ": ");
@@ -485,6 +490,7 @@ public class SettlementDataObject implements DatabaseObject<Settlement, Integer>
                   description TEXT NOT NULL,
                   map_color TEXT(7) DEFAULT '#FFAA00' NOT NULL,
                   icon TEXT DEFAULT 'minecraft:oak_planks' NOT NULL,
+                  food INTEGER DEFAULT 20 NOT NULL,
                   creation_time INTEGER DEFAULT CURRENT_TIMESTAMP NOT NULL,
                   nation_id INTEGER DEFAULT NULL,
                     CONSTRAINT stms_nation_id_fk

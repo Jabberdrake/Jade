@@ -44,7 +44,7 @@ public class SettlementViewCommand {
         jadePlayer.toggleBorderview();
 
         if (jadePlayer.isViewingBorders()) {
-            player.sendMessage(TextUtils.composePlainSuccessMessage("You are now viewing settlement borders!"));
+            player.sendMessage(TextUtils.composeSimpleSuccessMessage("You are now viewing settlement borders!"));
 
             Bukkit.getScheduler().runTaskTimer(Jade.getPlugin(Jade.class), task -> {
                 ongoingViewTasks.put(player.getUniqueId(), task);
@@ -54,7 +54,7 @@ public class SettlementViewCommand {
             }, 0, 60);
         } else {
             ongoingViewTasks.remove(player.getUniqueId()).cancel();
-            player.sendMessage(TextUtils.composePlainSuccessMessage("You are no longer viewing settlement borders!"));
+            player.sendMessage(TextUtils.composeSimpleSuccessMessage("You are no longer viewing settlement borders!"));
         }
 
         return Command.SINGLE_SUCCESS;

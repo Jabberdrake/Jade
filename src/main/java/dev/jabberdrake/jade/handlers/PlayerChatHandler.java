@@ -49,7 +49,7 @@ public class PlayerChatHandler implements Listener{
 
             // Replace this with proper chat channel logic if it ever gets implemented
             if (!PlayerManager.asJadePlayer(sender.getUniqueId()).isInRoleplay()) {
-                sender.sendMessage(TextUtils.composePlainErrorMessage("You are already speaking in this channel!"));
+                sender.sendMessage(TextUtils.composeSimpleErrorMessage("You are already speaking in this channel!"));
 
                 return true;
             }
@@ -65,7 +65,7 @@ public class PlayerChatHandler implements Listener{
         } else if (originalMessage.startsWith("rp:")) {
             // Replace this with proper chat channel logic if it ever gets implemented
             if (PlayerManager.asJadePlayer(sender.getUniqueId()).isInRoleplay()) {
-                sender.sendMessage(TextUtils.composePlainErrorMessage("You are already speaking in this channel!"));
+                sender.sendMessage(TextUtils.composeSimpleErrorMessage("You are already speaking in this channel!"));
                 return true;
             }
             PlayerManager.asJadePlayer(sender.getUniqueId()).toggleRoleplay();

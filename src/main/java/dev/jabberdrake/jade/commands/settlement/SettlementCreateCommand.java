@@ -16,7 +16,7 @@ public class SettlementCreateCommand {
 
     public static LiteralCommandNode<CommandSourceStack> buildCommand(final String label) {
         return Commands.literal(label)
-                .then(Commands.argument("name", StringArgumentType.greedyString())
+                .then(Commands.argument("name", StringArgumentType.word())
                         .requires(sender -> sender.getExecutor() instanceof Player)
                         .executes(SettlementCreateCommand::runCommand))
                 .build();
@@ -27,19 +27,19 @@ public class SettlementCreateCommand {
         ChunkAnchor anchor = new ChunkAnchor(player.getChunk());
 
         if (!RealmManager.isUnclaimedChunk(anchor)) {
-            player.sendMessage(TextUtils.composePlainErrorMessage("Cannot create a settlement on a claimed chunk!"));
+            player.sendMessage(TextUtils.composeSimpleErrorMessage("Cannot create a settlement on a claimed chunk!"));
             return Command.SINGLE_SUCCESS;
         }
 
         String name = StringArgumentType.getString(context, "name");
         if (!RealmManager.isUniqueSettlementName(name)) {
-            player.sendMessage(TextUtils.composePlainErrorMessage("There is already a settlement with that name!"));
+            player.sendMessage(TextUtils.composeSimpleErrorMessage("There is already a settlement with that name!"));
             return Command.SINGLE_SUCCESS;
         }
 
         Settlement settlement = RealmManager.createSettlement(name, player, anchor);
 
-        player.sendMessage(TextUtils.composePlainSuccessMessage("Successfully created ")
+        player.sendMessage(TextUtils.composeSimpleSuccessMessage("Successfully created ")
                 .append(settlement.getDisplayName())
                 .append(TextUtils.composeSuccessText("!"))
         );

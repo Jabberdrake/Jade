@@ -29,12 +29,12 @@ public class SettlementFocusCommand {
         Settlement focus = PlayerManager.asJadePlayer(player.getUniqueId()).getFocusSettlement();
 
         if (focus == null) {
-            player.sendMessage(TextUtils.composePlainInfoMessage("You are not focusing on any settlement..."));
+            player.sendMessage(TextUtils.composeSimpleInfoMessage("You are not focusing on any settlement..."));
             return Command.SINGLE_SUCCESS;
         }
 
-        player.sendMessage(TextUtils.composePlainInfoMessage("You are focusing on: ")
-                .append(focus.getDisplayName())
+        player.sendMessage(TextUtils.composeSimpleInfoMessage("You are focusing on: ")
+                .append(focus.asTextComponent())
         );
         return Command.SINGLE_SUCCESS;
     }
@@ -45,10 +45,10 @@ public class SettlementFocusCommand {
         String settlementAsString = StringArgumentType.getString(context, "settlement");
         Settlement settlement = RealmManager.getSettlement(settlementAsString);
         if (settlement == null) {
-            player.sendMessage(TextUtils.composePlainErrorMessage("Could not find a settlement with that name."));
+            player.sendMessage(TextUtils.composeSimpleErrorMessage("Could not find a settlement with that name."));
             return Command.SINGLE_SUCCESS;
         } else if (!settlement.containsPlayer(player.getUniqueId())) {
-            player.sendMessage(TextUtils.composePlainErrorMessage("You are not a member of ")
+            player.sendMessage(TextUtils.composeSimpleErrorMessage("You are not a member of ")
                     .append(settlement.getDisplayName())
                     .append(TextUtils.composeErrorText("!"))
             );

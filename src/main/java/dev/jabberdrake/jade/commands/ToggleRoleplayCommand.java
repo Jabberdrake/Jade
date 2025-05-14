@@ -31,9 +31,9 @@ public class ToggleRoleplayCommand {
         jadePlayer.toggleRoleplay();
 
         if (jadePlayer.isInRoleplay()) {
-            player.sendMessage(TextUtils.composePlainSuccessMessage("You are now in roleplay mode!"));
+            player.sendMessage(TextUtils.composeSimpleSuccessMessage("You are now in roleplay mode!"));
         } else {
-            player.sendMessage(TextUtils.composePlainSuccessMessage("You have left roleplay mode!"));
+            player.sendMessage(TextUtils.composeSimpleSuccessMessage("You have left roleplay mode!"));
         }
         return Command.SINGLE_SUCCESS;
     }

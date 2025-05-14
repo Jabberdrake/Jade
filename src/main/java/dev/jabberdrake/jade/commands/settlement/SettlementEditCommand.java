@@ -3,79 +3,206 @@ package dev.jabberdrake.jade.commands.settlement;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
-import com.mojang.brigadier.suggestion.Suggestions;
-import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import com.mojang.brigadier.tree.LiteralCommandNode;
+import dev.jabberdrake.jade.commands.CommonArgumentSuggestions;
+import dev.jabberdrake.jade.players.PlayerManager;
 import dev.jabberdrake.jade.realms.RealmManager;
 import dev.jabberdrake.jade.realms.Settlement;
+import dev.jabberdrake.jade.utils.TextUtils;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
+import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
+import io.papermc.paper.registry.RegistryAccess;
+import io.papermc.paper.registry.RegistryKey;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
+import org.bukkit.NamespacedKey;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemType;
 
 public class SettlementEditCommand {
 
     public static LiteralCommandNode<CommandSourceStack> buildCommand(final String label) {
         return Commands.literal(label)
-                .then(Commands.argument("settlement", StringArgumentType.string())
-                        .suggests(SettlementEditCommand::buildSettlementSuggestions)
-                        .then(Commands.argument("attribute", StringArgumentType.word())
-                                .suggests(SettlementEditCommand::buildStmFieldSuggestions)
-                                .then(Commands.argument("value", StringArgumentType.greedyString())
-                                        .executes(SettlementEditCommand::runCommand)
-                                )
+                .then(Commands.literal("name")
+                        .then(Commands.argument("name", StringArgumentType.word())
+                                .requires(sender -> sender.getExecutor() instanceof Player)
+                                .executes(SettlementEditCommand::runCommandForName)
+                        )
+                )
+                .then(Commands.literal("display")
+                        .then(Commands.argument("display_name", StringArgumentType.greedyString())
+                                .requires(sender -> sender.getExecutor() instanceof Player)
+                                .executes(SettlementEditCommand::runCommandForDisplay)
+                        )
+                )
+                .then(Commands.literal("description")
+                        .then(Commands.argument("description", StringArgumentType.greedyString())
+                                .requires(sender -> sender.getExecutor() instanceof Player)
+                                .executes(SettlementEditCommand::runCommandForDescription)
+                        )
+                )
+                .then(Commands.literal("mapColor")
+                        .then(Commands.argument("color_name_or_hex", StringArgumentType.greedyString())
+                                .requires(sender -> sender.getExecutor() instanceof Player)
+                                .executes(SettlementEditCommand::runCommandForMapColor)
+                        )
+                )
+                .then(Commands.literal("icon")
+                        .then(Commands.argument("icon", ArgumentTypes.namespacedKey())
+                                .suggests(CommonArgumentSuggestions::suggestAllItemKeys)
+                                .requires(sender -> sender.getExecutor() instanceof Player)
+                                .executes(SettlementEditCommand::runCommandForIcon)
                         )
                 )
                 .build();
     }
 
-    public static int runCommand(CommandContext<CommandSourceStack> context) {
-        String stmString = StringArgumentType.getString(context, "settlement");
-        Settlement settlement = RealmManager.getSettlement(stmString);
+    public static int runCommandForName(CommandContext<CommandSourceStack> context) {
+        Player player = (Player) context.getSource().getSender();
+        Settlement focus = PlayerManager.asJadePlayer(player.getUniqueId()).getFocusSettlement();
 
-        String attr = StringArgumentType.getString(context, "attribute");
-        String value = StringArgumentType.getString(context, "value");
-
-        switch (attr) {
-            case "name":
-                settlement.setName(value);
-                context.getSource().getSender().sendPlainMessage("Settlement name updated!");
-                break;
-            case "style":
-                settlement.setDisplayName(value);
-                context.getSource().getSender().sendPlainMessage("Settlement decorated name updated!");
-                break;
-            case "description":
-                settlement.setDescription(value);
-                context.getSource().getSender().sendPlainMessage("Settlement description updated!");
-                break;
-            default:
-                context.getSource().getSender().sendPlainMessage("Unknown settlement field!");
+        if (!performBasicChecks(player, focus)) {
+            return Command.SINGLE_SUCCESS;
         }
 
-        //RealmManager.storeSettlement(settlement);
+        String nameArgument = StringArgumentType.getString(context, "name");
+        if (!RealmManager.isUniqueSettlementName(nameArgument)) {
+            player.sendMessage(TextUtils.composeSimpleErrorMessage("This settlement name is already in use!"));
+            return Command.SINGLE_SUCCESS;
+        }
+
+        focus.setName(nameArgument);
+        player.sendMessage(TextUtils.composeSimpleSuccessMessage("Changed reference name to ")
+                .append(TextUtils.composeSuccessHighlight(focus.getName()))
+                .append(TextUtils.composeSuccessText("!")));
+
         return Command.SINGLE_SUCCESS;
     }
 
-    public static CompletableFuture<Suggestions> buildSettlementSuggestions(final CommandContext<CommandSourceStack> context, final SuggestionsBuilder builder) {
-        final List<String> stmNames = new ArrayList<>();
-        for (int i = 1; i <= RealmManager.getSettlementCount(); i++) {
-            stmNames.add(RealmManager.getSettlement(i).getName());
+    public static int runCommandForDisplay(CommandContext<CommandSourceStack> context) {
+        Player player = (Player) context.getSource().getSender();
+        Settlement focus = PlayerManager.asJadePlayer(player.getUniqueId()).getFocusSettlement();
+
+        if (!performBasicChecks(player, focus)) {
+            return Command.SINGLE_SUCCESS;
         }
 
-        stmNames.stream()
-                .filter(entry -> entry.toLowerCase().startsWith(builder.getRemainingLowerCase()))
-                .forEach(builder::suggest);
+        String displayArgument = StringArgumentType.getString(context, "display_name");
+        focus.setDisplayName(displayArgument);
+        player.sendMessage(TextUtils.composeSimpleSuccessMessage("Changed display name to ")
+                .append(focus.getDisplayName())
+                .append(TextUtils.composeSuccessText("!")));
 
-        return builder.buildFuture();
+        return Command.SINGLE_SUCCESS;
     }
 
-    public static CompletableFuture<Suggestions> buildStmFieldSuggestions(final CommandContext<CommandSourceStack> context, final SuggestionsBuilder builder) {
-        builder.suggest("name");
-        builder.suggest("style");
-        builder.suggest("description");
-        return builder.buildFuture();
+    public static int runCommandForDescription(CommandContext<CommandSourceStack> context) {
+        Player player = (Player) context.getSource().getSender();
+        Settlement focus = PlayerManager.asJadePlayer(player.getUniqueId()).getFocusSettlement();
+
+        if (!performBasicChecks(player, focus)) {
+            return Command.SINGLE_SUCCESS;
+        }
+
+        String descArgument = StringArgumentType.getString(context, "description");
+        focus.setDescription(descArgument);
+        player.sendMessage(TextUtils.composeSimpleSuccessMessage("Changed description to \"")
+                .append(focus.getDescription())
+                .append(TextUtils.composeSuccessText("\"!")));
+
+        return Command.SINGLE_SUCCESS;
+    }
+
+    public static int runCommandForMapColor(CommandContext<CommandSourceStack> context) {
+        Player player = (Player) context.getSource().getSender();
+        Settlement focus = PlayerManager.asJadePlayer(player.getUniqueId()).getFocusSettlement();
+
+        if (!performBasicChecks(player, focus)) {
+            return Command.SINGLE_SUCCESS;
+        }
+
+        String colorArgument = StringArgumentType.getString(context, "color_name_or_hex");
+        TextColor color;
+        if (colorArgument.startsWith("#")) {
+            color = TextColor.fromHexString(colorArgument);
+            if (color == null) {
+                player.sendMessage(TextUtils.composeSimpleErrorMessage("Please provide a valid hexstring!"));
+                player.sendMessage(TextUtils.composeSimpleInfoMessage("A hexstring is composed of a # and six hexadecimal characters (0-9 and a-f), e.g.: ")
+                        .append(Component.text("#ffaa00", NamedTextColor.GOLD)));
+                return Command.SINGLE_SUCCESS;
+            }
+        } else if (NamedTextColor.NAMES.keys().contains(colorArgument)) {
+            color = NamedTextColor.NAMES.value(colorArgument);
+        } else {
+            player.sendMessage(TextUtils.composeSimpleErrorMessage("Please provide a valid color name!"));
+            return Command.SINGLE_SUCCESS;
+        }
+
+        focus.setMapColor(color);
+        player.sendMessage(TextUtils.composeSimpleSuccessMessage("Changed map color to \"")
+                .append(Component.text(colorArgument).color(color))
+                .append(TextUtils.composeSuccessText("\"!")));
+
+        return Command.SINGLE_SUCCESS;
+    }
+
+    public static int runCommandForIcon(CommandContext<CommandSourceStack> context) {
+        Player player = (Player) context.getSource().getSender();
+        Settlement focus = PlayerManager.asJadePlayer(player.getUniqueId()).getFocusSettlement();
+
+        if (!performBasicChecks(player, focus)) {
+            return Command.SINGLE_SUCCESS;
+        }
+
+        NamespacedKey iconArgument = context.getArgument("icon", NamespacedKey.class);
+        String namespace = iconArgument.getNamespace();
+        if (namespace.equals("minecraft")) {
+            ItemType dummy = RegistryAccess.registryAccess().getRegistry(RegistryKey.ITEM).get(iconArgument);
+            if (dummy == null) {
+                player.sendMessage(TextUtils.composeSimpleErrorMessage("Please provide a valid item key!"));
+                return Command.SINGLE_SUCCESS;
+            }
+        } else if (namespace.equals("jade")) {
+            // TODO: implement this
+            player.sendMessage(TextUtils.composeSimpleErrorMessage("This feature has not been implemented yet!"));
+            return Command.SINGLE_SUCCESS;
+        } else {
+            player.sendMessage(TextUtils.composeSimpleErrorMessage("Please provide a valid namespace!"));
+            return Command.SINGLE_SUCCESS;
+        }
+
+        focus.setIcon(iconArgument.toString());
+        player.sendMessage(TextUtils.composeSimpleSuccessMessage("Changed icon to ")
+                .append(TextUtils.composeSuccessHighlight(focus.getIconAsString()))
+                .append(TextUtils.composeSuccessText("!")));
+
+        return Command.SINGLE_SUCCESS;
+    }
+
+    public static boolean performBasicChecks(Player player, Settlement settlement) {
+
+        if (settlement == null) {
+            // NOTE: Since it just uses whichever settlement you're focusing on, this shouldn't ever happen.
+            player.sendMessage(TextUtils.composeSimpleErrorMessage("You are not focusing on any settlement."));
+            return false;
+        } else if (!settlement.containsPlayer(player.getUniqueId())) {
+            // NOTE: Since it just uses whichever settlement you're focusing on, this shouldn't ever happen.
+            player.sendMessage(TextUtils.composeSimpleErrorMessage("You are not a member of ")
+                    .append(settlement.getDisplayName())
+                    .append(TextUtils.composeErrorText("!"))
+            );
+            return false;
+        } else if (!settlement.getRoleFromMember(player.getUniqueId()).canEdit()) {
+            player.sendMessage(
+                    TextUtils.composeSimpleErrorMessage("You do not have permission to edit attributes for ")
+                            .append(settlement.getDisplayName())
+                            .append(TextUtils.composeErrorText("!"))
+            );
+            return false;
+        }
+
+        return true;
     }
 }

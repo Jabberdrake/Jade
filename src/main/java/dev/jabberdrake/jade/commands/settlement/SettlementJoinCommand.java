@@ -4,7 +4,6 @@ import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.LiteralCommandNode;
-import dev.jabberdrake.jade.players.PlayerManager;
 import dev.jabberdrake.jade.realms.RealmManager;
 import dev.jabberdrake.jade.realms.Settlement;
 import dev.jabberdrake.jade.utils.TextUtils;
@@ -17,7 +16,7 @@ public class SettlementJoinCommand {
         return Commands.literal(label)
                 .requires(sender -> sender.getExecutor() instanceof Player)
                 .executes(SettlementJoinCommand::runCommandWithoutArgs)
-                .then(Commands.argument("settlement", StringArgumentType.greedyString())
+                .then(Commands.argument("settlement", StringArgumentType.string())
                         .suggests(CommonSettlementSuggestions::buildSuggestionsForAllSettlements)
                         .requires(sender -> sender.getExecutor() instanceof Player)
                         .executes(SettlementJoinCommand::runCommandWithArgs))
@@ -28,7 +27,7 @@ public class SettlementJoinCommand {
         Player player = (Player) context.getSource().getSender();
         Settlement inviter = RealmManager.getWhoInvitedPlayer(player);
         if (inviter == null) {
-            player.sendMessage(TextUtils.composePlainErrorMessage("You do not have any pending invites."));
+            player.sendMessage(TextUtils.composeSimpleErrorMessage("You do not have any pending invites."));
             return Command.SINGLE_SUCCESS;
         }
 
@@ -49,10 +48,10 @@ public class SettlementJoinCommand {
         Settlement stmArg = RealmManager.getSettlement(settlementAsString);
         Settlement stmInviter = RealmManager.getWhoInvitedPlayer(player);
         if (stmArg == null) {
-            player.sendMessage(TextUtils.composePlainErrorMessage("Could not find a stmArg with that name."));
+            player.sendMessage(TextUtils.composeSimpleErrorMessage("Could not find a stmArg with that name."));
             return Command.SINGLE_SUCCESS;
         } else if (!stmArg.equals(stmInviter)) {
-            player.sendMessage(TextUtils.composePlainErrorMessage("You do not have a pending invite from ")
+            player.sendMessage(TextUtils.composeSimpleErrorMessage("You do not have a pending invite from ")
                     .append(TextUtils.composeErrorHighlight(stmInviter.getName()))
                     .append(TextUtils.composeErrorText("!"))
             );

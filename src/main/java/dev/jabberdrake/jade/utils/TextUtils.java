@@ -54,7 +54,7 @@ public class TextUtils {
         return Component.text(content, LIGHT_ZORBA);
     }
 
-    public static Component composePlainInfoMessage(String content) {
+    public static Component composeSimpleInfoMessage(String content) {
         return Component.text()
                 .append(composeInfoPrefix())
                 .append(composeInfoText(content))
@@ -71,7 +71,7 @@ public class TextUtils {
 
     public static Component composeErrorHighlight(String content) { return Component.text(content, NamedTextColor.RED); }
 
-    public static Component composePlainErrorMessage(String content) {
+    public static Component composeSimpleErrorMessage(String content) {
         return Component.text()
                 .append(composeErrorPrefix())
                 .append(composeErrorText(content))
@@ -90,7 +90,7 @@ public class TextUtils {
         return Component.text(content, DARK_LAUREL);
     }
 
-    public static Component composePlainSuccessMessage(String content) {
+    public static Component composeSimpleSuccessMessage(String content) {
         return Component.text()
                 .append(composeSuccessPrefix())
                 .append(composeSuccessText(content))
@@ -109,7 +109,7 @@ public class TextUtils {
         return Component.text(content, LIGHT_CHROME);
     }
 
-    public static Component composePlainOperatorMessage(String content) {
+    public static Component composeSimpleOperatorMessage(String content) {
         return Component.text()
                 .append(composeOperatorPrefix())
                 .append(composeOperatorText(content))
@@ -127,13 +127,6 @@ public class TextUtils {
         return Component.text()
                 .append(TextUtils.SYMBOL_DENIED)
                 .append(Component.text(" " + content, TextUtils.DARK_CHROME))
-                .build();
-    }
-
-    public static Component composeSettlementDisplay(Settlement stm) {
-        return Component.text()
-                .append(stm.getDisplayName())
-                .append(Component.text(" (" + stm.getName() + ")", TextUtils.LIGHT_ZORBA))
                 .build();
     }
 

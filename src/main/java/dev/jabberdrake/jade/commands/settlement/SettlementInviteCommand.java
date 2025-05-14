@@ -36,10 +36,10 @@ public class SettlementInviteCommand {
 
         SettlementRole senderTitle = focus.getRoleFromMember(player.getUniqueId());
         if (senderTitle == null) {
-            player.sendMessage(TextUtils.composePlainErrorMessage("Could not find a matching title for command sender. Please report this to a developer!"));
+            player.sendMessage(TextUtils.composeSimpleErrorMessage("Could not find a matching title for command sender. Please report this to a developer!"));
             return Command.SINGLE_SUCCESS;
         } else if (!senderTitle.canInvite()) {
-            player.sendMessage(TextUtils.composePlainErrorMessage("You do not have the permission to invite a player."));
+            player.sendMessage(TextUtils.composeSimpleErrorMessage("You do not have the permission to invite a player."));
             return Command.SINGLE_SUCCESS;
         }
 
@@ -47,13 +47,13 @@ public class SettlementInviteCommand {
         Player target = Bukkit.getPlayer(targetName);
         UUID targetUUID = target.getUniqueId();
         if (Bukkit.getPlayer(targetName) == null) {
-            player.sendMessage(TextUtils.composePlainErrorMessage("Could not find the specified player."));
+            player.sendMessage(TextUtils.composeSimpleErrorMessage("Could not find the specified player."));
             return Command.SINGLE_SUCCESS;
         } else if (targetName.equals(player.getName())) {
-            player.sendMessage(TextUtils.composePlainErrorMessage("You can't invite yourself!"));
+            player.sendMessage(TextUtils.composeSimpleErrorMessage("You can't invite yourself!"));
             return Command.SINGLE_SUCCESS;
         } else if (focus.containsPlayer(targetUUID)) {
-            player.sendMessage(TextUtils.composePlainErrorMessage("The specified player is already a member of your focus settlement!."));
+            player.sendMessage(TextUtils.composeSimpleErrorMessage("The specified player is already a member of your focus settlement!."));
             return Command.SINGLE_SUCCESS;
         }
         // TODO: Check if at max capacity if we decide to implement that
@@ -74,11 +74,11 @@ public class SettlementInviteCommand {
 
         if (settlement == null) {
             // NOTE: Since it just uses whichever settlement you're focusing on, this shouldn't ever happen.
-            player.sendMessage(TextUtils.composePlainErrorMessage("You are not focusing on any settlement."));
+            player.sendMessage(TextUtils.composeSimpleErrorMessage("You are not focusing on any settlement."));
             return false;
         } else if (!settlement.containsPlayer(player.getUniqueId())) {
             // NOTE: Since it just uses whichever settlement you're focusing on, this shouldn't ever happen.
-            player.sendMessage(TextUtils.composePlainErrorMessage("You are not a member of ")
+            player.sendMessage(TextUtils.composeSimpleErrorMessage("You are not a member of ")
                     .append(settlement.getDisplayName())
                     .append(TextUtils.composeErrorText("!"))
             );

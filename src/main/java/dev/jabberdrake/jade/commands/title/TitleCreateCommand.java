@@ -37,7 +37,7 @@ public class TitleCreateCommand {
         String nameArgument = StringArgumentType.getString(context, "name");
         nameArgument = nameArgument.replace(" ", "_");
         if (!TitleManager.isUniqueName(nameArgument)) {
-            player.sendMessage(TextUtils.composePlainErrorMessage("There is already a title with that name!"));
+            player.sendMessage(TextUtils.composeSimpleErrorMessage("There is already a title with that name!"));
             return Command.SINGLE_SUCCESS;
         }
 
@@ -46,18 +46,18 @@ public class TitleCreateCommand {
         if (colorArgument.startsWith("#")) {
             color = TextColor.fromHexString(colorArgument);
             if (color == null) {
-                player.sendMessage(TextUtils.composePlainErrorMessage("Could not parse the specified color!"));
+                player.sendMessage(TextUtils.composeSimpleErrorMessage("Could not parse the specified color!"));
                 return Command.SINGLE_SUCCESS;
             }
         } else if (NamedTextColor.NAMES.keys().contains(colorArgument)) {
             color = NamedTextColor.NAMES.value(colorArgument);
         } else {
-            player.sendMessage(TextUtils.composePlainErrorMessage("Could not parse the specified color!"));
+            player.sendMessage(TextUtils.composeSimpleErrorMessage("Could not parse the specified color!"));
             return Command.SINGLE_SUCCESS;
         }
 
         JadeTitle createdTitle = TitleManager.createTitle(nameArgument, color, player.getUniqueId());
-        player.sendMessage(TextUtils.composePlainSuccessMessage("Successfully created the ")
+        player.sendMessage(TextUtils.composeSimpleSuccessMessage("Successfully created the ")
                 .append(createdTitle.getTitleAsComponent())
                 .append(TextUtils.composeSuccessText(" title!"))
         );

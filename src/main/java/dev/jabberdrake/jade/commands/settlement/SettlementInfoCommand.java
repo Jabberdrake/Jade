@@ -6,20 +6,18 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import com.mojang.brigadier.tree.LiteralCommandNode;
-import dev.jabberdrake.jade.Jade;
 import dev.jabberdrake.jade.realms.RealmManager;
 import dev.jabberdrake.jade.realms.Settlement;
-import dev.jabberdrake.jade.realms.SettlementRole;
 import dev.jabberdrake.jade.utils.TextUtils;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 
 public class SettlementInfoCommand {
 
@@ -39,13 +37,17 @@ public class SettlementInfoCommand {
         Player player = (Player) context.getSource().getSender();
         Settlement settlement = RealmManager.getSettlement(stmString);
         if (settlement == null) {
-            player.sendMessage(TextUtils.composePlainErrorMessage("Couldn't find the specified settlement!"));
+            player.sendMessage(TextUtils.composeSimpleErrorMessage("Couldn't find the specified settlement!"));
             return Command.SINGLE_SUCCESS;
         }
 
-        player.sendMessage(TextUtils.composePlainInfoMessage("Settlement ").append(TextUtils.composeSettlementDisplay(settlement)));
+        player.sendMessage(TextUtils.composeSimpleInfoMessage("Settlement info:"));
+        player.sendMessage(Component.text(INDENT).append(settlement.asTextComponent()));
         player.sendMessage(Component.text(INDENT).append(settlement.getDescription()));
-        player.sendMessage(Component.text());
+        player.sendMessage(Component.text()); //evil \n
+
+        player.sendMessage(Component.text(INDENT + "Food: ", TextUtils.LIGHT_BRASS)
+                .append(Component.text(settlement.getFood() + "/" + settlement.getFoodCapacity(), TextUtils.LIVINGMETAL)));
         if (settlement.isInNation()) {
             player.sendMessage(Component.text(INDENT + "Nation: ", TextUtils.LIGHT_BRASS)
                     .append(settlement.getNation().getDisplayName()));
@@ -70,6 +72,7 @@ public class SettlementInfoCommand {
                 .append(Component.text("...").color(TextUtils.ZORBA))
             );
         }
+        player.sendMessage(Component.text()); //evil \n
         return Command.SINGLE_SUCCESS;
     }
 

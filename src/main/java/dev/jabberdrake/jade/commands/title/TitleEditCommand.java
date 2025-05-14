@@ -7,19 +7,14 @@ import com.mojang.brigadier.tree.LiteralCommandNode;
 import dev.jabberdrake.jade.players.JadePlayer;
 import dev.jabberdrake.jade.players.PlayerManager;
 import dev.jabberdrake.jade.titles.JadeTitle;
-import dev.jabberdrake.jade.titles.NamedTitle;
 import dev.jabberdrake.jade.titles.TitleManager;
 import dev.jabberdrake.jade.utils.TextUtils;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.entity.Player;
-
-import java.util.List;
 
 public class TitleEditCommand {
 
@@ -47,15 +42,15 @@ public class TitleEditCommand {
         String newName = StringArgumentType.getString(context, "name");
 
         if (title == null) {
-            player.sendMessage(TextUtils.composePlainErrorMessage("Could not find the specified title!"));
+            player.sendMessage(TextUtils.composeSimpleErrorMessage("Could not find the specified title!"));
             return Command.SINGLE_SUCCESS;
         } else if (title.isUniversal()) {
-            player.sendMessage(TextUtils.composePlainErrorMessage("You cannot edit universal titles!"));
+            player.sendMessage(TextUtils.composeSimpleErrorMessage("You cannot edit universal titles!"));
         } else if (!title.getOwner().equals(player.getUniqueId())) {
-            player.sendMessage(TextUtils.composePlainErrorMessage("You do not own this title!"));
+            player.sendMessage(TextUtils.composeSimpleErrorMessage("You do not own this title!"));
             return Command.SINGLE_SUCCESS;
         } else if (!TitleManager.isUniqueName(newName)) {
-            player.sendMessage(TextUtils.composePlainErrorMessage("There is already a title with this reference name!"));
+            player.sendMessage(TextUtils.composeSimpleErrorMessage("There is already a title with this reference name!"));
             return Command.SINGLE_SUCCESS;
         }
 
@@ -73,7 +68,7 @@ public class TitleEditCommand {
 
         title.setName(newName);
 
-        player.sendMessage(TextUtils.composePlainSuccessMessage("Successfully edit the ")
+        player.sendMessage(TextUtils.composeSimpleSuccessMessage("Successfully edit the ")
                 .append(oldTitleComponent)
                 .append(TextUtils.composeSuccessText(" title to "))
                 .append(newTitleComponent)
@@ -91,10 +86,10 @@ public class TitleEditCommand {
         String display = StringArgumentType.getString(context, "display");
 
         if (title == null) {
-            player.sendMessage(TextUtils.composePlainErrorMessage("Could not find the specified title!"));
+            player.sendMessage(TextUtils.composeSimpleErrorMessage("Could not find the specified title!"));
             return Command.SINGLE_SUCCESS;
         } else if (!title.getOwner().equals(player.getUniqueId())) {
-            player.sendMessage(TextUtils.composePlainErrorMessage("You do not own this title!"));
+            player.sendMessage(TextUtils.composeSimpleErrorMessage("You do not own this title!"));
             return Command.SINGLE_SUCCESS;
         }
 
@@ -114,7 +109,7 @@ public class TitleEditCommand {
 
         title.setTitle(display);
 
-        player.sendMessage(TextUtils.composePlainSuccessMessage("Successfully edit the ")
+        player.sendMessage(TextUtils.composeSimpleSuccessMessage("Successfully edit the ")
                 .append(oldTitleComponent)
                 .append(TextUtils.composeSuccessText(" title to "))
                 .append(newTitleComponent)

@@ -26,18 +26,18 @@ public class SettlementDisbandCommand {
 
         SettlementRole title = focus.getRoleFromMember(player.getUniqueId());
         if (title == null) {
-            player.sendMessage(TextUtils.composePlainErrorMessage("Could not find a matching title for command sender. Please report this to a developer!"));
+            player.sendMessage(TextUtils.composeSimpleErrorMessage("Could not find a matching title for command sender. Please report this to a developer!"));
             return Command.SINGLE_SUCCESS;
         } else if (!title.isLeader()) {
-            player.sendMessage(TextUtils.composePlainErrorMessage("Only the leader can disband a settlement!"));
+            player.sendMessage(TextUtils.composeSimpleErrorMessage("Only the leader can disband a settlement!"));
             return Command.SINGLE_SUCCESS;
         }
 
         RealmManager.deleteSettlement(focus);
 
-        player.sendMessage(TextUtils.composePlainSuccessMessage("Successfully disbanded ")
+        player.sendMessage(TextUtils.composeSimpleSuccessMessage("Successfully disbanded ")
                 .append(focus.getDisplayName())
-                .append(TextUtils.composePlainSuccessMessage("!"))
+                .append(TextUtils.composeSimpleSuccessMessage("!"))
         );
 
         return Command.SINGLE_SUCCESS;
