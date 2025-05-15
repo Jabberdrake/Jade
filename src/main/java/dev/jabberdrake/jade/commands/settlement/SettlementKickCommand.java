@@ -4,6 +4,7 @@ import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.LiteralCommandNode;
+import dev.jabberdrake.jade.commands.SettlementCommand;
 import dev.jabberdrake.jade.players.PlayerManager;
 import dev.jabberdrake.jade.realms.SettlementRole;
 import dev.jabberdrake.jade.realms.Settlement;
@@ -30,14 +31,17 @@ public class SettlementKickCommand {
         Player player = (Player) context.getSource().getSender();
         Settlement focus = PlayerManager.asJadePlayer(player.getUniqueId()).getFocusSettlement();
 
-        if (!performBasicChecks(player, focus)) { return Command.SINGLE_SUCCESS; }
+        if (!SettlementCommand.validateFocusSettlement(player, focus)) { return Command.SINGLE_SUCCESS; }
 
-        SettlementRole senderTitle = focus.getRoleFromMember(player.getUniqueId());
-        if (senderTitle == null) {
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("Could not find a matching title for command sender. Please report this to a developer!"));
+        SettlementRole senderRole = focus.getRoleFromMember(player.getUniqueId());
+        if (senderRole == null) {
+            player.sendMessage(TextUtils.composeSimpleErrorMessage("Could not find a matching role for command sender. Please report this to a developer!"));
             return Command.SINGLE_SUCCESS;
-        } else if (!senderTitle.canKick()) {
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("You do not have the permission to kick a member."));
+        } else if (!senderRole.canKick()) {
+            player.sendMessage(TextUtils.composeSimpleErrorMessage("You do not have permission to kick members from ")
+                    .append(focus.getDisplayName())
+                    .append(TextUtils.composeErrorText("!"))
+            );
             return Command.SINGLE_SUCCESS;
         }
 
@@ -54,8 +58,8 @@ public class SettlementKickCommand {
         } else if (!focus.containsPlayer(targetUUID)) {
             player.sendMessage(TextUtils.composeSimpleErrorMessage("The specified player is not a member of your focus settlement."));
             return Command.SINGLE_SUCCESS;
-        } else if (settlementRole.getAuthority() >= senderTitle.getAuthority()) {
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("The specified player has a higher authority title than you!."));
+        } else if (settlementRole.getAuthority() >= senderRole.getAuthority()) {
+            player.sendMessage(TextUtils.composeSimpleErrorMessage("The specified player has a higher authority title than you!"));
             return Command.SINGLE_SUCCESS;
         }
 
@@ -68,29 +72,13 @@ public class SettlementKickCommand {
                 .append((TextUtils.composeSuccessHighlight("!")))
         );
 
-        target.sendMessage(TextUtils.composeSimpleInfoMessage("You have been kicked from ")
-                .append(focus.getDisplayName())
-                .append(TextUtils.composeInfoText("!"))
-        );
-
-        return Command.SINGLE_SUCCESS;
-    }
-
-    public static boolean performBasicChecks(Player player, Settlement settlement) {
-
-        if (settlement == null) {
-            // NOTE: Since it just uses whichever settlement you're focusing on, this shouldn't ever happen.
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("You are not focusing on any settlement."));
-            return false;
-        } else if (!settlement.containsPlayer(player.getUniqueId())) {
-            // NOTE: Since it just uses whichever settlement you're focusing on, this shouldn't ever happen.
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("You are not a member of ")
-                    .append(settlement.getDisplayName())
-                    .append(TextUtils.composeErrorText("!"))
+        if (target.isOnline()) {
+            target.sendMessage(TextUtils.composeSimpleInfoMessage("You have been kicked from ")
+                    .append(focus.getDisplayName())
+                    .append(TextUtils.composeInfoText("!"))
             );
-            return false;
         }
 
-        return true;
+        return Command.SINGLE_SUCCESS;
     }
 }

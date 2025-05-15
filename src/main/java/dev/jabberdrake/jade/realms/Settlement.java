@@ -1,10 +1,16 @@
 package dev.jabberdrake.jade.realms;
 
+import dev.jabberdrake.jade.JadeSettings;
 import dev.jabberdrake.jade.database.DatabaseManager;
 import dev.jabberdrake.jade.utils.TextUtils;
+import io.papermc.paper.datacomponent.DataComponentTypes;
+import io.papermc.paper.datacomponent.item.ItemLore;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -15,6 +21,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Settlement {
 
@@ -141,7 +148,19 @@ public class Settlement {
         DatabaseManager.saveSettlement(this);
     }
 
-    public String getIconAsString() { return this.icon; }
+    public String getIconAsString() {
+        return this.icon;
+    }
+
+    public ItemStack getIconAsMaterial() {
+        if (this.getIconAsString() == null) {
+            return ItemStack.of(Material.BARRIER);
+        } else if (this.getIconAsString().startsWith("minecraft:")) {
+            return ItemStack.of(Material.matchMaterial(this.getIconAsString()));
+        } else if (this.getIconAsString().startsWith("jade:")) {
+            return ItemStack.of(Material.BARRIER);
+        } else return null;
+    }
 
     public void setIcon(String icon) {
         this.icon = icon;
@@ -311,6 +330,9 @@ public class Settlement {
     // Called by RealmManager during claimChunk()
     public void addChunk(ChunkAnchor anchor) {
         this.territory.add(anchor);
+
+        this.food -= JadeSettings.chunkCost;
+
         DatabaseManager.addChunkToSettlement(anchor, this);
     }
 
@@ -390,7 +412,79 @@ public class Settlement {
     }
 
     public ItemStack asDisplayItem() {
-        return ItemStack.of(Material.BARRIER);
+        return this.asDisplayItem(null);
+    }
+
+    public ItemStack asDisplayItem(String addon) {
+        final int maxMembersToDisplay = 10;
+
+        ItemStack item = this.getIconAsMaterial();
+        item.setData(DataComponentTypes.CUSTOM_NAME, Component.text()
+                .append(this.asTextComponent())
+                .decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE)
+                .build());
+        ItemLore.Builder loreBuilder = ItemLore.lore()
+                .addLine(Component.text().append(this.getDescription()).decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE).build())
+                .addLine(Component.text(""))
+                .addLine(Component.text().append(this.presentFoodAsComponent()).decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE).build())
+                .addLine(Component.text().append(this.presentNationAsComponent()).decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE).build())
+                .addLine(Component.text("Members: ", TextUtils.LIGHT_BRASS).decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE));
+
+        List<Map.Entry<UUID, SettlementRole>> populationToDisplay = this.getPopulation().entrySet().stream()
+                .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+                .limit(maxMembersToDisplay).toList();
+
+        for (Map.Entry<UUID, SettlementRole> member : populationToDisplay) {
+            loreBuilder.addLine(Component.text("— ", TextUtils.LIGHT_BRASS)
+                    .append(member.getValue().getDisplayAsComponent())
+                    .append(Component.space())
+                    .append(Component.text(Bukkit.getPlayer(member.getKey()).getName(), TextUtils.LIGHT_ZORBA))
+                    .decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE)
+            );
+        }
+
+        if (this.getPopulation().size() > maxMembersToDisplay) {
+            loreBuilder.addLine(Component.text("— ", TextUtils.LIGHT_BRASS)
+                    .append(Component.text("...").color(TextUtils.ZORBA))
+                    .decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE)
+            );
+        }
+
+        if (addon == null) {
+            item.setData(DataComponentTypes.LORE, loreBuilder.build());
+        } else {
+            loreBuilder = loreBuilder.addLine(Component.text(""));
+            switch (addon) {
+                case "INFO":
+                    loreBuilder = loreBuilder.addLine(Component.text()
+                            .append(Component.text("Left Click", NamedTextColor.GREEN))
+                            .append(Component.text(" to read more", NamedTextColor.DARK_GREEN))
+                            .decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE)
+                            .build());
+                default:
+                    item.setData(DataComponentTypes.LORE, loreBuilder.build());
+            }
+        }
+
+        return item;
+    }
+
+    public Component presentFoodAsComponent() {
+        return Component.text().content("Food: ").color(TextUtils.LIGHT_BRASS)
+                .append(Component.text(this.getFood() + "/" + this.getFoodCapacity(), TextUtils.LIVINGMETAL))
+                .build();
+    }
+
+    public Component presentNationAsComponent() {
+        if (this.getNation() == null) {
+            return Component.text().content("Nation: ").color(TextUtils.LIGHT_BRASS)
+                    .append(Component.text("None", TextUtils.DARK_ZORBA))
+                    .build();
+        } else {
+            return Component.text().content("Nation: ").color(TextUtils.LIGHT_BRASS)
+                    .append(this.getNation().getDisplayName())
+                    .build();
+        }
     }
 
     @Override

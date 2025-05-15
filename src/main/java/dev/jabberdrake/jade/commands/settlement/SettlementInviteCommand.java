@@ -5,6 +5,7 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import dev.jabberdrake.jade.commands.CommonArgumentSuggestions;
+import dev.jabberdrake.jade.commands.SettlementCommand;
 import dev.jabberdrake.jade.players.PlayerManager;
 import dev.jabberdrake.jade.realms.SettlementRole;
 import dev.jabberdrake.jade.realms.RealmManager;
@@ -32,14 +33,17 @@ public class SettlementInviteCommand {
         Player player = (Player) context.getSource().getSender();
         Settlement focus = PlayerManager.asJadePlayer(player.getUniqueId()).getFocusSettlement();
 
-        if (!performBasicChecks(player, focus)) { return Command.SINGLE_SUCCESS; }
+        if (!SettlementCommand.validateFocusSettlement(player, focus)) { return Command.SINGLE_SUCCESS; }
 
-        SettlementRole senderTitle = focus.getRoleFromMember(player.getUniqueId());
-        if (senderTitle == null) {
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("Could not find a matching title for command sender. Please report this to a developer!"));
+        SettlementRole senderRole = focus.getRoleFromMember(player.getUniqueId());
+        if (senderRole == null) {
+            player.sendMessage(TextUtils.composeSimpleErrorMessage("Could not find a matching role for command sender. Please report this to a developer!"));
             return Command.SINGLE_SUCCESS;
-        } else if (!senderTitle.canInvite()) {
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("You do not have the permission to invite a player."));
+        } else if (!senderRole.canInvite()) {
+            player.sendMessage(TextUtils.composeSimpleErrorMessage("You do not have permission to invite players to ")
+                    .append(focus.getDisplayName())
+                    .append(TextUtils.composeSuccessText("!"))
+            );
             return Command.SINGLE_SUCCESS;
         }
 
@@ -68,23 +72,5 @@ public class SettlementInviteCommand {
         );
 
         return Command.SINGLE_SUCCESS;
-    }
-
-    public static boolean performBasicChecks(Player player, Settlement settlement) {
-
-        if (settlement == null) {
-            // NOTE: Since it just uses whichever settlement you're focusing on, this shouldn't ever happen.
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("You are not focusing on any settlement."));
-            return false;
-        } else if (!settlement.containsPlayer(player.getUniqueId())) {
-            // NOTE: Since it just uses whichever settlement you're focusing on, this shouldn't ever happen.
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("You are not a member of ")
-                    .append(settlement.getDisplayName())
-                    .append(TextUtils.composeErrorText("!"))
-            );
-            return false;
-        }
-
-        return true;
     }
 }

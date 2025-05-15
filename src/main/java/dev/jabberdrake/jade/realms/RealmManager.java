@@ -127,11 +127,24 @@ public class RealmManager {
     }
 
     public static void deleteSettlement(Settlement settlement) {
-        // TODO
-        int settlementId = settlement.getId();
-        settlementCache.remove(settlementId);
+        // Remove settlement from cache list
+        settlementCache.remove(settlement.getId());
 
-        DatabaseManager.deleteSettlement(settlementId);
+        // Remove all active invites to the deleted settlement
+        for (UUID playerID : activeSettlementInvites.keySet()) {
+            if (activeSettlementInvites.get(playerID).equals(settlement)) {
+                activeSettlementInvites.remove(playerID);
+            }
+        }
+
+        // Remove all territory map entries regarding the deleted settlement
+        for (ChunkAnchor anchor : territoryMap.keySet()) {
+            if (territoryMap.get(anchor).equals(settlement)) {
+                territoryMap.remove(anchor);
+            }
+        }
+
+        DatabaseManager.deleteSettlement(settlement.getId());
     }
 
     public static Settlement getWhoInvitedPlayer(Player player) {
@@ -192,7 +205,7 @@ public class RealmManager {
     }
 
     public static boolean claimChunk(Settlement settlement, ChunkAnchor anchor) {
-        if (RealmManager.getChunkOwner(anchor) == null && settlement.getFood() > JadeSettings.chunkCost) {
+        if (RealmManager.getChunkOwner(anchor) == null && settlement.getFood() >= JadeSettings.chunkCost) {
             settlement.addChunk(anchor);
 
             territoryMap.put(anchor, settlement);

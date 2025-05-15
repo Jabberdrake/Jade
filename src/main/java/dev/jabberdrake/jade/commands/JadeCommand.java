@@ -4,7 +4,7 @@ import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 
-public class CharterCommand {
+public class JadeCommand {
 
     // COMMAND TREE
     // /charter
@@ -24,10 +24,10 @@ public class CharterCommand {
 
     public static LiteralCommandNode<CommandSourceStack> buildCommand(final String label) {
         return Commands.literal(label)
-                    .executes(CharterHelpCommand::runCommand)
+                    .executes(HelpCommand::runCommand)
                 .then(AdminCommand.buildCommand("admin"))
                 .then(SettlementCommand.buildCommand("settlement"))
-                .then(CharterHelpCommand.buildCommand("help"))
+                .then(HelpCommand.buildCommand("help"))
                 .build();
     }
 }

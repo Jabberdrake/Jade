@@ -3,6 +3,8 @@ package dev.jabberdrake.jade.commands.settlement;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.LiteralCommandNode;
+import dev.jabberdrake.jade.menus.SettlementListMenu;
+import dev.jabberdrake.jade.menus.SettlementTitleMenu;
 import dev.jabberdrake.jade.realms.RealmManager;
 import dev.jabberdrake.jade.realms.Settlement;
 import dev.jabberdrake.jade.utils.TextUtils;
@@ -24,10 +26,7 @@ public class SettlementListCommand {
 
     public static int runCommand(CommandContext<CommandSourceStack> context) {
         Player player = (Player) context.getSource().getSender();
-
-        player.sendMessage(TextUtils.composeSimpleErrorMessage("Not implemented yet! Cycle through the argument suggestions provided for ")
-                .append(TextUtils.composeErrorHighlight("/settlement info"))
-                .append(TextUtils.composeErrorText(" to see all settlements!")));
+        new SettlementListMenu().open(player);
         return Command.SINGLE_SUCCESS;
     }
 }

@@ -5,6 +5,7 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import dev.jabberdrake.jade.JadeSettings;
+import dev.jabberdrake.jade.commands.SettlementCommand;
 import dev.jabberdrake.jade.players.JadePlayer;
 import dev.jabberdrake.jade.players.PlayerManager;
 import dev.jabberdrake.jade.realms.ChunkAnchor;
@@ -42,14 +43,15 @@ public class SettlementClaimCommand {
     public static int runCommandWithoutArgs(CommandContext<CommandSourceStack> context) {
         Player player = (Player) context.getSource().getSender();
         Chunk currentChunk = player.getLocation().getChunk();
+        Settlement focus = PlayerManager.asJadePlayer(player.getUniqueId()).getFocusSettlement();
 
-        Settlement settlement = PlayerManager.asJadePlayer(player.getUniqueId()).getFocusSettlement();
-        if (!performCommonChecks(player, settlement)) { return Command.SINGLE_SUCCESS; }
+        if (!SettlementCommand.validateFocusSettlement(player, focus)) { return Command.SINGLE_SUCCESS; }
+        if (!validateUserPermissions(player, focus)) { return Command.SINGLE_SUCCESS; }
 
-        if (RealmManager.claimChunk(settlement, currentChunk)) {
+        if (RealmManager.claimChunk(focus, currentChunk)) {
             player.sendMessage(TextUtils.composeSuccessPrefix()
                     .append(TextUtils.composeSuccessText("You have successfully claimed this chunk for "))
-                    .append(settlement.getDisplayName())
+                    .append(focus.getDisplayName())
                     .append(TextUtils.composeSuccessText("!"))
             );
         } else if (!RealmManager.isUnclaimedChunk(currentChunk)) {
@@ -57,7 +59,7 @@ public class SettlementClaimCommand {
                     .append(TextUtils.composeErrorHighlight(RealmManager.getChunkOwner(currentChunk).getName()))
                     .append(TextUtils.composeErrorText("!"))
             );
-        } else if (settlement.getFood() < JadeSettings.chunkCost) {
+        } else if (focus.getFood() < JadeSettings.chunkCost) {
             player.sendMessage(TextUtils.composeSimpleErrorMessage("Not enough food!"));
         } else {
             player.sendMessage(TextUtils.composeSimpleErrorMessage("This should be impossible! Please report this to a developer."));
@@ -68,9 +70,10 @@ public class SettlementClaimCommand {
 
     public static int runCommandForSquare(CommandContext<CommandSourceStack> context) {
         Player player = (Player) context.getSource().getSender();
+        Settlement focus = PlayerManager.asJadePlayer(player.getUniqueId()).getFocusSettlement();
 
-        Settlement settlement = PlayerManager.asJadePlayer(player.getUniqueId()).getFocusSettlement();
-        if (!performCommonChecks(player, settlement)) { return Command.SINGLE_SUCCESS; }
+        if (!SettlementCommand.validateFocusSettlement(player, focus)) { return Command.SINGLE_SUCCESS; }
+        if (!validateUserPermissions(player, focus)) { return Command.SINGLE_SUCCESS; }
 
         Chunk currentChunk = player.getLocation().getChunk();
 
@@ -84,7 +87,7 @@ public class SettlementClaimCommand {
                 ChunkAnchor aux = new ChunkAnchor(cX + aX, cZ + aZ);
                 Settlement auxOwner = RealmManager.getChunkOwner(aux);
 
-                if (auxOwner != null || settlement.getFood() < JadeSettings.chunkCost) { continue;}
+                if (auxOwner != null || focus.getFood() < JadeSettings.chunkCost) { continue;}
                 chunksToClaim.add(aux);
             }
         }
@@ -93,7 +96,7 @@ public class SettlementClaimCommand {
                 .append(TextUtils.composeSuccessText("You have successfully claimed "))
                 .append(TextUtils.composeSuccessHighlight(String.valueOf(chunksToClaim.size())))
                 .append(TextUtils.composeSuccessText(" chunks for "))
-                .append(settlement.getDisplayName())
+                .append(focus.getDisplayName())
                 .append(TextUtils.composeSuccessText("!"))
         );
 
@@ -102,24 +105,23 @@ public class SettlementClaimCommand {
 
     public static int runCommandForAuto(CommandContext<CommandSourceStack> context) {
         Player player = (Player) context.getSource().getSender();
+        Settlement focus = PlayerManager.asJadePlayer(player.getUniqueId()).getFocusSettlement();
 
-        Settlement settlement = PlayerManager.asJadePlayer(player.getUniqueId()).getFocusSettlement();
-        if (!performCommonChecks(player, settlement)) { return Command.SINGLE_SUCCESS; }
-
+        if (!SettlementCommand.validateFocusSettlement(player, focus)) { return Command.SINGLE_SUCCESS; }
+        if (!validateUserPermissions(player, focus)) { return Command.SINGLE_SUCCESS; }
 
         JadePlayer jadePlayer = PlayerManager.asJadePlayer(player.getUniqueId());
-
         jadePlayer.toggleAutoclaim();
 
         if (jadePlayer.isAutoclaiming()) {
             player.sendMessage(TextUtils.composeSimpleSuccessMessage("Toggled autoclaim ")
                     .append(TextUtils.composeSuccessHighlight("ON").decorate(TextDecoration.BOLD))
                     .append(TextUtils.composeSuccessText("! Keep walking to claim chunks for "))
-                    .append(settlement.getDisplayName())
+                    .append(focus.getDisplayName())
                     .append(TextUtils.composeSuccessText("!"))
             );
 
-            RealmManager.claimChunk(settlement, player.getChunk());
+            RealmManager.claimChunk(focus, player.getChunk());
 
         } else {
             player.sendMessage(TextUtils.composeSimpleSuccessMessage("Toggled autoclaim ")
@@ -133,22 +135,23 @@ public class SettlementClaimCommand {
     public static int runCommandForFill(CommandContext<CommandSourceStack> context) {
         Player player = (Player) context.getSource().getSender();
         ChunkAnchor anchor = new ChunkAnchor(player.getChunk());
+        Settlement focus = PlayerManager.asJadePlayer(player.getUniqueId()).getFocusSettlement();
 
-        Settlement settlement = PlayerManager.asJadePlayer(player.getUniqueId()).getFocusSettlement();
-        if (!performCommonChecks(player, settlement)) { return Command.SINGLE_SUCCESS; }
+        if (!SettlementCommand.validateFocusSettlement(player, focus)) { return Command.SINGLE_SUCCESS; }
+        if (!validateUserPermissions(player, focus)) { return Command.SINGLE_SUCCESS; }
 
-        Set<ChunkAnchor> chunksToClaim = RealmManager.prepareRecursiveChunkClaim(settlement, anchor);
+        Set<ChunkAnchor> chunksToClaim = RealmManager.prepareRecursiveChunkClaim(focus, anchor);
         if (chunksToClaim == null) {
             player.sendMessage(TextUtils.composeSimpleErrorMessage("Too many chunks to claim at once! Are you sure the border is closed?"));
             return Command.SINGLE_SUCCESS;
-        } else if (chunksToClaim.size() * JadeSettings.chunkCost > settlement.getFood()) {
+        } else if (chunksToClaim.size() * JadeSettings.chunkCost > focus.getFood()) {
             player.sendMessage(TextUtils.composeSimpleErrorMessage("You do not have enough food to claim this many chunks!"));
             return Command.SINGLE_SUCCESS;
         }
 
         int chunkCount = 0;
         for (ChunkAnchor chunk : chunksToClaim) {
-            RealmManager.claimChunk(settlement, chunk);
+            RealmManager.claimChunk(focus, chunk);
             chunkCount++;
         }
 
@@ -156,35 +159,20 @@ public class SettlementClaimCommand {
                 .append(TextUtils.composeSuccessText("You have successfully claimed "))
                 .append(TextUtils.composeSuccessHighlight(String.valueOf(chunkCount)))
                 .append(TextUtils.composeSuccessText(" chunks for "))
-                .append(settlement.getDisplayName())
+                .append(focus.getDisplayName())
                 .append(TextUtils.composeSuccessText("!"))
         );
         return Command.SINGLE_SUCCESS;
     }
 
-
-
-    public static boolean performCommonChecks(Player player, Settlement settlement) {
-
-        if (settlement == null) {
-            // NOTE: Since it just uses whichever settlement you're focusing on, this shouldn't ever happen.
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("You are not focusing on any settlement."));
-            return false;
-        } else if (!settlement.containsPlayer(player.getUniqueId())) {
-            // NOTE: Since it just uses whichever settlement you're focusing on, this shouldn't ever happen.
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("You are not a member of ")
-                    .append(settlement.getDisplayName())
-                    .append(TextUtils.composeErrorText("!"))
-            );
-            return false;
-        } else if (!settlement.getRoleFromMember(player.getUniqueId()).canClaim()) {
+    public static boolean validateUserPermissions(Player player, Settlement settlement) {
+        if (!settlement.getRoleFromMember(player.getUniqueId()).canClaim()) {
             player.sendMessage(TextUtils.composeSimpleErrorMessage("You are not allowed to claim chunks for ")
                     .append(settlement.getDisplayName())
                     .append(TextUtils.composeErrorText("!"))
             );
             return false;
         }
-
         return true;
     }
 }

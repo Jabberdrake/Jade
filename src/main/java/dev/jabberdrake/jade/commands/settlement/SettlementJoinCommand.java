@@ -25,6 +25,7 @@ public class SettlementJoinCommand {
 
     public static int runCommandWithoutArgs(CommandContext<CommandSourceStack> context) {
         Player player = (Player) context.getSource().getSender();
+
         Settlement inviter = RealmManager.getWhoInvitedPlayer(player);
         if (inviter == null) {
             player.sendMessage(TextUtils.composeSimpleErrorMessage("You do not have any pending invites."));
@@ -48,7 +49,7 @@ public class SettlementJoinCommand {
         Settlement stmArg = RealmManager.getSettlement(settlementAsString);
         Settlement stmInviter = RealmManager.getWhoInvitedPlayer(player);
         if (stmArg == null) {
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("Could not find a stmArg with that name."));
+            player.sendMessage(TextUtils.composeSimpleErrorMessage("Could not find a settlement with that name."));
             return Command.SINGLE_SUCCESS;
         } else if (!stmArg.equals(stmInviter)) {
             player.sendMessage(TextUtils.composeSimpleErrorMessage("You do not have a pending invite from ")

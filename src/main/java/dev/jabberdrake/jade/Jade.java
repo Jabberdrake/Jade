@@ -9,7 +9,7 @@ import de.bluecolored.bluemap.api.markers.MarkerSet;
 import de.bluecolored.bluemap.api.markers.ShapeMarker;
 import de.bluecolored.bluemap.api.math.Color;
 import de.bluecolored.bluemap.api.math.Shape;
-import dev.jabberdrake.jade.commands.CharterCommand;
+import dev.jabberdrake.jade.commands.JadeCommand;
 import dev.jabberdrake.jade.commands.ProfileCommand;
 import dev.jabberdrake.jade.commands.SettlementCommand;
 import dev.jabberdrake.jade.commands.ToggleRoleplayCommand;
@@ -84,7 +84,7 @@ public final class Jade extends JavaPlugin {
 
     private void registerCommands() {
         this.getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, commands -> {
-            commands.registrar().register(CharterCommand.buildCommand("jade"), "An all-purpose command for the Jade plugin!");
+            commands.registrar().register(JadeCommand.buildCommand("jade"), "An all-purpose command for the Jade plugin!");
             commands.registrar().register(SettlementCommand.buildCommand("settlement"), "Manages settlement interactions!");
             commands.registrar().register(TitleCommand.buildCommand("title"), "Manages vanity titles!");
             commands.registrar().register(ProfileCommand.buildCommand("profile"), "Manage profile interactions!");

@@ -28,7 +28,7 @@ public class SettlementTitleMenu extends SimpleJadeMenu {
     public void composeMenu(Player player) {
         int titleCount = this.settlement.getRoles().size();
         if (titleCount == 0 || titleCount > 9) {
-            composeErrorMenu(player, "Invalid number of titles " + titleCount + " in " + settlement.getName() + "!");
+            error(player, "Invalid number of titles " + titleCount + " in " + settlement.getName() + "!");
             return;
         }
 
@@ -92,7 +92,7 @@ public class SettlementTitleMenu extends SimpleJadeMenu {
 
             titleItem.setItemMeta(titleMeta);
 
-            this.setItem(getSlotForAuthority(title.getAuthority()), titleItem);
+            this.setItem(getSlotForAuthority(title.getAuthority()), new MenuItem(titleItem, null));
         }
     }
 

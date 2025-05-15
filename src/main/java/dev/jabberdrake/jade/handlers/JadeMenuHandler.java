@@ -1,6 +1,7 @@
 package dev.jabberdrake.jade.handlers;
 
 import dev.jabberdrake.jade.menus.JadeMenu;
+import dev.jabberdrake.jade.menus.PagedJadeMenu;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;

@@ -4,6 +4,7 @@ import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.LiteralCommandNode;
+import dev.jabberdrake.jade.commands.SettlementCommand;
 import dev.jabberdrake.jade.players.PlayerManager;
 import dev.jabberdrake.jade.realms.RealmManager;
 import dev.jabberdrake.jade.realms.Settlement;
@@ -55,7 +56,7 @@ public class SettlementFoodCommand {
         Player player = (Player) context.getSource().getSender();
         Settlement focus = PlayerManager.asJadePlayer(player.getUniqueId()).getFocusSettlement();
 
-        if (!performBasicChecks(player, focus)) {
+        if (!SettlementCommand.validateFocusSettlement(player, focus)) {
             return Command.SINGLE_SUCCESS;
         }
 
@@ -76,7 +77,7 @@ public class SettlementFoodCommand {
         Player player = (Player) context.getSource().getSender();
         Settlement focus = PlayerManager.asJadePlayer(player.getUniqueId()).getFocusSettlement();
 
-        if (!performBasicChecks(player, focus)) {
+        if (!SettlementCommand.validateFocusSettlement(player, focus)) {
             return Command.SINGLE_SUCCESS;
         }
 
@@ -109,7 +110,7 @@ public class SettlementFoodCommand {
         Player player = (Player) context.getSource().getSender();
         Settlement focus = PlayerManager.asJadePlayer(player.getUniqueId()).getFocusSettlement();
 
-        if (!performBasicChecks(player, focus)) {
+        if (!SettlementCommand.validateFocusSettlement(player, focus)) {
             return Command.SINGLE_SUCCESS;
         }
 
@@ -142,7 +143,7 @@ public class SettlementFoodCommand {
         Player player = (Player) context.getSource().getSender();
         Settlement focus = PlayerManager.asJadePlayer(player.getUniqueId()).getFocusSettlement();
 
-        if (!performBasicChecks(player, focus)) {
+        if (!SettlementCommand.validateFocusSettlement(player, focus)) {
             return Command.SINGLE_SUCCESS;
         }
 
@@ -155,30 +156,12 @@ public class SettlementFoodCommand {
         Player player = (Player) context.getSource().getSender();
         Settlement focus = PlayerManager.asJadePlayer(player.getUniqueId()).getFocusSettlement();
 
-        if (!performBasicChecks(player, focus)) {
+        if (!SettlementCommand.validateFocusSettlement(player, focus)) {
             return Command.SINGLE_SUCCESS;
         }
 
         player.sendMessage(TextUtils.composeSimpleErrorMessage("Not implemented yet!"));
 
         return Command.SINGLE_SUCCESS;
-    }
-
-    public static boolean performBasicChecks(Player player, Settlement settlement) {
-
-        if (settlement == null) {
-            // NOTE: Since it just uses whichever settlement you're focusing on, this shouldn't ever happen.
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("You are not focusing on any settlement."));
-            return false;
-        } else if (!settlement.containsPlayer(player.getUniqueId())) {
-            // NOTE: Since it just uses whichever settlement you're focusing on, this shouldn't ever happen.
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("You are not a member of ")
-                    .append(settlement.getDisplayName())
-                    .append(TextUtils.composeErrorText("!"))
-            );
-            return false;
-        }
-
-        return true;
     }
 }

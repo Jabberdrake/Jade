@@ -7,11 +7,11 @@ import dev.jabberdrake.jade.utils.TextUtils;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 
-public class CharterHelpCommand {
+public class HelpCommand {
 
     public static LiteralCommandNode<CommandSourceStack> buildCommand(final String label) {
         return Commands.literal(label)
-                    .executes(CharterHelpCommand::runCommand)
+                    .executes(HelpCommand::runCommand)
                 .build();
     }
 

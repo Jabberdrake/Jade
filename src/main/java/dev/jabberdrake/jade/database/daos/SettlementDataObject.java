@@ -307,7 +307,9 @@ public class SettlementDataObject implements DatabaseObject<Settlement, Integer>
     public void delete(Integer id) {
         String sql = "DELETE FROM settlements WHERE id = ?;";
         try {
-            database.execute(sql);
+            database.execute(sql, stmt -> {
+                stmt.setInt(1, id);
+            });
         } catch (SQLException e) {
             plugin.getLogger().warning("[SettlementDataObject::delete] Caught SQLException while deleting settlement object for ID=" + id + ": ");
             e.printStackTrace();
