@@ -13,6 +13,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class SettlementTitleMenu extends SimpleJadeMenu {
@@ -92,7 +93,7 @@ public class SettlementTitleMenu extends SimpleJadeMenu {
 
             titleItem.setItemMeta(titleMeta);
 
-            this.setItem(getSlotForAuthority(title.getAuthority()), new MenuItem(titleItem, null));
+            this.setItem(getSlotForAuthority(title.getAuthority()), new MenuItem(titleItem, (Consumer<Player>) null));
         }
     }
 

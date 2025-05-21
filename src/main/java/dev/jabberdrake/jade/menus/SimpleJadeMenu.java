@@ -1,22 +1,14 @@
 package dev.jabberdrake.jade.menus;
 
-import dev.jabberdrake.jade.utils.TextUtils;
-import io.papermc.paper.datacomponent.DataComponentTypes;
-import io.papermc.paper.datacomponent.item.ItemLore;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 
-import java.awt.*;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
@@ -33,16 +25,21 @@ public abstract class SimpleJadeMenu implements JadeMenu {
     }
 
     @Override
-    public void click(Player player, int slot) {
-        final Consumer<Player> action = this.items.get(slot).getAction();
+    public void click(Player player, int slot, ClickType clickType) {
 
-        if (action != null) { action.accept(player); }
+        final MenuItem clickedItem = this.getItems().get(slot);
+        if (clickedItem != null) {
+            final Consumer<Player> action = clickedItem.getAction(clickType);
+            if (action != null) {
+                action.accept(player);
+            }
+        }
     }
 
     @Override
     public void setItem(int slot, MenuItem menuItem) {
         this.items.put(slot, menuItem);
-        getInventory().setItem(slot, menuItem.getItem());
+        getInventory().setItem(slot, menuItem.getItemStack());
     }
 
     @Override
@@ -53,7 +50,7 @@ public abstract class SimpleJadeMenu implements JadeMenu {
         getInventory().clear();
 
         for (int i = 0; i < getInventory().getSize(); i++) {
-            final ItemStack item = getItems().get(i).getItem();
+            final ItemStack item = getItems().get(i).getItemStack();
             if (item != null) {
                 getInventory().setItem(i, item);
             }

@@ -6,6 +6,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 
 public class JadeMenuHandler implements Listener {
@@ -17,6 +18,6 @@ public class JadeMenuHandler implements Listener {
         if (inventory == null || !(inventory.getHolder(false) instanceof JadeMenu menu)) { return; }
 
         event.setCancelled(true);
-        menu.click((Player) event.getWhoClicked(), event.getSlot());
+        menu.click((Player) event.getWhoClicked(), event.getSlot(), event.getClick());
     }
 }

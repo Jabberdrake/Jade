@@ -12,6 +12,10 @@ public class JadeSettings {
     private static FileConfiguration config;
     public static final String FILENAME = "settings.yml";
 
+    // DEFINES
+    public static final String NONE = "NONE";
+    public static final String CONTAINER = "CONTAINER";
+    public static final String NORMAL = "NORMAL";
 
     // GENERIC
     public static String gameworld = "world";
@@ -20,6 +24,7 @@ public class JadeSettings {
 
     // GAMERULES
     public static boolean preventCoralFade = true;
+    public static String realmProtectionLevel = CONTAINER;
 
 
     public static void load(Jade jade) {
@@ -34,6 +39,7 @@ public class JadeSettings {
 
         // Load gamerules
         preventCoralFade = config.getBoolean("gamerules.preventCoralFade");
+        realmProtectionLevel = config.getString("gamerules.realmProtectionLevel");
     }
 
     public static boolean setGamerule(String gamerule, boolean value) {
@@ -43,6 +49,19 @@ public class JadeSettings {
                 config.set("gamerules.preventCoralFade", value);
                 JadeSettings.save();
                 return true;
+            default:
+                return false;
+        }
+    }
+
+    public static boolean setGamerule(String gamerule, String value) {
+        switch (gamerule) {
+            case "realmProtectionLevel":
+                if (value.equals(NONE) || value.equals(CONTAINER) || value.equals(NORMAL)) {
+                    config.set("gamerules.realmProtectionLevel", value);
+                    JadeSettings.save();
+                    return true;
+                }
             default:
                 return false;
         }

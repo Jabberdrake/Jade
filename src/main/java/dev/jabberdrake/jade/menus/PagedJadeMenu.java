@@ -5,6 +5,7 @@ import io.papermc.paper.datacomponent.DataComponentTypes;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
@@ -25,7 +26,7 @@ public abstract class PagedJadeMenu extends SimpleJadeMenu {
             update();
         });
 
-        MenuItem currPageButton = new MenuItem(getCurrentPageButtonAsItemStack(), null);
+        MenuItem currPageButton = new MenuItem(getCurrentPageButtonAsItemStack(), (Consumer<Player>) null);
 
         MenuItem prevPageButton = new MenuItem(getPreviousPageButtonAsItemStack(), player -> {
             currentPage = Math.max(0, currentPage - 1);
@@ -53,20 +54,19 @@ public abstract class PagedJadeMenu extends SimpleJadeMenu {
         getItems().put(index, menuItem);
 
         if (page == 0)
-            getInventory().setItem(index, menuItem.getItem());
+            getInventory().setItem(index, menuItem.getItemStack());
 
         if (page > maxPage)
             maxPage = page;
     }
 
     @Override
-    public void click(Player player, int slot) {
+    public void click(Player player, int slot, ClickType clickType) {
         final int mapIndex = slot < getInventory().getSize() - 9 ? (currentPage * getInventory().getSize()) + slot : slot;
 
         final MenuItem clickedItem = this.getItems().get(mapIndex);
-
         if (clickedItem != null) {
-            final Consumer<Player> action = clickedItem.getAction();
+            final Consumer<Player> action = clickedItem.getAction(clickType);
             if (action != null) {
                 action.accept(player);
             }
@@ -82,7 +82,7 @@ public abstract class PagedJadeMenu extends SimpleJadeMenu {
             final MenuItem item = this.getItems().get(index);
 
             if (item != null)
-                getInventory().setItem(i, item.getItem());
+                getInventory().setItem(i, item.getItemStack());
         }
 
         setNavigation();

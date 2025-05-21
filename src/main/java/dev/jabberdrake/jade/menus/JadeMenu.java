@@ -3,6 +3,7 @@ package dev.jabberdrake.jade.menus;
 import dev.jabberdrake.jade.utils.TextUtils;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.InventoryHolder;
 
 import java.util.Map;
@@ -10,7 +11,7 @@ import java.util.Map;
 public interface JadeMenu extends InventoryHolder {
 
     // Credit to SMCode (https://github.com/SimpleMineCode/) for this implementation!
-    void click(Player player, int slot);
+    void click(Player player, int slot, ClickType clickType);
 
     void setItem(int slot, MenuItem item);
 
@@ -20,13 +21,6 @@ public interface JadeMenu extends InventoryHolder {
         composeMenu(player);
         player.openInventory(getInventory());
     }
-
-    /*
-    default void reopen(Player player) {
-        player.closeInventory();
-        composeMenu(player);
-        player.openInventory(getInventory());
-    }*/
 
     void update();
 

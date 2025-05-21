@@ -28,7 +28,6 @@ public class SettlementClaimCommand {
                 .executes(SettlementClaimCommand::runCommandWithoutArgs)
                 .then(Commands.literal("square")
                         .then(Commands.argument("value", IntegerArgumentType.integer(1, 5))
-                            .suggests(CommonSettlementSuggestions::buildSuggestionsForSettlementsWithPlayer)
                             .requires(sender -> sender.getExecutor() instanceof Player)
                             .executes(SettlementClaimCommand::runCommandForSquare)))
                 .then(Commands.literal("auto")

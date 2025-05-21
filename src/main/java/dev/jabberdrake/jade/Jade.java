@@ -100,6 +100,7 @@ public final class Jade extends JavaPlugin {
         this.getServer().getPluginManager().registerEvents(new PlayerChatHandler(), this);
 
         this.getServer().getPluginManager().registerEvents(new BlockFadeHandler(), this);
+        this.getServer().getPluginManager().registerEvents(new RealmProtectionHandler(), this);
     }
 
     private void syncRealms(BlueMapAPI api) {

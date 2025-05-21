@@ -1,32 +1,45 @@
 package dev.jabberdrake.jade.menus;
 
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Consumer;
 
 public class MenuItem {
     private ItemStack item;
-    private Consumer<Player> action;
+    private Map<ClickType, Consumer<Player>> actions;
 
     public MenuItem(ItemStack item, Consumer<Player> action) {
         this.item = item;
-        this.action = action;
+        this.actions = new HashMap<>();
+        this.actions.put(ClickType.LEFT, action);
     }
 
-    public ItemStack getItem() {
+    public MenuItem(ItemStack item, Map<ClickType, Consumer<Player>> actions) {
+        this.item = item;
+        this.actions = actions;
+    }
+
+    public ItemStack getItemStack() {
         return item;
     }
 
-    public void setItem(ItemStack item) {
+    public void setItemStack(ItemStack item) {
         this.item = item;
     }
 
-    public Consumer<Player> getAction() {
-        return action;
+    public Map<ClickType, Consumer<Player>> getActions() {
+        return actions;
     }
 
-    public void setAction(Consumer<Player> action) {
-        this.action = action;
+    public Consumer<Player> getAction(ClickType clickType) {
+        return this.getActions().get(clickType);
+    }
+
+    public void setAction(ClickType clickType, Consumer<Player> action) {
+        this.getActions().put(clickType, action);
     }
 }
