@@ -16,6 +16,7 @@ public abstract class SimpleJadeMenu implements JadeMenu {
 
     // Credit to SMCode (https://github.com/SimpleMineCode/) for this implementation!
     private Map<Integer, MenuItem> items = new HashMap<>();
+    private Player player;
     private Inventory inventory;
     private int rows;
 
@@ -43,7 +44,14 @@ public abstract class SimpleJadeMenu implements JadeMenu {
     }
 
     @Override
-    public abstract void composeMenu(Player player);
+    public abstract void composeMenu();
+
+    @Override
+    public void open(Player player) {
+        this.player = player;
+        composeMenu();
+        player.openInventory(getInventory());
+    }
 
     @Override
     public void update() {
@@ -60,6 +68,11 @@ public abstract class SimpleJadeMenu implements JadeMenu {
     @Override
     public Map<Integer, MenuItem> getItems() {
         return this.items;
+    }
+
+    @Override
+    public Player getPlayer() {
+        return this.player;
     }
 
     @Override

@@ -21,7 +21,6 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class Settlement {
 
@@ -152,12 +151,13 @@ public class Settlement {
         return this.icon;
     }
 
-    public ItemStack getIconAsMaterial() {
+    public ItemStack getIconAsItem() {
         if (this.getIconAsString() == null) {
             return ItemStack.of(Material.BARRIER);
         } else if (this.getIconAsString().startsWith("minecraft:")) {
             return ItemStack.of(Material.matchMaterial(this.getIconAsString()));
         } else if (this.getIconAsString().startsWith("jade:")) {
+            // TODO: IMPLEMENT ME
             return ItemStack.of(Material.BARRIER);
         } else return null;
     }
@@ -262,14 +262,21 @@ public class Settlement {
                 // set the current default role to normal
                 // and set the specified role as default.
                 this.getDefaultRole().setToNormal();
-                DatabaseManager.saveSettlementRole(this.getDefaultRole());
 
                 role.setToDefault();
-                DatabaseManager.saveSettlementRole(role);
                 return true;
             }
         }
         return false;
+    }
+
+    public boolean isUniqueRoleName(String potentialRoleName) {
+        for (SettlementRole role: this.getRoles()) {
+            if (role.getName().equals(potentialRoleName)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public Map<UUID, SettlementRole> getPopulation() {
@@ -366,7 +373,7 @@ public class Settlement {
 
     public SettlementRole getRoleAbove(SettlementRole role) {
         int referenceAuthority = role.getAuthority();
-        for (int a = referenceAuthority + 1; a < SettlementRole.MAX_AUTHORITY; a++) {
+        for (int a = referenceAuthority + 1; a <= SettlementRole.MAX_AUTHORITY; a++) {
             SettlementRole roleAtAuthority = this.getRoleForAuthority(a);
             if (roleAtAuthority != null) { return roleAtAuthority; }
         }
@@ -418,17 +425,21 @@ public class Settlement {
     public ItemStack asDisplayItem(String addon) {
         final int maxMembersToDisplay = 10;
 
-        ItemStack item = this.getIconAsMaterial();
+        ItemStack item = this.getIconAsItem();
         item.setData(DataComponentTypes.CUSTOM_NAME, Component.text()
                 .append(this.asTextComponent())
                 .decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE)
                 .build());
         ItemLore.Builder loreBuilder = ItemLore.lore()
-                .addLine(Component.text().append(this.getDescription()).decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE).build())
+                .addLine(Component.text().append(this.getDescription())
+                        .decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE).build())
                 .addLine(Component.text(""))
-                .addLine(Component.text().append(this.presentFoodAsComponent()).decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE).build())
-                .addLine(Component.text().append(this.presentNationAsComponent()).decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE).build())
-                .addLine(Component.text("Members: ", TextUtils.LIGHT_BRASS).decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE));
+                .addLine(Component.text().append(this.presentFoodAsComponent())
+                        .decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE).build())
+                .addLine(Component.text().append(this.presentNationAsComponent())
+                        .decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE).build())
+                .addLine(Component.text("Members: ", TextUtils.LIGHT_BRASS)
+                        .decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE));
 
         List<Map.Entry<UUID, SettlementRole>> populationToDisplay = this.getPopulation().entrySet().stream()
                 .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))

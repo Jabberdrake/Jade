@@ -6,6 +6,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import com.mojang.brigadier.tree.LiteralCommandNode;
+import dev.jabberdrake.jade.commands.CommonArgumentSuggestions;
 import dev.jabberdrake.jade.titles.JadeTitle;
 import dev.jabberdrake.jade.titles.TitleManager;
 import dev.jabberdrake.jade.utils.TextUtils;
@@ -19,13 +20,11 @@ import java.util.concurrent.CompletableFuture;
 
 public class TitleCreateCommand {
 
-
-
     public static LiteralCommandNode<CommandSourceStack> buildCommand(final String label) {
         return Commands.literal(label)
                 .then(Commands.argument("name", StringArgumentType.string())
                         .then(Commands.argument("color", StringArgumentType.word())
-                                .suggests(TitleCreateCommand::suggestNamedTextColors)
+                                .suggests(CommonArgumentSuggestions::suggestNamedTextColors)
                                 .requires(sender -> sender.getExecutor() instanceof Player)
                                 .executes(TitleCreateCommand::runCommand)))
                 .build();
@@ -63,12 +62,5 @@ public class TitleCreateCommand {
         );
 
         return Command.SINGLE_SUCCESS;
-    }
-
-    public static CompletableFuture<Suggestions> suggestNamedTextColors(final CommandContext<CommandSourceStack> context, final SuggestionsBuilder builder) {
-
-        NamedTextColor.NAMES.keys().forEach(builder::suggest);
-
-        return builder.buildFuture();
     }
 }

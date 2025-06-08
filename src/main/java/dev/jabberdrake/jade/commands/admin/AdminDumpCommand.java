@@ -1,12 +1,16 @@
 package dev.jabberdrake.jade.commands.admin;
 
 import com.mojang.brigadier.Command;
+import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.LiteralCommandNode;
+import dev.jabberdrake.jade.commands.settlement.CommonSettlementSuggestions;
+import dev.jabberdrake.jade.commands.settlement.SettlementJoinCommand;
 import dev.jabberdrake.jade.database.DatabaseManager;
 import dev.jabberdrake.jade.realms.ChunkAnchor;
 import dev.jabberdrake.jade.realms.RealmManager;
 import dev.jabberdrake.jade.realms.Settlement;
+import dev.jabberdrake.jade.realms.SettlementRole;
 import dev.jabberdrake.jade.utils.TextUtils;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
@@ -34,6 +38,12 @@ public class AdminDumpCommand {
                         .then(Commands.literal("territory_map")
                                 .requires(sender -> sender.getExecutor() instanceof Player)
                                 .executes(AdminDumpCommand::runCommandForTerritoryMap)
+                        )
+                        .then(Commands.literal("settlement_roles")
+                                .then(Commands.argument("settlement", StringArgumentType.string())
+                                        .suggests(CommonSettlementSuggestions::buildSuggestionsForAllSettlements)
+                                        .requires(sender -> sender.getExecutor() instanceof Player)
+                                        .executes(AdminDumpCommand::runCommandForRoles))
                         )
                 )
                 .build();
@@ -100,6 +110,29 @@ public class AdminDumpCommand {
                                     .clickEvent(ClickEvent.runCommand("/settlement info " + settlement.getName()))
                             )
                             .append(TextUtils.composeOperatorText("]"))
+                            .build()
+            );
+        }
+        return Command.SINGLE_SUCCESS;
+    }
+    public static int runCommandForRoles(CommandContext<CommandSourceStack> context) {
+        Player player = (Player) context.getSource().getSender();
+        Settlement settlement = RealmManager.getSettlement(StringArgumentType.getString(context, "settlement"));
+        if (settlement == null) {
+            player.sendMessage(TextUtils.composeSimpleErrorMessage("Settlement not found!"));
+            return Command.SINGLE_SUCCESS;
+        }
+
+        player.sendMessage(TextUtils.composeSimpleOperatorMessage("Dumping ")
+                .append(TextUtils.composeOperatorHighlight("role list"))
+                .append(TextUtils.composeOperatorText(" for "))
+                .append(settlement.getDisplayName())
+                .append(TextUtils.composeOperatorText(":")));
+
+        for (SettlementRole role : settlement.getRoles()) {
+            player.sendMessage(
+                    Component.text()
+                            .append(TextUtils.composeOperatorText(INDENT + "[" + role.getDisplayAsString() + ", authority=" + role.getAuthority() + "]"))
                             .build()
             );
         }

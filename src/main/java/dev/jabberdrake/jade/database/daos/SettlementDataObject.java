@@ -126,7 +126,7 @@ public class SettlementDataObject implements DatabaseObject<Settlement, Integer>
 
     public List<SettlementRole> fetchRoles(Settlement settlement) {
         List<SettlementRole> roles = new ArrayList<>();
-        String sql = "SELECT id, name, color, authority, type, can_invite, can_kick, can_claim, can_unclaim, can_promote, can_demote, can_edit FROM settlement_roles WHERE settlement_id = ?;";
+        String sql = "SELECT id, name, color, authority, type, icon, can_invite, can_kick, can_claim, can_unclaim, can_promote, can_demote, can_edit, can_manage FROM settlement_roles WHERE settlement_id = ?;";
         try {
             database.query(sql, stmt -> {
                 stmt.setInt(1, settlement.getId());
@@ -137,6 +137,7 @@ public class SettlementDataObject implements DatabaseObject<Settlement, Integer>
                     String color = resultSet.getString("color");
                     int authority = resultSet.getInt("authority");
                     String type = resultSet.getString("type");
+                    String icon = resultSet.getString("icon");
                     boolean canInvite = resultSet.getBoolean("can_invite");
                     boolean canKick = resultSet.getBoolean("can_kick");
                     boolean canClaim = resultSet.getBoolean("can_claim");
@@ -144,8 +145,9 @@ public class SettlementDataObject implements DatabaseObject<Settlement, Integer>
                     boolean canPromote = resultSet.getBoolean("can_promote");
                     boolean canDemote = resultSet.getBoolean("can_demote");
                     boolean canEdit = resultSet.getBoolean("can_edit");
+                    boolean canManage = resultSet.getBoolean("can_manage");
 
-                    SettlementRole role = new SettlementRole(id, name, TextColor.fromHexString(color), settlement, authority, SettlementRole.parseTypeFromString(type), canInvite, canKick, canClaim, canUnclaim, canPromote, canDemote, canEdit);
+                    SettlementRole role = new SettlementRole(id, name, TextColor.fromHexString(color), settlement, authority, SettlementRole.parseTypeFromString(type), icon, canInvite, canKick, canClaim, canUnclaim, canPromote, canDemote, canEdit, canManage);
                     roles.add(role);
                 }
             });
@@ -322,7 +324,7 @@ public class SettlementDataObject implements DatabaseObject<Settlement, Integer>
 
     public Integer createSettlementRole(SettlementRole role) {
         Integer[] result = {null};
-        String sql = "INSERT INTO settlement_roles (settlement_id, name, color, authority, type, can_invite, can_kick, can_claim, can_unclaim, can_promote, can_demote, can_edit) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+        String sql = "INSERT INTO settlement_roles (settlement_id, name, color, authority, type, icon, can_invite, can_kick, can_claim, can_unclaim, can_promote, can_demote, can_edit, can_manage) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
         try {
             result[0] = Math.toIntExact(database.create(sql, stmt -> {
                 stmt.setInt(1, role.getSettlement().getId());
@@ -330,13 +332,15 @@ public class SettlementDataObject implements DatabaseObject<Settlement, Integer>
                 stmt.setString(3, role.getColor().asHexString());
                 stmt.setInt(4, role.getAuthority());
                 stmt.setString(5, role.getTypeAsString());
-                stmt.setBoolean(6, role.canInvite());
-                stmt.setBoolean(7, role.canKick());
-                stmt.setBoolean(8, role.canClaim());
-                stmt.setBoolean(9, role.canUnclaim());
-                stmt.setBoolean(10, role.canPromote());
-                stmt.setBoolean(11, role.canDemote());
-                stmt.setBoolean(12, role.canEdit());
+                stmt.setString(6, role.getIconAsString());
+                stmt.setBoolean(7, role.canInvite());
+                stmt.setBoolean(8, role.canKick());
+                stmt.setBoolean(9, role.canClaim());
+                stmt.setBoolean(10, role.canUnclaim());
+                stmt.setBoolean(11, role.canPromote());
+                stmt.setBoolean(12, role.canDemote());
+                stmt.setBoolean(13, role.canEdit());
+                stmt.setBoolean(14, role.canManage());
             }));
         } catch (SQLException e) {
             plugin.getLogger().warning("[SettlementDataObject::createSettlementRole] Caught SQLException while creating settlement role object for " + role.toString() + ": ");
@@ -346,20 +350,23 @@ public class SettlementDataObject implements DatabaseObject<Settlement, Integer>
     }
 
     public void saveSettlementRole(SettlementRole role) {
-        String sql = "UPDATE settlement_roles SET name = ?, color = ?, authority = ?, type = ?, can_invite = ?, can_kick = ?, can_claim = ?, can_unclaim = ?, can_promote = ?, can_demote = ?, can_edit = ? WHERE id = ?;";
+        String sql = "UPDATE settlement_roles SET name = ?, color = ?, authority = ?, type = ?, icon = ?, can_invite = ?, can_kick = ?, can_claim = ?, can_unclaim = ?, can_promote = ?, can_demote = ?, can_edit = ?, can_manage = ? WHERE id = ?;";
         try {
             database.execute(sql, stmt -> {
                 stmt.setString(1, role.getName());
                 stmt.setString(2, role.getColor().asHexString());
                 stmt.setInt(3, role.getAuthority());
                 stmt.setString(4, role.getTypeAsString());
-                stmt.setBoolean(5, role.canInvite());
-                stmt.setBoolean(6, role.canKick());
-                stmt.setBoolean(7, role.canClaim());
-                stmt.setBoolean(8, role.canUnclaim());
-                stmt.setBoolean(9, role.canPromote());
-                stmt.setBoolean(10, role.canDemote());
-                stmt.setBoolean(11, role.canEdit());
+                stmt.setString(5, role.getIconAsString());
+                stmt.setBoolean(6, role.canInvite());
+                stmt.setBoolean(7, role.canKick());
+                stmt.setBoolean(8, role.canClaim());
+                stmt.setBoolean(9, role.canUnclaim());
+                stmt.setBoolean(10, role.canPromote());
+                stmt.setBoolean(11, role.canDemote());
+                stmt.setBoolean(12, role.canEdit());
+                stmt.setBoolean(13, role.canManage());
+                stmt.setInt(14, role.getId());
             });
         } catch (SQLException e) {
             plugin.getLogger().warning("[SettlementDataObject::saveSettlementRole] Caught SQLException while saving settlement role object for " + role.toString() + ": ");
@@ -509,6 +516,7 @@ public class SettlementDataObject implements DatabaseObject<Settlement, Integer>
                   color TEXT(7) NOT NULL,
                   authority INTEGER DEFAULT 0 NOT NULL CHECK (authority BETWEEN 0 AND 8),
                   type TEXT DEFAULT 'NONE' NOT NULL,
+                  icon TEXT DEFAULT 'minecraft:leather_helmet' NOT NULL,
                   can_invite BOOLEAN DEFAULT FALSE NOT NULL,
                   can_kick BOOLEAN DEFAULT FALSE NOT NULL,
                   can_claim BOOLEAN DEFAULT FALSE NOT NULL,
@@ -516,6 +524,7 @@ public class SettlementDataObject implements DatabaseObject<Settlement, Integer>
                   can_promote BOOLEAN DEFAULT FALSE NOT NULL,
                   can_demote BOOLEAN DEFAULT FALSE NOT NULL,
                   can_edit BOOLEAN DEFAULT FALSE NOT NULL,
+                  can_manage BOOLEAN DEFAULT FALSE NOT NULL,
                     CONSTRAINT stmroles_settlement_id_fk
                       FOREIGN KEY (settlement_id) REFERENCES settlements (id)
                       ON DELETE CASCADE

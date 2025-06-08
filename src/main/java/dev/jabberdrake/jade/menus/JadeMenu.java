@@ -15,20 +15,19 @@ public interface JadeMenu extends InventoryHolder {
 
     void setItem(int slot, MenuItem item);
 
-    void composeMenu(Player player);
+    void composeMenu();
 
-    default void open(Player player) {
-        composeMenu(player);
-        player.openInventory(getInventory());
-    }
+    void open(Player player);
 
     void update();
 
-    default void error(Player player, String errorMessage) {
-        player.closeInventory();
-        player.sendMessage(TextUtils.composeSimpleErrorMessage("An error occurred while using a menu! Details: ")
+    default void error(String errorMessage) {
+        getPlayer().closeInventory();
+        getPlayer().sendMessage(TextUtils.composeSimpleErrorMessage("An error occurred while using a menu! Details: ")
                 .append(Component.text(errorMessage, TextUtils.DARK_ZORBA)));
     }
 
     Map<Integer, MenuItem> getItems();
+
+    Player getPlayer();
 }

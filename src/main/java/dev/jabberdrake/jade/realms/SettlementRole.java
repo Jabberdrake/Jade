@@ -1,9 +1,11 @@
 package dev.jabberdrake.jade.realms;
 
-import dev.jabberdrake.jade.Jade;
-import dev.jabberdrake.jade.titles.NamedTitle;
+import dev.jabberdrake.jade.database.DatabaseManager;
+import io.papermc.paper.datacomponent.DataComponentTypes;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
+import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 public class SettlementRole implements Comparable<SettlementRole> {
@@ -17,6 +19,7 @@ public class SettlementRole implements Comparable<SettlementRole> {
     private Settlement settlement;
     private int authority;
     private Type type;
+    private String icon;
     private boolean canInvite = false;
     private boolean canKick = false;
     private boolean canClaim = false;
@@ -24,6 +27,7 @@ public class SettlementRole implements Comparable<SettlementRole> {
     private boolean canPromote = false;
     private boolean canDemote = false;
     private boolean canEdit = false;
+    private boolean canManage = false;
 
     @Override
     public int compareTo(@NotNull SettlementRole o) {
@@ -37,14 +41,15 @@ public class SettlementRole implements Comparable<SettlementRole> {
     }
 
     // Used by DatabaseManager when composing runtime object from persistent data
-    public SettlementRole(int id, String name, TextColor color, Settlement settlement, int authority, Type type,
-        boolean canInvite, boolean canKick, boolean canClaim, boolean canUnclaim, boolean canPromote, boolean canDemote, boolean canEdit) {
+    public SettlementRole(int id, String name, TextColor color, Settlement settlement, int authority, Type type, String icon,
+        boolean canInvite, boolean canKick, boolean canClaim, boolean canUnclaim, boolean canPromote, boolean canDemote, boolean canEdit, boolean canManage) {
         this.id = id;
         this.name = name;
         this.color = color;
         this.settlement = settlement;
         this.authority = authority;
         this.type = type;
+        this.icon = icon;
 
         // I should probably see if I can make this a bit more elegant...
         this.canInvite = canInvite;
@@ -54,15 +59,17 @@ public class SettlementRole implements Comparable<SettlementRole> {
         this.canPromote = canPromote;
         this.canDemote = canDemote;
         this.canEdit = canEdit;
+        this.canManage = canManage;
     }
 
     // Used by DefaultSettlementRole to generate preset roles
-    protected SettlementRole(String name, TextColor color, Settlement settlement, int authority, Type type) {
+    protected SettlementRole(String name, TextColor color, Settlement settlement, int authority, Type type, String icon) {
         this.name = name;
         this.color = color;
         this.settlement = settlement;
         this.authority = authority;
         this.type = type;
+        this.icon = icon;
 
         generatePermissionsFromAuthority(authority);
     }
@@ -91,6 +98,7 @@ public class SettlementRole implements Comparable<SettlementRole> {
 
     public void setName(String name) {
         this.name = name;
+        DatabaseManager.saveSettlementRole(this);
     }
 
     public TextColor getColor() {
@@ -99,6 +107,7 @@ public class SettlementRole implements Comparable<SettlementRole> {
 
     public void setColor(TextColor color) {
         this.color = color;
+        DatabaseManager.saveSettlementRole(this);
     }
 
     public String getDisplayAsString() {
@@ -113,6 +122,25 @@ public class SettlementRole implements Comparable<SettlementRole> {
 
     public int getAuthority() {
         return this.authority;
+    }
+
+    public void increaseAuthority() {
+        // To clarify, we only change things if the current authority is 2 units lower than
+        // the maximum because:
+        // 1. if current authority is 0 units lower (8), then we're handling the leader role;
+        // 2. if current authority is 1 unit lower (7), then after promotion, this role would equal the leader role
+        //    in authority, which shouldn't ever happen;
+        if (this.authority < MAX_AUTHORITY - 1) {
+            this.authority++;
+        }
+        DatabaseManager.saveSettlementRole(this);
+    }
+
+    public void decreaseAuthority() {
+        if (this.authority > MIN_AUTHORITY) {
+            this.authority--;
+        }
+        DatabaseManager.saveSettlementRole(this);
     }
 
     public Type getType() { return this.type; }
@@ -131,6 +159,25 @@ public class SettlementRole implements Comparable<SettlementRole> {
             case "DEFAULT" -> Type.DEFAULT;
             default -> Type.NORMAL;
         };
+    }
+
+    public void setIcon(String icon) { this.icon = icon; }
+
+    public String getIconAsString() { return this.icon; }
+
+    public ItemStack getIconAsItem() {
+        if (this.getIconAsString() == null) {
+            return ItemStack.of(Material.BARRIER);
+        } else if (this.getIconAsString().startsWith("minecraft:")) {
+            ItemStack iconItem = ItemStack.of(Material.matchMaterial(this.getIconAsString()));
+            iconItem.getData(DataComponentTypes.TOOLTIP_DISPLAY).hideTooltip();
+            if (iconItem.hasData(DataComponentTypes.ATTRIBUTE_MODIFIERS)) {
+                iconItem.unsetData(DataComponentTypes.ATTRIBUTE_MODIFIERS);
+            }
+            return iconItem;
+        } else if (this.getIconAsString().startsWith("jade:")) {
+            return ItemStack.of(Material.BARRIER);
+        } else return null;
     }
 
     public boolean isLeader() { return this.type == Type.LEADER; }
@@ -165,6 +212,8 @@ public class SettlementRole implements Comparable<SettlementRole> {
         return this.canEdit;
     }
 
+    public boolean canManage() { return this.canManage; }
+
     public void generatePermissionsFromAuthority(int authority) {
 
         if (authority == MAX_AUTHORITY) {  // Leader
@@ -175,6 +224,7 @@ public class SettlementRole implements Comparable<SettlementRole> {
             this.canPromote = true;
             this.canDemote = true;
             this.canEdit = true;
+            this.canManage = true;
         } else if (authority >= MAX_AUTHORITY / 2) { // Officer, or above
             this.canInvite = true;
             this.canKick = true;
@@ -183,6 +233,7 @@ public class SettlementRole implements Comparable<SettlementRole> {
             this.canPromote = false;
             this.canDemote = false;
             this.canEdit = false;
+            this.canManage = false;
         } else {
             this.canInvite = false;
             this.canKick = false;
@@ -191,43 +242,58 @@ public class SettlementRole implements Comparable<SettlementRole> {
             this.canPromote = false;
             this.canDemote = false;
             this.canEdit = false;
+            this.canManage = false;
         }
     }
 
-    public void setPermission(String permissionName, boolean value) {
+    public boolean setPermission(String permissionName, boolean value) {
         switch (permissionName) {
             case "canInvite":
                 this.canInvite = value;
+                DatabaseManager.saveSettlementRole(this);
                 break;
             case "canKick":
                 this.canKick = value;
+                DatabaseManager.saveSettlementRole(this);
                 break;
             case "canClaim":
                 this.canClaim = value;
+                DatabaseManager.saveSettlementRole(this);
                 break;
             case "canUnclaim":
                 this.canUnclaim = value;
+                DatabaseManager.saveSettlementRole(this);
                 break;
             case "canPromote":
                 this.canPromote = value;
+                DatabaseManager.saveSettlementRole(this);
                 break;
             case "canDemote":
                 this.canDemote = value;
+                DatabaseManager.saveSettlementRole(this);
                 break;
             case "canEdit":
                 this.canEdit = value;
+                DatabaseManager.saveSettlementRole(this);
+                break;
+            case "canManage":
+                this.canManage = value;
+                DatabaseManager.saveSettlementRole(this);
                 break;
             default:
-                Jade.getPlugin(Jade.class).getLogger().warning("[SettlementRole::setPermission] Unknown permission key: " + permissionName);
+                return false;
         }
+        return true;
     }
 
     public void setToDefault() {
         this.type = Type.DEFAULT;
+        DatabaseManager.saveSettlementRole(this);
     }
 
     public void setToNormal() {
         this.type = Type.NORMAL;
+        DatabaseManager.saveSettlementRole(this);
     }
 
     @Override

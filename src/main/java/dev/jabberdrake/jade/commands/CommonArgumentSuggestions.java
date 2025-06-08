@@ -6,6 +6,7 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.registry.RegistryAccess;
 import io.papermc.paper.registry.RegistryKey;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemType;
@@ -33,6 +34,11 @@ public class CommonArgumentSuggestions {
         // Add all Jade item keys to suggestions builder
         //TODO: actually do this lmao
 
+        return builder.buildFuture();
+    }
+
+    public static CompletableFuture<Suggestions> suggestNamedTextColors(final CommandContext<CommandSourceStack> context, final SuggestionsBuilder builder) {
+        NamedTextColor.NAMES.keys().forEach(builder::suggest);
         return builder.buildFuture();
     }
 }

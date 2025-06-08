@@ -3,17 +3,10 @@ package dev.jabberdrake.jade.commands.settlement;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.LiteralCommandNode;
-import dev.jabberdrake.jade.menus.SettlementListMenu;
-import dev.jabberdrake.jade.menus.SettlementTitleMenu;
-import dev.jabberdrake.jade.realms.RealmManager;
-import dev.jabberdrake.jade.realms.Settlement;
-import dev.jabberdrake.jade.utils.TextUtils;
+import dev.jabberdrake.jade.menus.implementations.SettlementListMenu;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-
-import java.util.UUID;
 
 public class SettlementListCommand {
 
