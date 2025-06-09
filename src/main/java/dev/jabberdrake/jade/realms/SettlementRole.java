@@ -184,6 +184,60 @@ public class SettlementRole implements Comparable<SettlementRole> {
 
     public boolean isDefault() { return this.type == Type.DEFAULT; }
 
+    public static String getPermissionAsDisplayString(String permissionNode) {
+        switch (permissionNode) {
+            case "canInvite":
+                return "Can Invite";
+            case "canKick":
+                return "Can Kick";
+            case "canClaim":
+                return "Can Claim";
+            case "canUnclaim":
+                return "Can Unclaim";
+            case "canPromote":
+                return "Can Promote";
+            case "canDemote":
+                return "Can Demote";
+            case "canEdit":
+                return "Can Edit";
+            case "canManage":
+                return "Can Manage";
+            default:
+                return "Unknown permission";
+        }
+    }
+
+    public boolean hasPermission(String permissionNode) {
+        switch (permissionNode) {
+            case "canInvite":
+            case "Can Invite":
+                return this.canInvite();
+            case "canKick":
+            case "Can Kick":
+                return this.canKick();
+            case "canClaim":
+            case "Can Claim":
+                return this.canClaim();
+            case "canUnclaim":
+            case "Can Unclaim":
+                return this.canUnclaim();
+            case "canPromote":
+            case "Can Promote":
+                return this.canPromote();
+            case "canDemote":
+            case "Can Demote":
+                return this.canDemote();
+            case "canEdit":
+            case "Can Edit":
+                return this.canEdit();
+            case "canManage":
+            case "Can Manage":
+                return this.canManage();
+            default:
+                return false;
+        }
+    }
+
     public boolean canInvite() {
         return this.canInvite;
     }
