@@ -2,6 +2,7 @@ package dev.jabberdrake.jade.realms;
 
 import dev.jabberdrake.jade.JadeSettings;
 import dev.jabberdrake.jade.database.DatabaseManager;
+import dev.jabberdrake.jade.utils.ItemUtils;
 import dev.jabberdrake.jade.utils.TextUtils;
 import io.papermc.paper.datacomponent.DataComponentTypes;
 import io.papermc.paper.datacomponent.item.ItemLore;
@@ -12,6 +13,7 @@ import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -34,7 +36,7 @@ public class Settlement {
     private String displayName;
     private String description;
     private TextColor mapColor;
-    private String icon;
+    private NamespacedKey icon;
     private int food;
     private int foodCapacity;
     private long creationTime;
@@ -44,7 +46,7 @@ public class Settlement {
     private Set<ChunkAnchor> territory;
 
     // Used by DatabaseManager when composing runtime object from persistent data
-    public Settlement(int id, String name, String displayName, String description, TextColor mapColor, String icon, int food, long creationTime, Nation nation) {
+    public Settlement(int id, String name, String displayName, String description, TextColor mapColor, NamespacedKey icon, int food, long creationTime, Nation nation) {
         this.id = id;
         this.name = name;
         this.displayName = displayName;
@@ -67,7 +69,7 @@ public class Settlement {
         this.displayName = DEFAULT_NAME_DECORATION + name;
         this.description = DEFAULT_DESC + leader.getName();
         this.mapColor = DEFAULT_MAP_COLOR;
-        this.icon = "minecraft:oak_planks";
+        this.icon = NamespacedKey.fromString("oak_planks");
         this.food = 20;
         this.calculateFoodCapacity();
         this.creationTime = System.currentTimeMillis() / 1000L;
@@ -148,21 +150,14 @@ public class Settlement {
     }
 
     public String getIconAsString() {
-        return this.icon;
+        return this.icon.asString();
     }
 
     public ItemStack getIconAsItem() {
-        if (this.getIconAsString() == null) {
-            return ItemStack.of(Material.BARRIER);
-        } else if (this.getIconAsString().startsWith("minecraft:")) {
-            return ItemStack.of(Material.matchMaterial(this.getIconAsString()));
-        } else if (this.getIconAsString().startsWith("jade:")) {
-            // TODO: IMPLEMENT ME
-            return ItemStack.of(Material.BARRIER);
-        } else return null;
+        return ItemUtils.asDisplayItem(this.icon);
     }
 
-    public void setIcon(String icon) {
+    public void setIcon(NamespacedKey icon) {
         this.icon = icon;
         DatabaseManager.saveSettlement(this);
     }
@@ -387,6 +382,13 @@ public class Settlement {
             if (roleAtAuthority != null) { return roleAtAuthority; }
         }
         return null;
+    }
+
+    public int getLowestUnassignedAuthority() {
+        for (int authority = SettlementRole.MIN_AUTHORITY; authority <= SettlementRole.MAX_AUTHORITY; authority++) {
+            if (this.getRoleForAuthority(authority) == null) return authority;
+        }
+        return -1;
     }
 
     public boolean canManageRole(SettlementRole reference, SettlementRole target) {

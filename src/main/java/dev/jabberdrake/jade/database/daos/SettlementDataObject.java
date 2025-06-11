@@ -8,11 +8,12 @@ import dev.jabberdrake.jade.realms.RealmManager;
 import dev.jabberdrake.jade.realms.Settlement;
 import dev.jabberdrake.jade.realms.SettlementRole;
 import net.kyori.adventure.text.format.TextColor;
-import org.bukkit.entity.Player;
 
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.*;
+
+import static dev.jabberdrake.jade.utils.ItemUtils.parseKey;
 
 public class SettlementDataObject implements DatabaseObject<Settlement, Integer> {
 
@@ -54,9 +55,9 @@ public class SettlementDataObject implements DatabaseObject<Settlement, Integer>
                     // Otherwise, we'll request the RealmManager to hand over the relevant
                     // nation object.
                     if (nationId == 0) {
-                        result[0] = new Settlement(id, name, displayName, description, TextColor.fromHexString(mapColor), icon, food, creationTime, null);
+                        result[0] = new Settlement(id, name, displayName, description, TextColor.fromHexString(mapColor), parseKey(icon), food, creationTime, null);
                     } else {
-                        result[0] = new Settlement(id, name, displayName, description, TextColor.fromHexString(mapColor), icon, food, creationTime, RealmManager.getNation(nationId));
+                        result[0] = new Settlement(id, name, displayName, description, TextColor.fromHexString(mapColor), parseKey(icon), food, creationTime, RealmManager.getNation(nationId));
                     }
                 }
             });
@@ -100,9 +101,9 @@ public class SettlementDataObject implements DatabaseObject<Settlement, Integer>
                     // Otherwise, we'll request the RealmManager to hand over the relevant
                     // nation object.
                     if (nationId == 0) {
-                        result[0] = new Settlement(id, name, displayName, description, TextColor.fromHexString(mapColor), icon, food, creationTime, null);
+                        result[0] = new Settlement(id, name, displayName, description, TextColor.fromHexString(mapColor), parseKey(icon), food, creationTime, null);
                     } else {
-                        result[0] = new Settlement(id, name, displayName, description, TextColor.fromHexString(mapColor), icon, food, creationTime, RealmManager.getNation(nationId));
+                        result[0] = new Settlement(id, name, displayName, description, TextColor.fromHexString(mapColor), parseKey(icon), food, creationTime, RealmManager.getNation(nationId));
                     }
                 }
             });
@@ -147,7 +148,7 @@ public class SettlementDataObject implements DatabaseObject<Settlement, Integer>
                     boolean canEdit = resultSet.getBoolean("can_edit");
                     boolean canManage = resultSet.getBoolean("can_manage");
 
-                    SettlementRole role = new SettlementRole(id, name, TextColor.fromHexString(color), settlement, authority, SettlementRole.parseTypeFromString(type), icon, canInvite, canKick, canClaim, canUnclaim, canPromote, canDemote, canEdit, canManage);
+                    SettlementRole role = new SettlementRole(id, name, TextColor.fromHexString(color), settlement, authority, SettlementRole.parseTypeFromString(type), parseKey(icon), canInvite, canKick, canClaim, canUnclaim, canPromote, canDemote, canEdit, canManage);
                     roles.add(role);
                 }
             });
@@ -224,9 +225,9 @@ public class SettlementDataObject implements DatabaseObject<Settlement, Integer>
                     // nation object.
                     Settlement stm;
                     if (nationId == 0) {
-                        stm = new Settlement(id, name, displayName, description, TextColor.fromHexString(mapColor), icon, food, creationTime, null);
+                        stm = new Settlement(id, name, displayName, description, TextColor.fromHexString(mapColor), parseKey(icon), food, creationTime, null);
                     } else {
-                        stm = new Settlement(id, name, displayName, description, TextColor.fromHexString(mapColor), icon, food, creationTime, RealmManager.getNation(nationId));
+                        stm = new Settlement(id, name, displayName, description, TextColor.fromHexString(mapColor), parseKey(icon), food, creationTime, RealmManager.getNation(nationId));
                     }
 
                     stm.setRoles(this.fetchRoles(stm));

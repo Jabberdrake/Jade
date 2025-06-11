@@ -167,23 +167,24 @@ public class SettlementEditCommand {
         }
 
         NamespacedKey iconArgument = context.getArgument("icon", NamespacedKey.class);
-        String namespace = iconArgument.getNamespace();
-        if (namespace.equals("minecraft")) {
-            ItemType dummy = RegistryAccess.registryAccess().getRegistry(RegistryKey.ITEM).get(iconArgument);
-            if (dummy == null) {
-                player.sendMessage(TextUtils.composeSimpleErrorMessage("Please provide a valid item key!"));
+        switch (iconArgument.getNamespace()) {
+            case "minecraft":
+                ItemType dummy = RegistryAccess.registryAccess().getRegistry(RegistryKey.ITEM).get(iconArgument);
+                if (dummy == null) {
+                    player.sendMessage(TextUtils.composeSimpleErrorMessage("Please provide a valid item key!"));
+                    return Command.SINGLE_SUCCESS;
+                }
+                break;
+            case "jade":
+                // TODO: implement this
+                player.sendMessage(TextUtils.composeSimpleErrorMessage("This feature has not been implemented yet!"));
                 return Command.SINGLE_SUCCESS;
-            }
-        } else if (namespace.equals("jade")) {
-            // TODO: implement this
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("This feature has not been implemented yet!"));
-            return Command.SINGLE_SUCCESS;
-        } else {
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("Please provide a valid namespace!"));
-            return Command.SINGLE_SUCCESS;
+            default:
+                player.sendMessage(TextUtils.composeSimpleErrorMessage("Please provide a valid namespace!"));
+                return Command.SINGLE_SUCCESS;
         }
 
-        focus.setIcon(iconArgument.toString());
+        focus.setIcon(iconArgument);
         player.sendMessage(TextUtils.composeSimpleSuccessMessage("Changed icon to ")
                 .append(TextUtils.composeSuccessHighlight(focus.getIconAsString()))
                 .append(TextUtils.composeSuccessText("!")));

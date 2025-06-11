@@ -1,10 +1,12 @@
 package dev.jabberdrake.jade.realms;
 
 import dev.jabberdrake.jade.database.DatabaseManager;
+import dev.jabberdrake.jade.utils.ItemUtils;
 import io.papermc.paper.datacomponent.DataComponentTypes;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
@@ -19,7 +21,7 @@ public class SettlementRole implements Comparable<SettlementRole> {
     private Settlement settlement;
     private int authority;
     private Type type;
-    private String icon;
+    private NamespacedKey icon;
     private boolean canInvite = false;
     private boolean canKick = false;
     private boolean canClaim = false;
@@ -41,7 +43,7 @@ public class SettlementRole implements Comparable<SettlementRole> {
     }
 
     // Used by DatabaseManager when composing runtime object from persistent data
-    public SettlementRole(int id, String name, TextColor color, Settlement settlement, int authority, Type type, String icon,
+    public SettlementRole(int id, String name, TextColor color, Settlement settlement, int authority, Type type, NamespacedKey icon,
         boolean canInvite, boolean canKick, boolean canClaim, boolean canUnclaim, boolean canPromote, boolean canDemote, boolean canEdit, boolean canManage) {
         this.id = id;
         this.name = name;
@@ -63,7 +65,8 @@ public class SettlementRole implements Comparable<SettlementRole> {
     }
 
     // Used by DefaultSettlementRole to generate preset roles
-    protected SettlementRole(String name, TextColor color, Settlement settlement, int authority, Type type, String icon) {
+    // Used by SettlementManageCommand to create new roles
+    public SettlementRole(String name, TextColor color, Settlement settlement, int authority, Type type, NamespacedKey icon) {
         this.name = name;
         this.color = color;
         this.settlement = settlement;
@@ -161,23 +164,14 @@ public class SettlementRole implements Comparable<SettlementRole> {
         };
     }
 
-    public void setIcon(String icon) { this.icon = icon; }
+    public void setIcon(NamespacedKey icon) { this.icon = icon; }
 
-    public String getIconAsString() { return this.icon; }
+    public String getIconAsString() {
+        return this.icon.asString();
+    }
 
     public ItemStack getIconAsItem() {
-        if (this.getIconAsString() == null) {
-            return ItemStack.of(Material.BARRIER);
-        } else if (this.getIconAsString().startsWith("minecraft:")) {
-            ItemStack iconItem = ItemStack.of(Material.matchMaterial(this.getIconAsString()));
-            iconItem.getData(DataComponentTypes.TOOLTIP_DISPLAY).hideTooltip();
-            if (iconItem.hasData(DataComponentTypes.ATTRIBUTE_MODIFIERS)) {
-                iconItem.unsetData(DataComponentTypes.ATTRIBUTE_MODIFIERS);
-            }
-            return iconItem;
-        } else if (this.getIconAsString().startsWith("jade:")) {
-            return ItemStack.of(Material.BARRIER);
-        } else return null;
+        return ItemUtils.asDisplayItem(this.icon);
     }
 
     public boolean isLeader() { return this.type == Type.LEADER; }

@@ -3,6 +3,8 @@ package dev.jabberdrake.jade.realms;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 
+import static dev.jabberdrake.jade.utils.ItemUtils.parseKey;
+
 public class DefaultSettlementRole extends SettlementRole {
 
     private static final String LEADER_NAME = "Leader";
@@ -14,7 +16,7 @@ public class DefaultSettlementRole extends SettlementRole {
     private static final TextColor MEMBER_COLOR = NamedTextColor.YELLOW;
 
     public DefaultSettlementRole(String name, TextColor color, Settlement settlement, int authority, Type type, String icon) {
-        super(name, color, settlement, authority, type, icon);
+        super(name, color, settlement, authority, type, parseKey(icon));
     }
 
     public static DefaultSettlementRole leader(Settlement settlement) {
