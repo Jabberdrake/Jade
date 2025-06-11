@@ -9,13 +9,9 @@ import de.bluecolored.bluemap.api.markers.MarkerSet;
 import de.bluecolored.bluemap.api.markers.ShapeMarker;
 import de.bluecolored.bluemap.api.math.Color;
 import de.bluecolored.bluemap.api.math.Shape;
-import dev.jabberdrake.jade.commands.JadeCommand;
-import dev.jabberdrake.jade.commands.ProfileCommand;
-import dev.jabberdrake.jade.commands.SettlementCommand;
-import dev.jabberdrake.jade.commands.ToggleRoleplayCommand;
+import dev.jabberdrake.jade.commands.*;
 import dev.jabberdrake.jade.database.DatabaseManager;
 import dev.jabberdrake.jade.handlers.*;
-import dev.jabberdrake.jade.commands.TitleCommand;
 import dev.jabberdrake.jade.players.PlayerManager;
 import dev.jabberdrake.jade.titles.TitleManager;
 import dev.jabberdrake.jade.realms.RealmManager;
@@ -86,6 +82,7 @@ public final class Jade extends JavaPlugin {
         this.getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, commands -> {
             commands.registrar().register(JadeCommand.buildCommand("jade"), "An all-purpose command for the Jade plugin!");
             commands.registrar().register(SettlementCommand.buildCommand("settlement"), "Manages settlement interactions!");
+            commands.registrar().register(NationCommand.buildCommand("nation"), "Manages nation interactions!");
             commands.registrar().register(TitleCommand.buildCommand("title"), "Manages vanity titles!");
             commands.registrar().register(ProfileCommand.buildCommand("profile"), "Manage profile interactions!");
             commands.registrar().register(ToggleRoleplayCommand.buildCommand("toggleroleplay"), "Toggle roleplay mode!");
