@@ -1,12 +1,15 @@
-package dev.jabberdrake.jade.commands.settlement;
+package dev.jabberdrake.jade.commands.nation;
 
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import dev.jabberdrake.jade.commands.CommonArgumentSuggestions;
+import dev.jabberdrake.jade.commands.NationCommand;
 import dev.jabberdrake.jade.commands.SettlementCommand;
+import dev.jabberdrake.jade.commands.settlement.SettlementEditCommand;
 import dev.jabberdrake.jade.players.PlayerManager;
+import dev.jabberdrake.jade.realms.Nation;
 import dev.jabberdrake.jade.realms.RealmManager;
 import dev.jabberdrake.jade.realms.Settlement;
 import dev.jabberdrake.jade.utils.TextUtils;
@@ -22,39 +25,39 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemType;
 
-public class SettlementEditCommand {
+public class NationEditCommand {
 
     public static LiteralCommandNode<CommandSourceStack> buildCommand(final String label) {
         return Commands.literal(label)
                 .then(Commands.literal("name")
                         .then(Commands.argument("name", StringArgumentType.word())
                                 .requires(sender -> sender.getExecutor() instanceof Player)
-                                .executes(SettlementEditCommand::runCommandForName)
+                                .executes(NationEditCommand::runCommandForName)
                         )
                 )
                 .then(Commands.literal("display")
                         .then(Commands.argument("display_name", StringArgumentType.greedyString())
                                 .requires(sender -> sender.getExecutor() instanceof Player)
-                                .executes(SettlementEditCommand::runCommandForDisplay)
+                                .executes(NationEditCommand::runCommandForDisplay)
                         )
                 )
                 .then(Commands.literal("description")
                         .then(Commands.argument("description", StringArgumentType.greedyString())
                                 .requires(sender -> sender.getExecutor() instanceof Player)
-                                .executes(SettlementEditCommand::runCommandForDescription)
+                                .executes(NationEditCommand::runCommandForDescription)
                         )
                 )
                 .then(Commands.literal("mapColor")
                         .then(Commands.argument("color_name_or_hex", StringArgumentType.greedyString())
                                 .requires(sender -> sender.getExecutor() instanceof Player)
-                                .executes(SettlementEditCommand::runCommandForMapColor)
+                                .executes(NationEditCommand::runCommandForMapColor)
                         )
                 )
                 .then(Commands.literal("icon")
                         .then(Commands.argument("icon", ArgumentTypes.namespacedKey())
                                 .suggests(CommonArgumentSuggestions::suggestAllItemKeys)
                                 .requires(sender -> sender.getExecutor() instanceof Player)
-                                .executes(SettlementEditCommand::runCommandForIcon)
+                                .executes(NationEditCommand::runCommandForIcon)
                         )
                 )
                 .build();
@@ -65,17 +68,18 @@ public class SettlementEditCommand {
         Settlement focus = PlayerManager.asJadePlayer(player.getUniqueId()).getFocusSettlement();
 
         if (!SettlementCommand.validateFocusSettlement(player, focus)) { return Command.SINGLE_SUCCESS; }
-        if (!validateUserPermissions(player, focus)) { return Command.SINGLE_SUCCESS; }
+        if (!SettlementCommand.validateFocusLeadership(player, focus)) { return Command.SINGLE_SUCCESS; }
+        if (!NationCommand.validateCapitalStatus(player, focus)) { return Command.SINGLE_SUCCESS; }
 
         String nameArgument = StringArgumentType.getString(context, "name");
-        if (!RealmManager.isUniqueSettlementName(nameArgument)) {
+        if (!RealmManager.isUniqueNationName(nameArgument)) {
             player.sendMessage(TextUtils.composeSimpleErrorMessage("That name is already in use!"));
             return Command.SINGLE_SUCCESS;
         }
 
-        focus.setName(nameArgument);
+        focus.getNation().setName(nameArgument);
         player.sendMessage(TextUtils.composeSimpleSuccessMessage("Changed reference name to ")
-                .append(TextUtils.composeSuccessHighlight(focus.getName()))
+                .append(TextUtils.composeSuccessHighlight(focus.getNation().getName()))
                 .append(TextUtils.composeSuccessText("!")));
 
         return Command.SINGLE_SUCCESS;
@@ -85,14 +89,14 @@ public class SettlementEditCommand {
         Player player = (Player) context.getSource().getSender();
         Settlement focus = PlayerManager.asJadePlayer(player.getUniqueId()).getFocusSettlement();
 
-        if (!SettlementCommand.validateFocusSettlement(player, focus)) {
-            return Command.SINGLE_SUCCESS;
-        }
+        if (!SettlementCommand.validateFocusSettlement(player, focus)) { return Command.SINGLE_SUCCESS; }
+        if (!SettlementCommand.validateFocusLeadership(player, focus)) { return Command.SINGLE_SUCCESS; }
+        if (!NationCommand.validateCapitalStatus(player, focus)) { return Command.SINGLE_SUCCESS; }
 
         String displayArgument = StringArgumentType.getString(context, "display_name");
-        focus.setDisplayName(displayArgument);
+        focus.getNation().setDisplayName(displayArgument);
         player.sendMessage(TextUtils.composeSimpleSuccessMessage("Changed display name to ")
-                .append(focus.getDisplayName())
+                .append(focus.getNation().getDisplayName())
                 .append(TextUtils.composeSuccessText("!")));
 
         return Command.SINGLE_SUCCESS;
@@ -103,10 +107,11 @@ public class SettlementEditCommand {
         Settlement focus = PlayerManager.asJadePlayer(player.getUniqueId()).getFocusSettlement();
 
         if (!SettlementCommand.validateFocusSettlement(player, focus)) { return Command.SINGLE_SUCCESS; }
-        if (!validateUserPermissions(player, focus)) { return Command.SINGLE_SUCCESS; }
+        if (!SettlementCommand.validateFocusLeadership(player, focus)) { return Command.SINGLE_SUCCESS; }
+        if (!NationCommand.validateCapitalStatus(player, focus)) { return Command.SINGLE_SUCCESS; }
 
         String descArgument = StringArgumentType.getString(context, "description");
-        focus.setDescription(descArgument);
+        focus.getNation().setDescription(descArgument);
         player.sendMessage(TextUtils.composeSimpleSuccessMessage("Changed description to \"")
                 .append(focus.getDescription())
                 .append(TextUtils.composeSuccessText("\"!")));
@@ -119,7 +124,8 @@ public class SettlementEditCommand {
         Settlement focus = PlayerManager.asJadePlayer(player.getUniqueId()).getFocusSettlement();
 
         if (!SettlementCommand.validateFocusSettlement(player, focus)) { return Command.SINGLE_SUCCESS; }
-        if (!validateUserPermissions(player, focus)) { return Command.SINGLE_SUCCESS; }
+        if (!SettlementCommand.validateFocusLeadership(player, focus)) { return Command.SINGLE_SUCCESS; }
+        if (!NationCommand.validateCapitalStatus(player, focus)) { return Command.SINGLE_SUCCESS; }
 
         String colorArgument = StringArgumentType.getString(context, "color_name_or_hex");
         TextColor color;
@@ -138,7 +144,7 @@ public class SettlementEditCommand {
             return Command.SINGLE_SUCCESS;
         }
 
-        focus.setMapColor(color);
+        focus.getNation().setMapColor(color);
         player.sendMessage(TextUtils.composeSimpleSuccessMessage("Changed map color to \"")
                 .append(Component.text(colorArgument).color(color))
                 .append(TextUtils.composeSuccessText("\"!")));
@@ -151,7 +157,8 @@ public class SettlementEditCommand {
         Settlement focus = PlayerManager.asJadePlayer(player.getUniqueId()).getFocusSettlement();
 
         if (!SettlementCommand.validateFocusSettlement(player, focus)) { return Command.SINGLE_SUCCESS; }
-        if (!validateUserPermissions(player, focus)) { return Command.SINGLE_SUCCESS; }
+        if (!SettlementCommand.validateFocusLeadership(player, focus)) { return Command.SINGLE_SUCCESS; }
+        if (!NationCommand.validateCapitalStatus(player, focus)) { return Command.SINGLE_SUCCESS; }
 
         NamespacedKey iconArgument = context.getArgument("icon", NamespacedKey.class);
         switch (iconArgument.getNamespace()) {
@@ -171,22 +178,11 @@ public class SettlementEditCommand {
                 return Command.SINGLE_SUCCESS;
         }
 
-        focus.setIcon(iconArgument);
+        focus.getNation().setIcon(iconArgument);
         player.sendMessage(TextUtils.composeSimpleSuccessMessage("Changed icon to ")
-                .append(TextUtils.composeSuccessHighlight(focus.getIconAsString()))
+                .append(TextUtils.composeSuccessHighlight(focus.getNation().getIconAsString()))
                 .append(TextUtils.composeSuccessText("!")));
 
         return Command.SINGLE_SUCCESS;
-    }
-
-    public static boolean validateUserPermissions(Player player, Settlement settlement) {
-        if (!settlement.getRoleFromMember(player.getUniqueId()).canEdit()) {
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("You are not allowed to edit attributes in ")
-                    .append(settlement.getDisplayName())
-                    .append(TextUtils.composeErrorText("!"))
-            );
-            return false;
-        }
-        return true;
     }
 }

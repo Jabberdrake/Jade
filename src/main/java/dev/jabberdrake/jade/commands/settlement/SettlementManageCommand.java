@@ -164,9 +164,9 @@ public class SettlementManageCommand {
             return Command.SINGLE_SUCCESS;
         }
 
-        String processedName = roleArg.substring(0, 1).toUpperCase() + roleArg.substring(1);
+        String treatedName = roleArg.substring(0, 1).toUpperCase() + roleArg.substring(1);
 
-        SettlementRole newRole = new SettlementRole(processedName, NamedTextColor.GRAY, focus, targetAuthority, SettlementRole.Type.NORMAL, NamespacedKey.fromString("leather_helmet"));
+        SettlementRole newRole = new SettlementRole(treatedName, NamedTextColor.GRAY, focus, targetAuthority, SettlementRole.Type.NORMAL, NamespacedKey.minecraft("leather_helmet"));
 
         focus.addRole(newRole);
 

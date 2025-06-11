@@ -1,18 +1,26 @@
 package dev.jabberdrake.jade.realms;
 
 import dev.jabberdrake.jade.database.DatabaseManager;
+import dev.jabberdrake.jade.utils.ItemUtils;
+import dev.jabberdrake.jade.utils.TextUtils;
+import io.papermc.paper.datacomponent.DataComponentTypes;
+import io.papermc.paper.datacomponent.item.ItemLore;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import org.bukkit.Bukkit;
+import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.inventory.ItemStack;
 
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class Nation {
 
@@ -21,7 +29,7 @@ public class Nation {
     private String displayName;
     private String description;
     private TextColor mapColor;
-    private String icon;
+    private NamespacedKey icon;
     private long creationTime;
 
     // Normally, just storing 'capital' would do, but due to the way Settlements *also*
@@ -38,7 +46,7 @@ public class Nation {
     private List<Settlement> members;
 
     // Used by DatabaseManager when composing runtime object from persistent data
-    public Nation(int id, String name, String displayName, String description, TextColor mapColor, String icon, long creationTime, int capitalId) {
+    public Nation(int id, String name, String displayName, String description, TextColor mapColor, NamespacedKey icon, long creationTime, int capitalId) {
         this.id = id;
         this.name = name;
         this.displayName = displayName;
@@ -55,11 +63,11 @@ public class Nation {
     }
 
     // Used by RealmManager when creating new nation
-    public Nation(String name, TextColor mapColor, Settlement capital) {
+    public Nation(String name, Settlement capital) {
         this.name = name;
         this.displayName = "<gold>" + name;
-        this.mapColor = mapColor;
-        this.icon = "minecraft:barrel";
+        this.mapColor = NamedTextColor.GOLD;
+        this.icon = NamespacedKey.minecraft("minecraft:barrel");
         this.creationTime = System.currentTimeMillis() / 1000L;
 
         this.capitalId = capital.getId();
@@ -109,9 +117,11 @@ public class Nation {
         DatabaseManager.saveNation(this);
     }
 
-    public String getIconAsString() { return this.icon; }
+    public String getIconAsString() { return this.icon.asString(); }
 
-    public void setIcon(String icon) {
+    public ItemStack getIconAsItem() { return ItemUtils.asDisplayItem(this.icon); }
+
+    public void setIcon(NamespacedKey icon) {
         this.icon = icon;
         DatabaseManager.saveNation(this);
     }
@@ -167,6 +177,70 @@ public class Nation {
 
     public boolean containsSettlement(Settlement settlement) {
         return this.getMembers().contains(settlement);
+    }
+
+    public Component asTextComponent() {
+        return Component.text()
+                .append(this.getDisplayName())
+                .append(Component.text(" (" + this.getName() + ")", TextUtils.LIGHT_ZORBA))
+                .build();
+    }
+
+    public ItemStack asDisplayItem() {
+        return this.asDisplayItem(null);
+    }
+
+    public ItemStack asDisplayItem(String addon) {
+        final int maxMembersToDisplay = 10;
+
+        ItemStack item = this.getIconAsItem();
+        item.setData(DataComponentTypes.CUSTOM_NAME, Component.text()
+                .append(this.asTextComponent())
+                .decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE)
+                .build());
+        ItemLore.Builder loreBuilder = ItemLore.lore()
+                .addLine(Component.text().append(this.getDescription())
+                        .decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE).build())
+                .addLine(Component.text(""))
+                .addLine(Component.text().content("Capital: ").color(TextUtils.LIGHT_BRASS)
+                        .append(this.getCapital().getDisplayName())
+                        .decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE).build())
+                .addLine(Component.text("Members: ", TextUtils.LIGHT_BRASS)
+                        .decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE));
+
+        List<Settlement> membersToDisplay = this.getMembers().stream().limit(maxMembersToDisplay).toList();
+
+        for (Settlement member : membersToDisplay) {
+            loreBuilder.addLine(Component.text("— ", TextUtils.LIGHT_BRASS)
+                    .append(member.asTextComponent())
+                    .decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE)
+            );
+        }
+
+        if (this.getMembers().size() > maxMembersToDisplay) {
+            loreBuilder.addLine(Component.text("— ", TextUtils.LIGHT_BRASS)
+                    .append(Component.text("...").color(TextUtils.ZORBA))
+                    .decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE)
+            );
+        }
+
+        if (addon == null) {
+            item.setData(DataComponentTypes.LORE, loreBuilder.build());
+        } else {
+            loreBuilder = loreBuilder.addLine(Component.text(""));
+            switch (addon) {
+                case "INFO":
+                    loreBuilder = loreBuilder.addLine(Component.text()
+                            .append(Component.text("Left Click", NamedTextColor.GREEN))
+                            .append(Component.text(" to read more", NamedTextColor.DARK_GREEN))
+                            .decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE)
+                            .build());
+                default:
+                    item.setData(DataComponentTypes.LORE, loreBuilder.build());
+            }
+        }
+
+        return item;
     }
 
 }

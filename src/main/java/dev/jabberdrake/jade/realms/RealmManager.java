@@ -16,10 +16,10 @@ public class RealmManager {
     private static final Logger logger = plugin.getLogger();
 
     private static Map<Integer, Settlement> settlementCache = new HashMap<>();
-    private static Map<UUID, Settlement> activeSettlementInvites = new HashMap<>();
+    private static Map<UUID, Settlement> activeSettlementInvites = new HashMap<>(); // <invited player UUID, Settlement>
 
     private static Map<Integer, Nation> nationCache = new HashMap<>();
-    private static Map<Nation, Settlement> activeNationInvites = new HashMap<>();
+    private static Map<Integer, Nation> activeNationInvites = new HashMap<>(); // <invited settlement ID, Nation>
 
     private static Map<ChunkAnchor, Settlement> territoryMap = new HashMap<>();
 
@@ -28,9 +28,13 @@ public class RealmManager {
         for (Settlement settlement : settlements) {
             settlementCache.put(settlement.getId(), settlement);
         }
-        logger.info("[RealmManager::initialize] Successfully loaded " + settlements.size() + " settlements and " + "0" + " nations!");
 
-        // List<Nation> nations = DatabaseManager.fetchAllNations();
+        List<Nation> nations = DatabaseManager.fetchAllNations();
+        for (Nation nation : nations) {
+            nationCache.put(nation.getId(), nation);
+        }
+
+        logger.info("[RealmManager::initialize] Successfully loaded " + settlements.size() + " settlements and " + nations.size() + " nations!");
 
 
         RealmManager.territoryMap = DatabaseManager.fetchTerritoryMap(settlements);
@@ -152,11 +156,12 @@ public class RealmManager {
         return RealmManager.activeSettlementInvites.get(playerID);
     }
 
-    public static void registerInviteToSettlement(Player player, Settlement settlement) {
+    public static boolean registerInviteToSettlement(Player player, Settlement settlement) {
         UUID playerID = player.getUniqueId();
         if (!RealmManager.activeSettlementInvites.containsKey(playerID)) {
             RealmManager.activeSettlementInvites.put(playerID, settlement);
-        }
+            return true;
+        } else return false;
     }
 
     public static void clearInviteToSettlement(Player player) {
@@ -257,6 +262,26 @@ public class RealmManager {
         }
     }
 
+    public static List<Nation> getAllNations() {
+        return new ArrayList<>(nationCache.values());
+    }
+
+    public static boolean isUniqueNationName(String potentialNatName) {
+        for (Nation nation : getAllNations()) {
+            if (nation.getName().equalsIgnoreCase(potentialNatName)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static Nation createNation(String name, Settlement capital) {
+        Nation nation = new Nation(name, capital);
+
+        nationCache.put(nation.getId(), nation);
+        return nation;
+    }
+
     // Used by DatabaseManager when composing settlement objects from persistent data
     public static Nation getNation(int id) {
         if (id == 0) return null;
@@ -291,5 +316,42 @@ public class RealmManager {
             plugin.getLogger().warning("[RealmManager::getNation(name)] Attempted to fetch unknown nation for name=" + name);
             return null;
         }
+    }
+
+    public static void deleteNation(Nation nation) {
+        // Remove nation from cache list
+        nationCache.remove(nation.getId());
+
+        // Remove all active invites to the deleted nation
+        for (int stmID : activeNationInvites.keySet()) {
+            if (activeNationInvites.get(stmID).equals(nation)) {
+                activeNationInvites.remove(stmID);
+            }
+        }
+
+        // Make all member settlements leave deleted nation
+        for (Settlement settlement : getAllSettlements()) {
+            Nation nationToCheck = settlement.getNation();
+            if (nationToCheck != null && nationToCheck.equals(nation)) {
+                settlement.leaveNation();
+            }
+        }
+
+        DatabaseManager.deleteNation(nation.getId());
+    }
+
+    public static Nation getWhoInvitedSettlement(Settlement settlement) {
+        return RealmManager.activeNationInvites.get(settlement.getId());
+    }
+
+    public static boolean registerInviteToNation(Settlement settlement, Nation nation) {
+        if (!RealmManager.activeNationInvites.containsKey(settlement.getId())) {
+            RealmManager.activeNationInvites.put(settlement.getId(), nation);
+            return true;
+        } else return false;
+    }
+
+    public static void clearInviteToNation(Settlement settlement) {
+        Nation inviter = RealmManager.activeNationInvites.remove(settlement.getId());
     }
 }

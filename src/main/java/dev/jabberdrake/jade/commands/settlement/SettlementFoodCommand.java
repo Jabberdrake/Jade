@@ -147,7 +147,24 @@ public class SettlementFoodCommand {
             return Command.SINGLE_SUCCESS;
         }
 
-        player.sendMessage(TextUtils.composeSimpleErrorMessage("Not implemented yet!"));
+        int totalFoodValue = 0;
+        for (int slot = 0; slot <= 8; slot++) {
+            ItemStack item = player.getInventory().getItem(slot);
+            if (!item.hasData(DataComponentTypes.FOOD)) continue;
+
+            int itemFoodValue = (item.getData(DataComponentTypes.FOOD).nutrition() / 2) * item.getAmount();
+            if (!focus.canHandleFoodDeposit(itemFoodValue)) break;
+
+            player.getInventory().setItem(slot, null);
+            totalFoodValue += itemFoodValue;
+        }
+
+        player.sendMessage(TextUtils.composeSimpleSuccessMessage("Deposited ")
+                .append(Component.text(totalFoodValue, TextUtils.LIVINGMETAL))
+                .append(TextUtils.composeSuccessText(" food for "))
+                .append(focus.getDisplayName())
+                .append(TextUtils.composeSuccessText("!"))
+        );
 
         return Command.SINGLE_SUCCESS;
     }
@@ -160,7 +177,24 @@ public class SettlementFoodCommand {
             return Command.SINGLE_SUCCESS;
         }
 
-        player.sendMessage(TextUtils.composeSimpleErrorMessage("Not implemented yet!"));
+        int totalFoodValue = 0;
+        for (int slot = 0; slot <= 35; slot++) {
+            ItemStack item = player.getInventory().getItem(slot);
+            if (!item.hasData(DataComponentTypes.FOOD)) continue;
+
+            int itemFoodValue = (item.getData(DataComponentTypes.FOOD).nutrition() / 2) * item.getAmount();
+            if (!focus.canHandleFoodDeposit(itemFoodValue)) break;
+
+            player.getInventory().setItem(slot, null);
+            totalFoodValue += itemFoodValue;
+        }
+
+        player.sendMessage(TextUtils.composeSimpleSuccessMessage("Deposited ")
+                .append(Component.text(totalFoodValue, TextUtils.LIVINGMETAL))
+                .append(TextUtils.composeSuccessText(" food for "))
+                .append(focus.getDisplayName())
+                .append(TextUtils.composeSuccessText("!"))
+        );
 
         return Command.SINGLE_SUCCESS;
     }

@@ -62,14 +62,20 @@ public class SettlementInviteCommand {
         }
         // TODO: Check if at max capacity if we decide to implement that
 
-        RealmManager.registerInviteToSettlement(target, focus);
-
-        player.sendMessage(TextUtils.composeSuccessPrefix()
-                .append(TextUtils.composeSuccessHighlight(targetName))
-                .append(TextUtils.composeSuccessText(" has been invited to "))
-                .append(focus.getDisplayName())
-                .append((TextUtils.composeSuccessHighlight("!")))
-        );
+        boolean successFlag = RealmManager.registerInviteToSettlement(target, focus);
+        if (successFlag) {
+            player.sendMessage(TextUtils.composeSuccessPrefix()
+                    .append(TextUtils.composeSuccessHighlight(targetName))
+                    .append(TextUtils.composeSuccessText(" has been invited to "))
+                    .append(focus.getDisplayName())
+                    .append((TextUtils.composeSuccessHighlight("!")))
+            );
+        } else {
+            player.sendMessage(TextUtils.composeErrorPrefix()
+                    .append(TextUtils.composeErrorHighlight(targetName))
+                    .append(TextUtils.composeErrorText(" has already been invited to another nation!"))
+            );
+        }
 
         return Command.SINGLE_SUCCESS;
     }

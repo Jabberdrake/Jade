@@ -25,8 +25,8 @@ public class SettlementInfoCommand {
 
     public static LiteralCommandNode<CommandSourceStack> buildCommand(final String label) {
         return Commands.literal(label)
-                .then(Commands.argument("settlement", StringArgumentType.greedyString())
-                        .suggests(SettlementInfoCommand::buildSettlementSuggestions)
+                .then(Commands.argument("settlement", StringArgumentType.word())
+                        .suggests(CommonSettlementSuggestions::buildSuggestionsForAllSettlements)
                         .requires(sender -> sender.getExecutor() instanceof Player)
                         .executes(SettlementInfoCommand::runCommand))
                 .build();
@@ -37,7 +37,7 @@ public class SettlementInfoCommand {
         Player player = (Player) context.getSource().getSender();
         Settlement settlement = RealmManager.getSettlement(stmString);
         if (settlement == null) {
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("Couldn't find the specified settlement!"));
+            player.sendMessage(TextUtils.composeSimpleErrorMessage("Could not find the specified settlement!"));
             return Command.SINGLE_SUCCESS;
         }
 
@@ -61,27 +61,18 @@ public class SettlementInfoCommand {
                 .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
                 .limit(10)
                 .forEach(entry -> {
-                    player.sendMessage(Component.text(INDENT + "- ", TextUtils.LIGHT_BRASS)
+                    player.sendMessage(Component.text(INDENT + "— ", TextUtils.LIGHT_BRASS)
                             .append(entry.getValue().getDisplayAsComponent())
                             .append(Component.space())
                             .append(Component.text(Bukkit.getPlayer(entry.getKey()).getName(), TextUtils.LIGHT_ZORBA))
                     );
                 });
         if (settlement.getPopulation().size() > 10) {
-            player.sendMessage(Component.text(INDENT + "- ", TextUtils.LIGHT_BRASS)
+            player.sendMessage(Component.text(INDENT + "— ", TextUtils.LIGHT_BRASS)
                 .append(Component.text("...").color(TextUtils.ZORBA))
             );
         }
         player.sendMessage(Component.text()); //evil \n
         return Command.SINGLE_SUCCESS;
-    }
-
-    public static CompletableFuture<Suggestions> buildSettlementSuggestions(final CommandContext<CommandSourceStack> context, final SuggestionsBuilder builder) {
-
-        RealmManager.getAllSettlements().stream()
-                .filter(entry -> entry.getName().toLowerCase().startsWith(builder.getRemainingLowerCase()))
-                .forEach(entry -> builder.suggest(entry.getName()));
-
-        return builder.buildFuture();
     }
 }

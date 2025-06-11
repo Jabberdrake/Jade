@@ -15,7 +15,7 @@ public class SettlementCommand {
     public static LiteralCommandNode<CommandSourceStack> buildCommand(final String label) {
         return Commands.literal(label)
                     .executes(SettlementCommand::runCommand)
-                .then(SettlementListCommand.buildCommand("list")) //NEEDS WORK
+                .then(SettlementListCommand.buildCommand("list"))
                 .then(SettlementInfoCommand.buildCommand("info"))
                 .then(SettlementCreateCommand.buildCommand("create"))
                 .then(SettlementInviteCommand.buildCommand("invite"))
@@ -24,7 +24,8 @@ public class SettlementCommand {
                 .then(SettlementLeaveCommand.buildCommand("leave"))
                 .then(SettlementClaimCommand.buildCommand("claim"))
                 .then(SettlementUnclaimCommand.buildCommand("unclaim"))
-                .then(SettlementManageCommand.buildCommand("manage")) //NEEDS WORK
+                .then(SettlementManageCommand.buildCommand("manage"))
+                .then(SettlementTransferCommand.buildCommand("transfer"))
                 .then(SettlementPromoteCommand.buildCommand("promote"))
                 .then(SettlementDemoteCommand.buildCommand("demote"))
                 .then(SettlementEditCommand.buildCommand("edit"))
@@ -55,5 +56,15 @@ public class SettlementCommand {
             return false;
         }
         return true;
+    }
+
+    public static boolean validateFocusLeadership(Player player, Settlement settlement) {
+        // IMPORTANT: This method assumes that validateFocusSettlement has been run beforehand, and that:
+        //      1. settlement is NOT null;
+        //      2. settlement contains player;
+        if (!settlement.getRoleFromMember(player.getUniqueId()).isLeader()) {
+            player.sendMessage(TextUtils.composeSimpleErrorMessage("You are not the leader of this settlement!"));
+            return false;
+        } else return true;
     }
 }

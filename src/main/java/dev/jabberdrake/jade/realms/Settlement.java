@@ -69,7 +69,7 @@ public class Settlement {
         this.displayName = DEFAULT_NAME_DECORATION + name;
         this.description = DEFAULT_DESC + leader.getName();
         this.mapColor = DEFAULT_MAP_COLOR;
-        this.icon = NamespacedKey.fromString("oak_planks");
+        this.icon = NamespacedKey.minecraft("oak_planks");
         this.food = 20;
         this.calculateFoodCapacity();
         this.creationTime = System.currentTimeMillis() / 1000L;
@@ -141,7 +141,9 @@ public class Settlement {
     }
 
     public TextColor getMapColor() {
-        return this.mapColor;
+        if (this.isInNation()) {
+            return this.getNation().getMapColor();
+        } else return this.mapColor;
     }
 
     public void setMapColor(TextColor color) {
@@ -213,7 +215,9 @@ public class Settlement {
 
     public boolean isInNation() { return this.nation != null; }
 
-    public boolean isMemberOfNation(Nation nation) { return nation.containsSettlement(this); }
+    public void leaveNation() {
+        this.nation = null;
+    }
 
     public List<SettlementRole> getRoles() {
         return this.roles;

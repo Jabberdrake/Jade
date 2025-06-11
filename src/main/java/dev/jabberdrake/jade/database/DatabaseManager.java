@@ -215,6 +215,10 @@ public class DatabaseManager {
         return getNationDao().fetchByName(name);
     }
 
+    public static List<Nation> fetchAllNations() {
+        return getNationDao().fetchAll();
+    }
+
     public static void saveNation(Nation nation) {
         getNationDao().save(nation);
     }

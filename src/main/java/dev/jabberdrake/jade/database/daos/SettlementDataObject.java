@@ -205,7 +205,7 @@ public class SettlementDataObject implements DatabaseObject<Settlement, Integer>
     @Override
     public List<Settlement> fetchAll() {
         List<Settlement> settlements = new ArrayList<>();
-        String sql = "SELECT id, name, display_name, description, map_color, icon, food, creation_time, nation_id FROM settlements";
+        String sql = "SELECT id, name, display_name, description, map_color, icon, food, creation_time, nation_id FROM settlements;";
         try {
             database.query(sql,resultSet -> {
                 while (resultSet.next()) {
@@ -238,7 +238,7 @@ public class SettlementDataObject implements DatabaseObject<Settlement, Integer>
                 }
             });
         } catch (SQLException e) {
-            plugin.getLogger().warning("[SettlementDataObject::fetchAll] Caught SQLException while fetching all registered settlement objects: ");
+            plugin.getLogger().warning("[SettlementDataObject::fetchAll] Caught SQLException while fetching all registered settlement objects!");
             e.printStackTrace();
         }
 

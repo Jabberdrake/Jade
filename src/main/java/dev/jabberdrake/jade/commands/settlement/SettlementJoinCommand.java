@@ -33,6 +33,7 @@ public class SettlementJoinCommand {
         }
 
         inviter.addMember(player.getUniqueId(), inviter.getDefaultRole());
+        RealmManager.clearInviteToSettlement(player);
 
         player.sendMessage(TextUtils.composeSuccessPrefix()
                 .append(TextUtils.composeSuccessText("You are now a member of "))

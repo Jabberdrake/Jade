@@ -1,11 +1,13 @@
-package dev.jabberdrake.jade.commands.settlement;
+package dev.jabberdrake.jade.commands.nation;
 
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.LiteralCommandNode;
+import dev.jabberdrake.jade.commands.NationCommand;
+import dev.jabberdrake.jade.commands.SettlementCommand;
 import dev.jabberdrake.jade.players.PlayerManager;
-import dev.jabberdrake.jade.realms.ChunkAnchor;
+import dev.jabberdrake.jade.realms.Nation;
 import dev.jabberdrake.jade.realms.RealmManager;
 import dev.jabberdrake.jade.realms.Settlement;
 import dev.jabberdrake.jade.utils.TextUtils;
@@ -13,37 +15,38 @@ import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import org.bukkit.entity.Player;
 
-public class SettlementCreateCommand {
+public class NationProclaimCommand {
 
     public static LiteralCommandNode<CommandSourceStack> buildCommand(final String label) {
         return Commands.literal(label)
                 .then(Commands.argument("name", StringArgumentType.word())
                         .requires(sender -> sender.getExecutor() instanceof Player)
-                        .executes(SettlementCreateCommand::runCommand))
+                        .executes(NationProclaimCommand::runCommand))
                 .build();
     }
 
     public static int runCommand(CommandContext<CommandSourceStack> context) {
         Player player = (Player) context.getSource().getSender();
-        ChunkAnchor anchor = new ChunkAnchor(player.getChunk());
+        Settlement focus = PlayerManager.asJadePlayer(player.getUniqueId()).getFocusSettlement();
 
-        if (!RealmManager.isUnclaimedChunk(anchor)) {
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("Cannot create a settlement on a claimed chunk!"));
+        if (!SettlementCommand.validateFocusSettlement(player, focus)) { return Command.SINGLE_SUCCESS; }
+        if (!SettlementCommand.validateFocusLeadership(player, focus)) { return Command.SINGLE_SUCCESS; }
+
+        if (focus.isInNation()) {
+            player.sendMessage(TextUtils.composeSimpleErrorMessage("This settlement is already part of a nation!"));
             return Command.SINGLE_SUCCESS;
         }
 
         String name = StringArgumentType.getString(context, "name");
-        if (!RealmManager.isUniqueSettlementName(name)) {
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("There is already a settlement with that name!"));
+        if (!RealmManager.isUniqueNationName(name)) {
+            player.sendMessage(TextUtils.composeSimpleErrorMessage("There is already a nation with that name!"));
             return Command.SINGLE_SUCCESS;
         }
 
-        Settlement settlement = RealmManager.createSettlement(name, player, anchor);
-
-        PlayerManager.asJadePlayer(player.getUniqueId()).setFocusSettlement(settlement);
+        Nation nation = RealmManager.createNation(name, focus);
 
         player.sendMessage(TextUtils.composeSimpleSuccessMessage("Successfully created ")
-                .append(settlement.getDisplayName())
+                .append(nation.getDisplayName())
                 .append(TextUtils.composeSuccessText("!"))
         );
 

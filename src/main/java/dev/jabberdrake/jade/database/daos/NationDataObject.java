@@ -11,6 +11,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static dev.jabberdrake.jade.utils.ItemUtils.parseKey;
+
 public class NationDataObject implements DatabaseObject<Nation, Integer> {
 
     private Jade plugin;
@@ -45,7 +47,7 @@ public class NationDataObject implements DatabaseObject<Nation, Integer> {
                     long creationTime = resultSet.getLong("creation_time");
                     int capitalId = resultSet.getInt("capital_id");
 
-                    result[0] = new Nation(id, name, displayName, description, TextColor.fromHexString(mapColor), icon, creationTime, capitalId);
+                    result[0] = new Nation(id, name, displayName, description, TextColor.fromHexString(mapColor), parseKey(icon), creationTime, capitalId);
                 }
             });
         } catch (SQLException e) {
@@ -80,11 +82,11 @@ public class NationDataObject implements DatabaseObject<Nation, Integer> {
                     long creationTime = resultSet.getLong("creation_time");
                     int capitalId = resultSet.getInt("capital_id");
 
-                    result[0] = new Nation(id, name, displayName, description, TextColor.fromHexString(mapColor), icon, creationTime, capitalId);
+                    result[0] = new Nation(id, name, displayName, description, TextColor.fromHexString(mapColor), parseKey(icon), creationTime, capitalId);
                 }
             });
         } catch (SQLException e) {
-            plugin.getLogger().warning("[SettlementDataObject::fetchByName] Caught SQLException while fetching nation object: ");
+            plugin.getLogger().warning("[NationDataObject::fetchByName] Caught SQLException while fetching nation object: ");
             e.printStackTrace();
         }
 
@@ -112,7 +114,7 @@ public class NationDataObject implements DatabaseObject<Nation, Integer> {
                 }
             });
         } catch (SQLException e) {
-            plugin.getLogger().warning("[SettlementDataObject::fetchTerritory] Caught SQLException while fetching member settlement IDs for nation" + nation.getName() + ": ");
+            plugin.getLogger().warning("[NationDataObject::fetchMemberIDList] Caught SQLException while fetching member settlement IDs for nation" + nation.getName() + ": ");
             e.printStackTrace();
         }
         return memberIDList;
@@ -120,7 +122,31 @@ public class NationDataObject implements DatabaseObject<Nation, Integer> {
 
     @Override
     public List<Nation> fetchAll() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        List<Nation> nations = new ArrayList<>();
+        String sql = "SELECT id, name, display_name, description, map_color, icon, creation_time, capital_id FROM nations";
+        try {
+            database.query(sql, resultSet -> {
+                while (resultSet.next()) {
+                    int id = resultSet.getInt("id");
+                    String name = resultSet.getString("name");
+                    String displayName = resultSet.getString("display_name");
+                    String description = resultSet.getString("description");
+                    String mapColor = resultSet.getString("map_color");
+                    String icon = resultSet.getString("icon");
+                    long creationTime = resultSet.getLong("creation_time");
+                    int capitalId = resultSet.getInt("capital_id");
+
+                    Nation nation = new Nation(id, name, displayName, description, TextColor.fromHexString(mapColor), parseKey(icon), creationTime, capitalId);
+                    nation.setMemberList(fetchMemberIDList(nation));
+
+                    nations.add(nation);
+                }
+            });
+        } catch (SQLException e) {
+            plugin.getLogger().warning("[SettlementDataObject::fetchAll] Caught SQLException while fetching all registered nation objects!");
+            e.printStackTrace();
+        }
+        return nations;
     }
 
     @Override
