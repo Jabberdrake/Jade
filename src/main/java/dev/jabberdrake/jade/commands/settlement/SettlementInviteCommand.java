@@ -14,9 +14,12 @@ import dev.jabberdrake.jade.utils.TextUtils;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 import java.util.UUID;
+
+import static dev.jabberdrake.jade.utils.TextUtils.*;
 
 public class SettlementInviteCommand {
 
@@ -37,44 +40,39 @@ public class SettlementInviteCommand {
 
         SettlementRole senderRole = focus.getRoleFromMember(player.getUniqueId());
         if (senderRole == null) {
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("Could not find a matching role for command sender. Please report this to a developer!"));
+            player.sendMessage(error("Could not find a matching role for command sender. Please report this to a developer!"));
             return Command.SINGLE_SUCCESS;
         } else if (!senderRole.canInvite()) {
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("You do not have permission to invite players to ")
-                    .append(focus.getDisplayName())
-                    .append(TextUtils.composeSuccessText("!"))
-            );
+            player.sendMessage(error("You are not allowed to invite members to <highlight>" + focus.getDisplayNameAsString() + "</highlight>!"));
             return Command.SINGLE_SUCCESS;
         }
 
-        String targetName = StringArgumentType.getString(context, "player");
-        Player target = Bukkit.getPlayer(targetName);
-        UUID targetUUID = target.getUniqueId();
-        if (Bukkit.getPlayer(targetName) == null) {
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("Could not find the specified player."));
+        String targetArgument = StringArgumentType.getString(context, "player");
+        OfflinePlayer target = Bukkit.getOfflinePlayer(targetArgument);
+        if (!target.hasPlayedBefore()) {
+            player.sendMessage(error("Could not find a player named <highlight>" + targetArgument + "</highlight>!"));
             return Command.SINGLE_SUCCESS;
-        } else if (targetName.equals(player.getName())) {
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("You can't invite yourself!"));
+        } else if (targetArgument.equals(player.getName())) {
+            player.sendMessage(error("You can't invite yourself!"));
             return Command.SINGLE_SUCCESS;
-        } else if (focus.containsPlayer(targetUUID)) {
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("The specified player is already a member of your focus settlement!."));
+        } else if (!target.isOnline()) {
+            player.sendMessage(error("This player (<highlight>" + target.getName() + "</highlight>) is not online!"));
+            return Command.SINGLE_SUCCESS;
+        } else if (focus.containsPlayer(target.getUniqueId())) {
+            player.sendMessage(error("This player (<highlight>" + target.getName() + "</highlight>) is already a member of your settlement!"));
             return Command.SINGLE_SUCCESS;
         }
+
         // TODO: Check if at max capacity if we decide to implement that
 
-        boolean successFlag = RealmManager.registerInviteToSettlement(target, focus);
+        Player onlineTarget = (Player) target;
+        boolean successFlag = RealmManager.registerInviteToSettlement(onlineTarget, focus);
         if (successFlag) {
-            player.sendMessage(TextUtils.composeSuccessPrefix()
-                    .append(TextUtils.composeSuccessHighlight(targetName))
-                    .append(TextUtils.composeSuccessText(" has been invited to "))
-                    .append(focus.getDisplayName())
-                    .append((TextUtils.composeSuccessHighlight("!")))
-            );
+            player.sendMessage(success("Invited <highlight>" + target.getName() + "</highlight> to " + focus.getDisplayNameAsString() + "!"));
+            focus.tell(onlineTarget, "<highlight>" + target.getName() + "</highlight> has invited you to join " + focus.getDisplayNameAsString() + "!");
+            onlineTarget.sendMessage(info("To accept a settlement invite, do <highlight>/settlement join"));
         } else {
-            player.sendMessage(TextUtils.composeErrorPrefix()
-                    .append(TextUtils.composeErrorHighlight(targetName))
-                    .append(TextUtils.composeErrorText(" has already been invited to another nation!"))
-            );
+            player.sendMessage(error("This player (<highlight>" + target.getName() + "</highlight>) already has a pending settlement invite!"));
         }
 
         return Command.SINGLE_SUCCESS;

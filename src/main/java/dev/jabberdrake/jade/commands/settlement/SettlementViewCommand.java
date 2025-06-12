@@ -13,21 +13,21 @@ import dev.jabberdrake.jade.realms.Settlement;
 import dev.jabberdrake.jade.utils.TextUtils;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
 
+import static dev.jabberdrake.jade.utils.TextUtils.info;
+
 public class SettlementViewCommand {
     private static final int CLAIM_VIEW_RANGE = 2;
     private static final int AREA_VIEW_RANGE = 1;
 
     private static Map<UUID, BukkitTask> ongoingViewTasks = new HashMap<>();
-
-    private static Particle.DustOptions claimBorderOptions = new Particle.DustOptions(Color.YELLOW, 10F);
-    private static ParticleBuilder claimParticleTemplate = new ParticleBuilder(Particle.DUST)
-            .data(claimBorderOptions).count(10);
 
     public static LiteralCommandNode<CommandSourceStack> buildCommand(final String label) {
         return Commands.literal(label)
@@ -39,30 +39,39 @@ public class SettlementViewCommand {
     public static int runCommand(CommandContext<CommandSourceStack> context) {
         Player player = (Player) context.getSource().getSender();
         JadePlayer jadePlayer = PlayerManager.asJadePlayer(player.getUniqueId());
-        ParticleBuilder borderParticle = claimParticleTemplate.clone().receivers(player);
 
         jadePlayer.toggleBorderview();
 
         if (jadePlayer.isViewingBorders()) {
-            player.sendMessage(TextUtils.composeSimpleSuccessMessage("You are now viewing settlement borders!"));
+            player.sendMessage(info("You are now viewing settlement borders around you!"));
 
             Bukkit.getScheduler().runTaskTimer(Jade.getPlugin(Jade.class), task -> {
                 ongoingViewTasks.put(player.getUniqueId(), task);
                 if (!player.isOnline() || player.isDead()) { task.cancel(); }
 
-                drawClaimBorders(borderParticle, player, new ChunkAnchor(player.getChunk()));
+                drawClaimBorders(player, new ChunkAnchor(player.getChunk()));
             }, 0, 60);
         } else {
             ongoingViewTasks.remove(player.getUniqueId()).cancel();
-            player.sendMessage(TextUtils.composeSimpleSuccessMessage("You are no longer viewing settlement borders!"));
+            player.sendMessage(info("You are no longer viewing settlement borders!"));
         }
 
         return Command.SINGLE_SUCCESS;
     }
 
-    public static void drawClaimBorders(ParticleBuilder particle, Player player, ChunkAnchor anchor) {
+    public static ParticleBuilder buildParticle(TextColor mapColor, Player player) {
+        Particle.DustOptions claimBorderOptions = new Particle.DustOptions(
+                Color.fromRGB(mapColor.red(), mapColor.green(), mapColor.blue()
+                ), 10F);
+        ParticleBuilder claimParticle = new ParticleBuilder(Particle.DUST)
+                .data(claimBorderOptions).count(10).clone().receivers(player);
+
+        return claimParticle;
+    }
+
+    public static void drawClaimBorders(Player player, ChunkAnchor anchor) {
         World world = player.getWorld();
-        double y = player.getY() - 2;
+        double y = player.getY();
 
         Set<ChunkAnchor> processed = new LinkedHashSet<>();
         Queue<ChunkAnchor> queue = new LinkedList<>();
@@ -92,19 +101,19 @@ public class SettlementViewCommand {
             Settlement westOwner = RealmManager.getChunkOwner(west);
             Settlement eastOwner = RealmManager.getChunkOwner(east);
             if (northOwner == null || !northOwner.equals(owner)) {
-                drawNorthEdge(particle, world, head, y);
+                drawNorthEdge(buildParticle(owner.getMapColor(), player), world, head, y);
             }
 
             if (southOwner == null || !southOwner.equals(owner)) {
-                drawSouthEdge(particle, world, head, y);
+                drawSouthEdge(buildParticle(owner.getMapColor(), player), world, head, y);
             }
 
             if (westOwner == null || !westOwner.equals(owner)) {
-                drawWestEdge(particle, world, head, y);
+                drawWestEdge(buildParticle(owner.getMapColor(), player), world, head, y);
             }
 
             if (eastOwner == null || !eastOwner.equals(owner)) {
-                drawEastEdge(particle, world, head, y);
+                drawEastEdge(buildParticle(owner.getMapColor(), player), world, head, y);
             }
 
             processed.add(head);

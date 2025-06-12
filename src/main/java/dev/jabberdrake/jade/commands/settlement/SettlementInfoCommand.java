@@ -3,8 +3,6 @@ package dev.jabberdrake.jade.commands.settlement;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
-import com.mojang.brigadier.suggestion.Suggestions;
-import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import dev.jabberdrake.jade.realms.RealmManager;
 import dev.jabberdrake.jade.realms.Settlement;
@@ -12,12 +10,14 @@ import dev.jabberdrake.jade.utils.TextUtils;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-import java.util.*;
-import java.util.concurrent.CompletableFuture;
+import java.util.Comparator;
+import java.util.Map;
+
+import static dev.jabberdrake.jade.utils.TextUtils.error;
+import static dev.jabberdrake.jade.utils.TextUtils.info;
 
 public class SettlementInfoCommand {
 
@@ -26,22 +26,22 @@ public class SettlementInfoCommand {
     public static LiteralCommandNode<CommandSourceStack> buildCommand(final String label) {
         return Commands.literal(label)
                 .then(Commands.argument("settlement", StringArgumentType.word())
-                        .suggests(CommonSettlementSuggestions::buildSuggestionsForAllSettlements)
+                        .suggests(CommonSettlementSuggestions::suggestAllSettlements)
                         .requires(sender -> sender.getExecutor() instanceof Player)
                         .executes(SettlementInfoCommand::runCommand))
                 .build();
     }
 
     public static int runCommand(CommandContext<CommandSourceStack> context) {
-        String stmString = StringArgumentType.getString(context, "settlement");
+        String settlementArgument = StringArgumentType.getString(context, "settlement");
         Player player = (Player) context.getSource().getSender();
-        Settlement settlement = RealmManager.getSettlement(stmString);
+        Settlement settlement = RealmManager.getSettlement(settlementArgument);
         if (settlement == null) {
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("Could not find the specified settlement!"));
+            player.sendMessage(error("Could not find a settlement named <highlight>" + settlementArgument + "</highlight>!"));
             return Command.SINGLE_SUCCESS;
         }
 
-        player.sendMessage(TextUtils.composeSimpleInfoMessage("Settlement info:"));
+        player.sendMessage(info("Settlement info:"));
         player.sendMessage(Component.text(INDENT).append(settlement.asTextComponent()));
         player.sendMessage(Component.text(INDENT).append(settlement.getDescription()));
         player.sendMessage(Component.text()); //evil \n
@@ -53,7 +53,7 @@ public class SettlementInfoCommand {
                     .append(settlement.getNation().getDisplayName()));
         } else {
             player.sendMessage(Component.text(INDENT + "Nation: ", TextUtils.LIGHT_BRASS)
-                    .append(Component.text("None", TextUtils.ZORBA)));
+                    .append(Component.text("None", TextUtils.DARK_ZORBA)));
         }
 
         player.sendMessage(Component.text(INDENT + "Members:", TextUtils.LIGHT_BRASS));

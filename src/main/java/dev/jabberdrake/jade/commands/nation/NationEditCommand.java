@@ -12,6 +12,7 @@ import dev.jabberdrake.jade.players.PlayerManager;
 import dev.jabberdrake.jade.realms.Nation;
 import dev.jabberdrake.jade.realms.RealmManager;
 import dev.jabberdrake.jade.realms.Settlement;
+import dev.jabberdrake.jade.utils.JadeTextColor;
 import dev.jabberdrake.jade.utils.TextUtils;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
@@ -24,6 +25,9 @@ import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemType;
+
+import static dev.jabberdrake.jade.utils.TextUtils.error;
+import static dev.jabberdrake.jade.utils.TextUtils.info;
 
 public class NationEditCommand {
 
@@ -49,6 +53,7 @@ public class NationEditCommand {
                 )
                 .then(Commands.literal("mapColor")
                         .then(Commands.argument("color_name_or_hex", StringArgumentType.greedyString())
+                                .suggests(CommonArgumentSuggestions::suggestNamedTextColors)
                                 .requires(sender -> sender.getExecutor() instanceof Player)
                                 .executes(NationEditCommand::runCommandForMapColor)
                         )
@@ -73,15 +78,12 @@ public class NationEditCommand {
 
         String nameArgument = StringArgumentType.getString(context, "name");
         if (!RealmManager.isUniqueNationName(nameArgument)) {
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("That name is already in use!"));
+            player.sendMessage(error("That name (<highlight>" + nameArgument + "</highlight>) is already in use!"));
             return Command.SINGLE_SUCCESS;
         }
 
         focus.getNation().setName(nameArgument);
-        player.sendMessage(TextUtils.composeSimpleSuccessMessage("Changed reference name to ")
-                .append(TextUtils.composeSuccessHighlight(focus.getNation().getName()))
-                .append(TextUtils.composeSuccessText("!")));
-
+        focus.getNation().broadcast("Changed <highlight>reference name<!highlight> to <highlight><i>" + focus.getNation().getName() + "</i></highlight>!");
         return Command.SINGLE_SUCCESS;
     }
 
@@ -95,10 +97,7 @@ public class NationEditCommand {
 
         String displayArgument = StringArgumentType.getString(context, "display_name");
         focus.getNation().setDisplayName(displayArgument);
-        player.sendMessage(TextUtils.composeSimpleSuccessMessage("Changed display name to ")
-                .append(focus.getNation().getDisplayName())
-                .append(TextUtils.composeSuccessText("!")));
-
+        focus.getNation().broadcast("Changed <highlight>display name<!highlight> to " + focus.getNation().getDisplayNameAsString() + "!");
         return Command.SINGLE_SUCCESS;
     }
 
@@ -111,11 +110,11 @@ public class NationEditCommand {
         if (!NationCommand.validateCapitalStatus(player, focus)) { return Command.SINGLE_SUCCESS; }
 
         String descArgument = StringArgumentType.getString(context, "description");
+        if (!descArgument.startsWith("<")) {
+            descArgument = "<white>" + descArgument;
+        }
         focus.getNation().setDescription(descArgument);
-        player.sendMessage(TextUtils.composeSimpleSuccessMessage("Changed description to \"")
-                .append(focus.getDescription())
-                .append(TextUtils.composeSuccessText("\"!")));
-
+        focus.getNation().broadcast("Changed <highlight>description<!highlight> to :" + focus.getDescriptionAsString());
         return Command.SINGLE_SUCCESS;
     }
 
@@ -128,27 +127,19 @@ public class NationEditCommand {
         if (!NationCommand.validateCapitalStatus(player, focus)) { return Command.SINGLE_SUCCESS; }
 
         String colorArgument = StringArgumentType.getString(context, "color_name_or_hex");
-        TextColor color;
-        if (colorArgument.startsWith("#")) {
-            color = TextColor.fromHexString(colorArgument);
-            if (color == null) {
-                player.sendMessage(TextUtils.composeSimpleErrorMessage("Please provide a valid hexstring!"));
-                player.sendMessage(TextUtils.composeSimpleInfoMessage("A hexstring is composed of a # and six hexadecimal characters (0-9 and a-f), e.g.: ")
-                        .append(Component.text("#ffaa00", NamedTextColor.GOLD)));
-                return Command.SINGLE_SUCCESS;
-            }
-        } else if (NamedTextColor.NAMES.keys().contains(colorArgument)) {
-            color = NamedTextColor.NAMES.value(colorArgument);
-        } else {
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("Please provide a valid color name!"));
+        TextColor color = JadeTextColor.fromNameOrHexstring(colorArgument, true);
+        if (color == null) {
+            player.sendMessage(error("Please provide a valid color name or hexstring!"));
+            player.sendMessage(info("A hexstring is composed of a <highlight>#</highlight> and six <highlight>hexadecimal</highlight> characters (0-9 and a-f), e.g.: <gold>#ffaa00"));
+            player.sendMessage(info("This input recognizes all default Minecraft colors. For a full list of valid names, see this " +
+                    "<hover:show_text:'<zorba>Clicking this text will open </zorba><aqua>https://minecraft.wiki/w/Formatting_codes#Color_codes</aqua>'>" +
+                    "<click:open_url:https://minecraft.wiki/w/Formatting_codes#Color_codes>webpage</click>" +
+                    "</hover>."));
             return Command.SINGLE_SUCCESS;
         }
 
         focus.getNation().setMapColor(color);
-        player.sendMessage(TextUtils.composeSimpleSuccessMessage("Changed map color to \"")
-                .append(Component.text(colorArgument).color(color))
-                .append(TextUtils.composeSuccessText("\"!")));
-
+        focus.getNation().broadcast("Changed <highlight>map color<!highlight> to <color:" + color.asHexString() + ">" + colorArgument + "</color>!");
         return Command.SINGLE_SUCCESS;
     }
 
@@ -165,24 +156,21 @@ public class NationEditCommand {
             case "minecraft":
                 ItemType dummy = RegistryAccess.registryAccess().getRegistry(RegistryKey.ITEM).get(iconArgument);
                 if (dummy == null) {
-                    player.sendMessage(TextUtils.composeSimpleErrorMessage("Please provide a valid item key!"));
+                    player.sendMessage(error("Please provide a valid item key!"));
                     return Command.SINGLE_SUCCESS;
                 }
                 break;
             case "jade":
                 // TODO: implement this
-                player.sendMessage(TextUtils.composeSimpleErrorMessage("This feature has not been implemented yet!"));
+                player.sendMessage(error("This feature has not been implemented yet!"));
                 return Command.SINGLE_SUCCESS;
             default:
-                player.sendMessage(TextUtils.composeSimpleErrorMessage("Please provide a valid namespace!"));
+                player.sendMessage(error("Please provide a valid namespace!"));
                 return Command.SINGLE_SUCCESS;
         }
 
         focus.getNation().setIcon(iconArgument);
-        player.sendMessage(TextUtils.composeSimpleSuccessMessage("Changed icon to ")
-                .append(TextUtils.composeSuccessHighlight(focus.getNation().getIconAsString()))
-                .append(TextUtils.composeSuccessText("!")));
-
+        focus.getNation().broadcast("Changed <highlight>icon<!highlight> to <highlight>" + focus.getNation().getIconAsString() + "</highlight>!");
         return Command.SINGLE_SUCCESS;
     }
 }

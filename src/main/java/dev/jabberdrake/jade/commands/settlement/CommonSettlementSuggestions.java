@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 
 public class CommonSettlementSuggestions {
 
-    public static CompletableFuture<Suggestions> buildSuggestionsForAllSettlements(final CommandContext<CommandSourceStack> context, final SuggestionsBuilder builder) {
+    public static CompletableFuture<Suggestions> suggestAllSettlements(final CommandContext<CommandSourceStack> context, final SuggestionsBuilder builder) {
         final List<String> stmNames = new ArrayList<>();
 
         RealmManager.getAllSettlements().forEach(settlement -> {
@@ -34,7 +34,7 @@ public class CommonSettlementSuggestions {
         return builder.buildFuture();
     }
 
-    public static CompletableFuture<Suggestions> buildSuggestionsForSettlementsWithPlayer(final CommandContext<CommandSourceStack> context, final SuggestionsBuilder builder) {
+    public static CompletableFuture<Suggestions> suggestAllSettlementsWithPlayer(final CommandContext<CommandSourceStack> context, final SuggestionsBuilder builder) {
         final List<String> stmNames = new ArrayList<>();
         Player player = (Player) context.getSource().getSender();
 
@@ -49,7 +49,7 @@ public class CommonSettlementSuggestions {
         return builder.buildFuture();
     }
 
-    public static CompletableFuture<Suggestions> buildSuggestionsForAllPlayersInSettlement(final CommandContext<CommandSourceStack> context, final SuggestionsBuilder builder) {
+    public static CompletableFuture<Suggestions> suggestAllPlayersInSettlement(final CommandContext<CommandSourceStack> context, final SuggestionsBuilder builder) {
         Player player = (Player) context.getSource().getSender();
         Settlement focus = PlayerManager.asJadePlayer(player.getUniqueId()).getFocusSettlement();
 

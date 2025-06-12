@@ -12,16 +12,20 @@ import dev.jabberdrake.jade.utils.TextUtils;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 import java.util.UUID;
+
+import static dev.jabberdrake.jade.utils.TextUtils.error;
+import static dev.jabberdrake.jade.utils.TextUtils.info;
 
 public class SettlementKickCommand {
 
     public static LiteralCommandNode<CommandSourceStack> buildCommand(final String label) {
         return Commands.literal(label)
                 .then(Commands.argument("player", StringArgumentType.word())
-                        .suggests(CommonSettlementSuggestions::buildSuggestionsForAllPlayersInSettlement)
+                        .suggests(CommonSettlementSuggestions::suggestAllPlayersInSettlement)
                         .requires(sender -> sender.getExecutor() instanceof Player)
                         .executes(SettlementKickCommand::runCommand))
                 .build();
@@ -35,50 +39,36 @@ public class SettlementKickCommand {
 
         SettlementRole senderRole = focus.getRoleFromMember(player.getUniqueId());
         if (senderRole == null) {
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("Could not find a matching role for command sender. Please report this to a developer!"));
+            player.sendMessage(error("Could not find a matching role for command sender. Please report this to a developer!"));
             return Command.SINGLE_SUCCESS;
         } else if (!senderRole.canKick()) {
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("You do not have permission to kick members from ")
-                    .append(focus.getDisplayName())
-                    .append(TextUtils.composeErrorText("!"))
-            );
+            player.sendMessage(error("You are not allowed to kick members from <highlight>" + focus.getDisplayNameAsString() + "</highlight>!"));
             return Command.SINGLE_SUCCESS;
         }
 
-        String targetName = StringArgumentType.getString(context, "player");
-        Player target = Bukkit.getPlayer(targetName);
-        UUID targetUUID = target.getUniqueId();
-        SettlementRole settlementRole = focus.getRoleFromMember(targetUUID);
-        if (Bukkit.getPlayer(targetName) == null) {
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("Could not find the specified player."));
+        String targetArgument = StringArgumentType.getString(context, "player");
+        OfflinePlayer target = Bukkit.getOfflinePlayer(targetArgument);
+        if (!target.hasPlayedBefore()) {
+            player.sendMessage(error("Could not find a player named <highlight>" + targetArgument + "</highlight>!"));
             return Command.SINGLE_SUCCESS;
-        } else if (targetName.equals(player.getName())) {
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("You can't kick yourself! To leave the settlement, do /settlement leave."));
+        } else if (targetArgument.equals(player.getName())) {
+            player.sendMessage(error("You can't kick yourself!"));
+            player.sendMessage(info("To leave the settlement, do <highlight>/settlement leave"));
             return Command.SINGLE_SUCCESS;
-        } else if (!focus.containsPlayer(targetUUID)) {
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("The specified player is not a member of your focus settlement."));
+        } else if (!focus.containsPlayer(target.getUniqueId())) {
+            player.sendMessage(error("This player (<highlight>" + target.getName() + "</highlight>) is not a member of your settlement!"));
             return Command.SINGLE_SUCCESS;
-        } else if (settlementRole.getAuthority() >= senderRole.getAuthority()) {
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("The specified player has a higher authority title than you!"));
+        } else if (focus.getRoleFromMember(target.getUniqueId()).getAuthority() >= senderRole.getAuthority()) {
+            player.sendMessage(error("This player (<highlight>" + target.getName() + "</highlight>) has equal or higher authority than you!"));
             return Command.SINGLE_SUCCESS;
         }
 
-        focus.removeMember(targetUUID);
+        focus.removeMember(target.getUniqueId());
 
-        player.sendMessage(TextUtils.composeSuccessPrefix()
-                .append(TextUtils.composeSuccessHighlight(targetName))
-                .append(TextUtils.composeSuccessText(" has been kicked from "))
-                .append(focus.getDisplayName())
-                .append((TextUtils.composeSuccessHighlight("!")))
-        );
-
+        focus.broadcast("<highlight>" + target.getName() + "</highlight> has been kicked from the settlement!");
         if (target.isOnline()) {
-            target.sendMessage(TextUtils.composeSimpleInfoMessage("You have been kicked from ")
-                    .append(focus.getDisplayName())
-                    .append(TextUtils.composeInfoText("!"))
-            );
+            ((Player) target).sendMessage(info("You have been kicked from " + focus.getDisplayNameAsString() + "!"));
         }
-
         return Command.SINGLE_SUCCESS;
     }
 }

@@ -3,6 +3,8 @@ package dev.jabberdrake.jade.realms;
 import dev.jabberdrake.jade.database.DatabaseManager;
 import dev.jabberdrake.jade.utils.ItemUtils;
 import dev.jabberdrake.jade.utils.TextUtils;
+import dev.jabberdrake.jade.utils.message.NationStrategy;
+import dev.jabberdrake.jade.utils.message.SettlementStrategy;
 import io.papermc.paper.datacomponent.DataComponentTypes;
 import io.papermc.paper.datacomponent.item.ItemLore;
 import net.kyori.adventure.text.Component;
@@ -10,9 +12,12 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.time.Instant;
@@ -45,6 +50,8 @@ public class Nation {
     private List<Integer> memberIds;
     private List<Settlement> members;
 
+    private NationStrategy broadcastFormatter = new NationStrategy(this);
+
     // Used by DatabaseManager when composing runtime object from persistent data
     public Nation(int id, String name, String displayName, String description, TextColor mapColor, NamespacedKey icon, long creationTime, int capitalId) {
         this.id = id;
@@ -66,8 +73,9 @@ public class Nation {
     public Nation(String name, Settlement capital) {
         this.name = name;
         this.displayName = "<gold>" + name;
+        this.description = "<green>Preparing to take over the world...";
         this.mapColor = NamedTextColor.GOLD;
-        this.icon = NamespacedKey.minecraft("minecraft:barrel");
+        this.icon = NamespacedKey.minecraft("barrel");
         this.creationTime = System.currentTimeMillis() / 1000L;
 
         this.capitalId = capital.getId();
@@ -241,6 +249,17 @@ public class Nation {
         }
 
         return item;
+    }
+
+    public void broadcast(String message, TagResolver... resolvers) {
+        for (Settlement settlement : this.getMembers()) {
+            for (UUID memberID : settlement.getPopulation().keySet()) {
+                OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(memberID);
+                if (offlinePlayer.isOnline()) {
+                    ((Player) offlinePlayer).sendMessage(this.broadcastFormatter.process(message, resolvers));
+                }
+            }
+        }
     }
 
 }

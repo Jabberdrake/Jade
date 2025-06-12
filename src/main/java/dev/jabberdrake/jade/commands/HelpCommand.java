@@ -10,6 +10,7 @@ import io.papermc.paper.command.brigadier.Commands;
 public class HelpCommand {
 
     public static LiteralCommandNode<CommandSourceStack> buildCommand(final String label) {
+
         return Commands.literal(label)
                     .executes(HelpCommand::runCommand)
                 .build();

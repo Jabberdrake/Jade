@@ -4,6 +4,7 @@ import dev.jabberdrake.jade.JadeSettings;
 import dev.jabberdrake.jade.database.DatabaseManager;
 import dev.jabberdrake.jade.utils.ItemUtils;
 import dev.jabberdrake.jade.utils.TextUtils;
+import dev.jabberdrake.jade.utils.message.SettlementStrategy;
 import io.papermc.paper.datacomponent.DataComponentTypes;
 import io.papermc.paper.datacomponent.item.ItemLore;
 import net.kyori.adventure.text.Component;
@@ -11,9 +12,11 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -44,6 +47,8 @@ public class Settlement {
     private List<SettlementRole> roles;
     private Map<UUID, SettlementRole> population;
     private Set<ChunkAnchor> territory;
+
+    private SettlementStrategy broadcastFormatter = new SettlementStrategy(this);
 
     // Used by DatabaseManager when composing runtime object from persistent data
     public Settlement(int id, String name, String displayName, String description, TextColor mapColor, NamespacedKey icon, int food, long creationTime, Nation nation) {
@@ -424,6 +429,10 @@ public class Settlement {
                 .build();
     }
 
+    public String asDisplayString() {
+        return this.getDisplayNameAsString() + "<light_zorba>(" + this.getName() + ")</light_zorba>";
+    }
+
     public ItemStack asDisplayItem() {
         return this.asDisplayItem(null);
     }
@@ -502,6 +511,22 @@ public class Settlement {
                     .append(this.getNation().getDisplayName())
                     .build();
         }
+    }
+
+    public void broadcast(String message, TagResolver... resolvers) {
+        for (UUID memberID : this.getPopulation().keySet()) {
+            OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(memberID);
+            if (offlinePlayer.isOnline()) {
+                ((Player) offlinePlayer).sendMessage(this.broadcastFormatter.process(message, resolvers));
+            }
+        }
+    }
+
+    public void tell(Player player, String message, TagResolver... resolvers) {
+        // This method assumes that:
+        //  - player matches a valid known player;
+        //  - player is online;
+        player.sendMessage(this.broadcastFormatter.process(message, resolvers));
     }
 
     @Override

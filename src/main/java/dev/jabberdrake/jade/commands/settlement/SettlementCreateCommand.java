@@ -11,7 +11,10 @@ import dev.jabberdrake.jade.realms.Settlement;
 import dev.jabberdrake.jade.utils.TextUtils;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+
+import static dev.jabberdrake.jade.utils.TextUtils.*;
 
 public class SettlementCreateCommand {
 
@@ -28,25 +31,22 @@ public class SettlementCreateCommand {
         ChunkAnchor anchor = new ChunkAnchor(player.getChunk());
 
         if (!RealmManager.isUnclaimedChunk(anchor)) {
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("Cannot create a settlement on a claimed chunk!"));
+            player.sendMessage(error("Cannot create a settlement on a claimed chunk!"));
             return Command.SINGLE_SUCCESS;
         }
 
-        String name = StringArgumentType.getString(context, "name");
-        if (!RealmManager.isUniqueSettlementName(name)) {
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("There is already a settlement with that name!"));
+        String nameArgument = StringArgumentType.getString(context, "name");
+        if (!RealmManager.isUniqueSettlementName(nameArgument)) {
+            player.sendMessage(error("That name (<highlight>" + nameArgument + "</highlight>) is already in use!"));
             return Command.SINGLE_SUCCESS;
         }
 
-        Settlement settlement = RealmManager.createSettlement(name, player, anchor);
+        Settlement settlement = RealmManager.createSettlement(nameArgument, player, anchor);
 
         PlayerManager.asJadePlayer(player.getUniqueId()).setFocusSettlement(settlement);
 
-        player.sendMessage(TextUtils.composeSimpleSuccessMessage("Successfully created ")
-                .append(settlement.getDisplayName())
-                .append(TextUtils.composeSuccessText("!"))
-        );
-
+        player.sendMessage(success("Created the settlement of " + settlement.getDisplayNameAsString() + "!"));
+        Bukkit.broadcast(info("<highlight>" + player.getName() + "</highlight> has created the settlement of " + settlement.getDisplayNameAsString() + "!"));
         return Command.SINGLE_SUCCESS;
     }
 }

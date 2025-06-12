@@ -10,6 +10,8 @@ import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import org.bukkit.entity.Player;
 
+import static dev.jabberdrake.jade.utils.TextUtils.error;
+
 public class SettlementCommand {
 
     public static LiteralCommandNode<CommandSourceStack> buildCommand(final String label) {
@@ -45,14 +47,11 @@ public class SettlementCommand {
     // Auxiliary methods for child command nodes
     public static boolean validateFocusSettlement(Player player, Settlement settlement) {
         if (settlement == null) {
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("You are not focusing on any settlement."));
+            player.sendMessage(error("You are not focusing on any settlement."));
             return false;
         } else if (!settlement.containsPlayer(player.getUniqueId())) {
             // NOTE: Since it just uses whichever settlement you're focusing on, this shouldn't ever happen.
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("You are not a member of ")
-                    .append(settlement.getDisplayName())
-                    .append(TextUtils.composeErrorText("!"))
-            );
+            player.sendMessage(error("You are not a member of " + settlement.getDisplayNameAsString() + "!"));
             return false;
         }
         return true;
@@ -63,7 +62,7 @@ public class SettlementCommand {
         //      1. settlement is NOT null;
         //      2. settlement contains player;
         if (!settlement.getRoleFromMember(player.getUniqueId()).isLeader()) {
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("You are not the leader of this settlement!"));
+            player.sendMessage(error("You are not the leader of this settlement!"));
             return false;
         } else return true;
     }

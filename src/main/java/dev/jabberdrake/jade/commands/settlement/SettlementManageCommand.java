@@ -30,6 +30,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+import static dev.jabberdrake.jade.utils.TextUtils.error;
+import static dev.jabberdrake.jade.utils.TextUtils.success;
+
 public class SettlementManageCommand {
 
     public static LiteralCommandNode<CommandSourceStack> buildCommand(final String label) {
@@ -99,8 +102,6 @@ public class SettlementManageCommand {
 
         if (!SettlementCommand.validateFocusSettlement(player, focus)) { return Command.SINGLE_SUCCESS; }
 
-        //player.sendMessage(TextUtils.composeSimpleErrorMessage("Settlement role management GUI has not been implemented yet!"));
-
         new SettlementManageMenu(focus).open(player);
 
         return Command.SINGLE_SUCCESS;
@@ -108,10 +109,7 @@ public class SettlementManageCommand {
 
     public static boolean validateUserPermissions(Player player, Settlement settlement) {
         if (!settlement.getRoleFromMember(player.getUniqueId()).canManage()) {
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("You are not allowed to manage roles for ")
-                    .append(settlement.getDisplayName())
-                    .append(TextUtils.composeErrorText("!"))
-            );
+            player.sendMessage(error("You are not allowed to manage roles for <highlight>" + settlement.getDisplayNameAsString() + "</highlight>!"));
             return false;
         }
         return true;
@@ -119,12 +117,7 @@ public class SettlementManageCommand {
 
     public static boolean validateRoleArgument(String roleArgument, Player player, Settlement settlement) {
         if (settlement.getRoleFromName(roleArgument) == null) {
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("There is no \"")
-                    .append(TextUtils.composeErrorHighlight(roleArgument))
-                    .append(TextUtils.composeErrorText("\" role in "))
-                    .append(settlement.getDisplayName())
-                    .append(TextUtils.composeErrorText("!"))
-            );
+            player.sendMessage(error("Could not find a role named <highlight>" + roleArgument + "</highlight> in " + settlement.getDisplayNameAsString() + "!"));
             return false;
         }
         return true;
@@ -138,7 +131,7 @@ public class SettlementManageCommand {
     public static boolean validateAuthorityDynamic(Player player, Settlement settlement, SettlementRole targetRole, int authorityOffset) {
         SettlementRole senderRole = settlement.getRoleFromMember(player.getUniqueId());
         if (senderRole.getAuthority() <= targetRole.getAuthority() + authorityOffset) {
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("Insufficient authority!"));
+            player.sendMessage(error("You don't have enough authority to manage that role!"));
             return false;
         }
         return true;
@@ -147,69 +140,61 @@ public class SettlementManageCommand {
     public static int runCommandForCreate(CommandContext<CommandSourceStack> context) {
         Player player = (Player) context.getSource().getSender();
         Settlement focus = PlayerManager.asJadePlayer(player.getUniqueId()).getFocusSettlement();
-        String roleArg = StringArgumentType.getString(context, "role");
+        String roleArgument = StringArgumentType.getString(context, "role");
 
         if (!SettlementCommand.validateFocusSettlement(player, focus)) { return Command.SINGLE_SUCCESS; }
         if (!SettlementManageCommand.validateUserPermissions(player, focus)) { return Command.SINGLE_SUCCESS; }
-        //if (!SettlementManageCommand.validateRoleArgument(roleArg, player, focus)) { return Command.SINGLE_SUCCESS; }
 
-        if (!focus.isUniqueRoleName(roleArg)) {
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("The specified name is already in use by another role in that settlement!"));
+        if (!focus.isUniqueRoleName(roleArgument)) {
+            player.sendMessage(error("That name (<highlight>" + roleArgument + "</highlight>) is already in use by another role!"));
             return Command.SINGLE_SUCCESS;
         }
 
         int targetAuthority = focus.getLowestUnassignedAuthority();
         if (targetAuthority > focus.getRoleFromMember(player.getUniqueId()).getAuthority()) {
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("There are no free role slots for authority levels below that of your current role!"));
+            player.sendMessage(error("There are no free role slots for authority levels below that of your current role!"));
             return Command.SINGLE_SUCCESS;
         }
 
-        String treatedName = roleArg.substring(0, 1).toUpperCase() + roleArg.substring(1);
+        String treatedName = roleArgument.substring(0, 1).toUpperCase() + roleArgument.substring(1);
 
         SettlementRole newRole = new SettlementRole(treatedName, NamedTextColor.GRAY, focus, targetAuthority, SettlementRole.Type.NORMAL, NamespacedKey.minecraft("leather_helmet"));
 
         focus.addRole(newRole);
 
-        player.sendMessage(TextUtils.composeSimpleSuccessMessage("Created role ")
-                .append(newRole.getDisplayAsComponent())
-                .append(TextUtils.composeSuccessText(" in the settlement "))
-                .append(focus.getDisplayName())
-                .append(TextUtils.composeSuccessText("!")));
-
+        focus.tell(player, "Created a <highlight>new role</highlight> named " + newRole.getDisplayAsString() + "! Its current authority level is <light_amethyst>" + newRole.getAuthority() + "</light_amethyst>.");
         return Command.SINGLE_SUCCESS;
     }
 
     public static int runCommandForAuthorityIncrease(CommandContext<CommandSourceStack> context) {
         Player player = (Player) context.getSource().getSender();
         Settlement focus = PlayerManager.asJadePlayer(player.getUniqueId()).getFocusSettlement();
-        String roleArg = StringArgumentType.getString(context, "role");
+        String roleArgument = StringArgumentType.getString(context, "role");
 
         if (!SettlementCommand.validateFocusSettlement(player, focus)) { return Command.SINGLE_SUCCESS; }
         if (!SettlementManageCommand.validateUserPermissions(player, focus)) { return Command.SINGLE_SUCCESS; }
-        if (!SettlementManageCommand.validateRoleArgument(roleArg, player, focus)) { return Command.SINGLE_SUCCESS; }
+        if (!SettlementManageCommand.validateRoleArgument(roleArgument, player, focus)) { return Command.SINGLE_SUCCESS; }
 
-        SettlementRole role = focus.getRoleFromName(roleArg);
+        SettlementRole role = focus.getRoleFromName(roleArgument);
         if (!SettlementManageCommand.validateAuthorityDynamic(player, focus, role, 1)) { return Command.SINGLE_SUCCESS; }
 
         if (role.getAuthority() == SettlementRole.MAX_AUTHORITY) {
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("Cannot increase authority for the leader role!"));
+            player.sendMessage(error("Cannot edit authority for the <highlight>leader role</highlight>!"));
             return Command.SINGLE_SUCCESS;
         } else if (role.getAuthority() == (SettlementRole.MAX_AUTHORITY - 1)) {
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("Only the leader role can be at maximum authority!"));
+            player.sendMessage(error("Only the <highlight>leader role</highlight> can be at maximum authority!"));
             return Command.SINGLE_SUCCESS;
         }
 
         SettlementRole roleAbove = focus.getRoleAbove(role);
         if (roleAbove != null && roleAbove.getAuthority() == role.getAuthority() + 1) {
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("Another role is occupying the target authority level!"));
+            player.sendMessage(error("Another role is occupying the authority level above!"));
             return Command.SINGLE_SUCCESS;
         }
+
         role.increaseAuthority();
 
-        player.sendMessage(TextUtils.composeSimpleSuccessMessage("Increased authority of role ")
-                .append(role.getDisplayAsComponent())
-                .append(TextUtils.composeSuccessText("!")));
-
+        focus.tell(player, "<green>Increased</green> authority of role " + role.getDisplayAsString() + "!");
         return Command.SINGLE_SUCCESS;
     }
 
@@ -226,107 +211,95 @@ public class SettlementManageCommand {
         if (!SettlementManageCommand.validateAuthorityDynamic(player, focus, role)) { return Command.SINGLE_SUCCESS; }
 
         if (role.getAuthority() == SettlementRole.MAX_AUTHORITY) {
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("Cannot decrease authority for the leader role!"));
+            player.sendMessage(error("Cannot edit authority for the <highlight>leader role</highlight>!"));
             return Command.SINGLE_SUCCESS;
         } else if (role.getAuthority() == SettlementRole.MIN_AUTHORITY) {
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("Target role is already at minimum authority!"));
+            player.sendMessage(error("That role is already at the minimum authority level!"));
             return Command.SINGLE_SUCCESS;
         }
 
         SettlementRole roleBelow = focus.getRoleBelow(role);
         if (roleBelow != null && roleBelow.getAuthority() == role.getAuthority() - 1) {
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("Another role is occupying the target authority level!"));
+            player.sendMessage(error("Another role is occupying the authority level below!"));
             return Command.SINGLE_SUCCESS;
         }
 
         role.decreaseAuthority();
 
-        player.sendMessage(TextUtils.composeSimpleSuccessMessage("Decreased authority of role ")
-                .append(role.getDisplayAsComponent())
-                .append(TextUtils.composeSuccessText("!")));
-
+        focus.tell(player, "<red>Decreased</red> authority of role " + role.getDisplayAsString() + "!");
         return Command.SINGLE_SUCCESS;
     }
 
     public static int runCommandForNameChange(CommandContext<CommandSourceStack> context) {
         Player player = (Player) context.getSource().getSender();
         Settlement focus = PlayerManager.asJadePlayer(player.getUniqueId()).getFocusSettlement();
-        String roleArg = StringArgumentType.getString(context, "role");
+        String roleArgument = StringArgumentType.getString(context, "role");
 
         if (!SettlementCommand.validateFocusSettlement(player, focus)) { return Command.SINGLE_SUCCESS; }
         if (!SettlementManageCommand.validateUserPermissions(player, focus)) { return Command.SINGLE_SUCCESS; }
-        if (!SettlementManageCommand.validateRoleArgument(roleArg, player, focus)) { return Command.SINGLE_SUCCESS; }
+        if (!SettlementManageCommand.validateRoleArgument(roleArgument, player, focus)) { return Command.SINGLE_SUCCESS; }
 
-        SettlementRole role = focus.getRoleFromName(roleArg);
+        SettlementRole role = focus.getRoleFromName(roleArgument);
         if (!SettlementManageCommand.validateAuthorityDynamic(player, focus, role)) { return Command.SINGLE_SUCCESS; }
 
         String nameArg = StringArgumentType.getString(context, "name");
         if (nameArg.equals(role.getName())) {
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("Target role already has that name..."));
+            player.sendMessage(error("That role already has that name..."));
             return Command.SINGLE_SUCCESS;
         } else if (!focus.isUniqueRoleName(nameArg)) {
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("Another role in ")
-                    .append(focus.getDisplayName())
-                    .append(TextUtils.composeErrorText(" already has that name!")));
+            player.sendMessage(error("That name (<highlight>" + roleArgument + "</highlight>) is already in use by another role!"));
             return Command.SINGLE_SUCCESS;
         }
 
+        String oldDisplay = role.getDisplayAsString();
         role.setName(nameArg.substring(0, 1).toUpperCase() + nameArg.substring(1));
 
-        player.sendMessage(TextUtils.composeSimpleSuccessMessage("Renamed target role to ")
-                .append(role.getDisplayAsComponent())
-                .append(TextUtils.composeSuccessText("!")));
-
+        focus.tell(player, "Changed the name of role " + oldDisplay + " to " + role.getDisplayAsString() + "!");
         return Command.SINGLE_SUCCESS;
     }
 
     public static int runCommandForColorChange(CommandContext<CommandSourceStack> context) {
         Player player = (Player) context.getSource().getSender();
         Settlement focus = PlayerManager.asJadePlayer(player.getUniqueId()).getFocusSettlement();
-        String roleArg = StringArgumentType.getString(context, "role");
+        String roleArgument = StringArgumentType.getString(context, "role");
 
         if (!SettlementCommand.validateFocusSettlement(player, focus)) { return Command.SINGLE_SUCCESS; }
         if (!SettlementManageCommand.validateUserPermissions(player, focus)) { return Command.SINGLE_SUCCESS; }
-        if (!SettlementManageCommand.validateRoleArgument(roleArg, player, focus)) { return Command.SINGLE_SUCCESS; }
+        if (!SettlementManageCommand.validateRoleArgument(roleArgument, player, focus)) { return Command.SINGLE_SUCCESS; }
 
-        SettlementRole role = focus.getRoleFromName(roleArg);
+        SettlementRole role = focus.getRoleFromName(roleArgument);
         if (!SettlementManageCommand.validateAuthorityDynamic(player, focus, role)) { return Command.SINGLE_SUCCESS; }
 
-        String colorArg = StringArgumentType.getString(context, "named_color");
+        String colorArgument = StringArgumentType.getString(context, "named_color");
         TextColor color;
-        if (NamedTextColor.NAMES.keys().contains(colorArg)) {
-            color = NamedTextColor.NAMES.value(colorArg);
+        if (NamedTextColor.NAMES.keys().contains(colorArgument)) {
+            color = NamedTextColor.NAMES.value(colorArgument);
         } else {
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("Could not recognize the specified color!"));
+            player.sendMessage(error("Could not find a color named <highlight>" + colorArgument + "</highlight>!"));
             return Command.SINGLE_SUCCESS;
         }
 
         if (color.equals(role.getColor())) {
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("Target role already has that color!"));
+            player.sendMessage(error("That role already has that color!"));
             return Command.SINGLE_SUCCESS;
         }
 
         role.setColor(color);
 
-        player.sendMessage(TextUtils.composeSimpleSuccessMessage("Changed color of role ")
-                .append(role.getDisplayAsComponent())
-                .append(TextUtils.composeSuccessText(" to "))
-                .append(Component.text(colorArg.toUpperCase()).color(color))
-                .append(TextUtils.composeSuccessText("!")));
-
+        focus.tell(player, "Changed color of role " + role.getDisplayAsString() + " to <" + colorArgument.toLowerCase() + ">" + colorArgument.toUpperCase() + "</" + colorArgument.toLowerCase() + ">!");
         return Command.SINGLE_SUCCESS;
     }
 
     public static int runCommandForIconChange(CommandContext<CommandSourceStack> context) {
         Player player = (Player) context.getSource().getSender();
         Settlement focus = PlayerManager.asJadePlayer(player.getUniqueId()).getFocusSettlement();
-        String roleArg = StringArgumentType.getString(context, "role");
+        String roleArgument = StringArgumentType.getString(context, "role");
 
         if (!SettlementCommand.validateFocusSettlement(player, focus)) { return Command.SINGLE_SUCCESS; }
         if (!SettlementManageCommand.validateUserPermissions(player, focus)) { return Command.SINGLE_SUCCESS; }
-        if (!SettlementManageCommand.validateRoleArgument(roleArg, player, focus)) { return Command.SINGLE_SUCCESS; }
+        if (!SettlementManageCommand.validateRoleArgument(roleArgument, player, focus)) { return Command.SINGLE_SUCCESS; }
 
-        SettlementRole role = focus.getRoleFromName(roleArg);
+        SettlementRole role = focus.getRoleFromName(roleArgument);
         if (!SettlementManageCommand.validateAuthorityDynamic(player, focus, role)) { return Command.SINGLE_SUCCESS; }
 
         NamespacedKey iconArgument = context.getArgument("icon", NamespacedKey.class);
@@ -334,65 +307,48 @@ public class SettlementManageCommand {
         if (namespace.equals("minecraft")) {
             ItemType dummy = RegistryAccess.registryAccess().getRegistry(RegistryKey.ITEM).get(iconArgument);
             if (dummy == null) {
-                player.sendMessage(TextUtils.composeSimpleErrorMessage("Please provide a valid item key!"));
+                player.sendMessage(error("Please provide a valid item key!"));
                 return Command.SINGLE_SUCCESS;
             }
         } else if (namespace.equals("jade")) {
             // TODO: implement this
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("This feature has not been implemented yet!"));
+            player.sendMessage(error("This feature has not been implemented yet!"));
             return Command.SINGLE_SUCCESS;
         } else {
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("Please provide a valid namespace!"));
+            player.sendMessage(error("Please provide a valid namespace!"));
             return Command.SINGLE_SUCCESS;
         }
 
         role.setIcon(iconArgument);
 
-        player.sendMessage(TextUtils.composeSimpleSuccessMessage("Changed icon of role ")
-                .append(role.getDisplayAsComponent())
-                .append(TextUtils.composeSuccessText(" to "))
-                .append(TextUtils.composeSuccessHighlight(iconArgument.asString()))
-                .append(TextUtils.composeSuccessText("!")));
-
+        focus.tell(player, "Changed icon of role " + role.getDisplayAsString() + " to <highlight>" + iconArgument.asString() + "</highlight>!");
         return Command.SINGLE_SUCCESS;
     }
 
     public static int runCommandForPermissionChange(CommandContext<CommandSourceStack> context) {
         Player player = (Player) context.getSource().getSender();
         Settlement focus = PlayerManager.asJadePlayer(player.getUniqueId()).getFocusSettlement();
-        String roleArg = StringArgumentType.getString(context, "role");
+        String roleArgument = StringArgumentType.getString(context, "role");
 
         if (!SettlementCommand.validateFocusSettlement(player, focus)) { return Command.SINGLE_SUCCESS; }
         if (!SettlementManageCommand.validateUserPermissions(player, focus)) { return Command.SINGLE_SUCCESS; }
-        if (!SettlementManageCommand.validateRoleArgument(roleArg, player, focus)) { return Command.SINGLE_SUCCESS; }
+        if (!SettlementManageCommand.validateRoleArgument(roleArgument, player, focus)) { return Command.SINGLE_SUCCESS; }
 
-        SettlementRole role = focus.getRoleFromName(roleArg);
+        SettlementRole role = focus.getRoleFromName(roleArgument);
         if (!SettlementManageCommand.validateAuthorityDynamic(player, focus, role)) { return Command.SINGLE_SUCCESS; }
 
-        String permArg = StringArgumentType.getString(context, "permission_node");
-        boolean valueArg = BoolArgumentType.getBool(context, "value");
-        if (role.setPermission(permArg, valueArg)) {
-            if (valueArg) {
-                player.sendMessage(TextUtils.composeSimpleSuccessMessage("Set permission ")
-                        .append(Component.text(permArg).color(TextUtils.LIGHT_AMETHYST))
-                        .append(TextUtils.composeSuccessText(" to "))
-                        .append(Component.text("TRUE", NamedTextColor.GREEN))
-                        .append(TextUtils.composeSuccessText(" for role "))
-                        .append(role.getDisplayAsComponent())
-                        .append(TextUtils.composeSuccessText("!")));
+        String permArgument = StringArgumentType.getString(context, "permission_node");
+        boolean valueArgument = BoolArgumentType.getBool(context, "value");
+        if (role.setPermission(permArgument, valueArgument)) {
+            if (valueArgument) {
+                focus.tell(player, "Changed permission <light_amethyst>" + permArgument + "</light_amethyst> to <green>TRUE</green> for role " + role.getDisplayAsString() + "!");
 
             } else {
-                player.sendMessage(TextUtils.composeSimpleSuccessMessage("Set permission ")
-                        .append(Component.text(permArg).color(TextUtils.LIGHT_AMETHYST))
-                        .append(TextUtils.composeSuccessText(" to "))
-                        .append(Component.text("FALSE", NamedTextColor.RED))
-                        .append(TextUtils.composeSuccessText(" for role "))
-                        .append(role.getDisplayAsComponent())
-                        .append(TextUtils.composeSuccessText("!")));
+                focus.tell(player, "Changed permission <light_amethyst>" + permArgument + "</light_amethyst> to <red>FALSE</red> for role " + role.getDisplayAsString() + "!");
             }
 
         } else {
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("Invalid permission node specified!"));
+            player.sendMessage(error("Could not find a permission node named <highlight>" + permArgument + "</highlight>!"));
         }
 
         return Command.SINGLE_SUCCESS;
@@ -401,71 +357,61 @@ public class SettlementManageCommand {
     public static int runCommandForMakeDefault(CommandContext<CommandSourceStack> context) {
         Player player = (Player) context.getSource().getSender();
         Settlement focus = PlayerManager.asJadePlayer(player.getUniqueId()).getFocusSettlement();
-        String roleArg = StringArgumentType.getString(context, "role");
+        String roleArgument = StringArgumentType.getString(context, "role");
 
         if (!SettlementCommand.validateFocusSettlement(player, focus)) { return Command.SINGLE_SUCCESS; }
         if (!SettlementManageCommand.validateUserPermissions(player, focus)) { return Command.SINGLE_SUCCESS; }
-        if (!SettlementManageCommand.validateRoleArgument(roleArg, player, focus)) { return Command.SINGLE_SUCCESS; }
+        if (!SettlementManageCommand.validateRoleArgument(roleArgument, player, focus)) { return Command.SINGLE_SUCCESS; }
 
-        SettlementRole role = focus.getRoleFromName(roleArg);
+        SettlementRole role = focus.getRoleFromName(roleArgument);
         if (!SettlementManageCommand.validateAuthorityDynamic(player, focus, role)) { return Command.SINGLE_SUCCESS; }
 
         if (!focus.getRoleFromMember(player.getUniqueId()).isLeader()) {
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("Only the leader may change the default role!"));
+            player.sendMessage(error("Only the <highlight>leader</highlight> may change the default role!"));
             return Command.SINGLE_SUCCESS;
         }
 
         if (role.isDefault()) {
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("This role is already the default role, silly!"));
+            player.sendMessage(error("That role is already the default role, silly!"));
             return Command.SINGLE_SUCCESS;
         }
 
         focus.setDefaultRole(role);
 
-        player.sendMessage(TextUtils.composeSimpleSuccessMessage("Made ")
-                .append(role.getDisplayAsComponent())
-                .append(TextUtils.composeSuccessText(" the default role of settlement "))
-                .append(focus.getDisplayName())
-                .append(TextUtils.composeSuccessText("!")));
-
+        focus.broadcast("A high official has made " + role.getDisplayAsString() + " the <highlight>default role</highlight>! Newcomers will automatically be assigned this role when they join!");
         return Command.SINGLE_SUCCESS;
     }
 
     public static int runCommandForDelete(CommandContext<CommandSourceStack> context) {
         Player player = (Player) context.getSource().getSender();
         Settlement focus = PlayerManager.asJadePlayer(player.getUniqueId()).getFocusSettlement();
-        String roleArg = StringArgumentType.getString(context, "role");
+        String roleArgument = StringArgumentType.getString(context, "role");
 
         if (!SettlementCommand.validateFocusSettlement(player, focus)) { return Command.SINGLE_SUCCESS; }
         if (!SettlementManageCommand.validateUserPermissions(player, focus)) { return Command.SINGLE_SUCCESS; }
-        if (!SettlementManageCommand.validateRoleArgument(roleArg, player, focus)) { return Command.SINGLE_SUCCESS; }
+        if (!SettlementManageCommand.validateRoleArgument(roleArgument, player, focus)) { return Command.SINGLE_SUCCESS; }
 
-        SettlementRole role = focus.getRoleFromName(roleArg);
+        SettlementRole role = focus.getRoleFromName(roleArgument);
         if (!SettlementManageCommand.validateAuthorityDynamic(player, focus, role)) { return Command.SINGLE_SUCCESS; }
 
         if (!focus.getRoleFromMember(player.getUniqueId()).isLeader()) {
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("Only the leader may delete roles!"));
+            player.sendMessage(error("Only the <highlight>leader</highlight> may delete roles!"));
             return Command.SINGLE_SUCCESS;
         }
 
         if (role.isLeader()) {
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("The leader role cannot be deleted!"));
+            player.sendMessage(error("The <highlight>leader role</highlight> cannot be deleted!"));
             return Command.SINGLE_SUCCESS;
         }
 
         if (role.isDefault()) {
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("The default role cannot be deleted!"));
+            player.sendMessage(error("The <highlight>default role</highlight> cannot be deleted!"));
             return Command.SINGLE_SUCCESS;
         }
 
         focus.removeRole(role);
 
-        player.sendMessage(TextUtils.composeSimpleSuccessMessage("Deleted role ")
-                .append(role.getDisplayAsComponent())
-                .append(TextUtils.composeSuccessText(" in the settlement "))
-                .append(focus.getDisplayName())
-                .append(TextUtils.composeSuccessText("!")));
-
+        focus.broadcast("A high official has <red>deleted</red> the role of " + role.getDisplayAsString() + "!");
         return Command.SINGLE_SUCCESS;
     }
 
@@ -480,7 +426,7 @@ public class SettlementManageCommand {
         permissionNodes.add("canEdit");
         permissionNodes.add("canManage");
 
-        permissionNodes.stream().filter(str -> str.startsWith(builder.getRemainingLowerCase())).forEach(builder::suggest);
+        permissionNodes.stream().filter(str -> str.contains(builder.getRemainingLowerCase())).forEach(builder::suggest);
 
         return builder.buildFuture();
     }
@@ -495,7 +441,7 @@ public class SettlementManageCommand {
         permissionNodes.add("minecraft:iron_helmet");
         permissionNodes.add("minecraft:leather_helmet");
 
-        permissionNodes.stream().filter(str -> str.startsWith(builder.getRemainingLowerCase())).forEach(builder::suggest);
+        permissionNodes.stream().filter(str -> str.contains(builder.getRemainingLowerCase())).forEach(builder::suggest);
 
         return builder.buildFuture();
     }

@@ -1,11 +1,19 @@
 package dev.jabberdrake.jade.utils;
 
 import dev.jabberdrake.jade.realms.Settlement;
+import dev.jabberdrake.jade.utils.message.ErrorStrategy;
+import dev.jabberdrake.jade.utils.message.InfoStrategy;
+import dev.jabberdrake.jade.utils.message.SuccessStrategy;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 
 public class TextUtils {
+
+    public static final InfoStrategy INFO_STRATEGY = new InfoStrategy();
+    public static final ErrorStrategy ERROR_STRATEGY = new ErrorStrategy();
+    public static final SuccessStrategy SUCCESS_STRATEGY = new SuccessStrategy();
+
     public static final TextColor DARK_ZORBA = TextColor.color(0x4b4047);
     public static final TextColor ZORBA = TextColor.color(0x9f918d);
     public static final TextColor LIGHT_ZORBA = TextColor.color(0xdadada);
@@ -128,6 +136,18 @@ public class TextUtils {
                 .append(TextUtils.SYMBOL_DENIED)
                 .append(Component.text(" " + content, TextUtils.DARK_CHROME))
                 .build();
+    }
+
+    public static Component info(String message) {
+        return INFO_STRATEGY.process(message);
+    }
+
+    public static Component error(String message) {
+        return ERROR_STRATEGY.process(message);
+    }
+
+    public static Component success(String message) {
+        return SUCCESS_STRATEGY.process(message);
     }
 
 }

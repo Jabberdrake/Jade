@@ -19,6 +19,8 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.Map;
 
+import static dev.jabberdrake.jade.utils.TextUtils.error;
+
 public class SettlementFoodCommand {
 
     private static final String INDENT = "     ";
@@ -82,26 +84,21 @@ public class SettlementFoodCommand {
         }
 
         ItemStack mhItem = player.getInventory().getItemInMainHand();
-        if (!mhItem.hasData(DataComponentTypes.FOOD)) {
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("You do not have a food item in your main hand!"));
+        if (mhItem == null || !mhItem.hasData(DataComponentTypes.FOOD)) {
+            player.sendMessage(error("You do not have a food item in your main hand!"));
             return Command.SINGLE_SUCCESS;
         }
 
         int foodValue = (mhItem.getData(DataComponentTypes.FOOD).nutrition() / 2) * mhItem.getAmount();
 
         if (!focus.canHandleFoodDeposit(foodValue)) {
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("Too much food! (" + foodValue + " > " + (focus.getFoodCapacity() - focus.getFood()) + ")"));
+            player.sendMessage(error("Too much food! (<highlight>" + foodValue + "</highlight> > " + (focus.getFoodCapacity() - focus.getFood()) + ")"));
             return Command.SINGLE_SUCCESS;
         }
 
         player.getInventory().setItemInMainHand(null);
         focus.addFood(foodValue);
-        player.sendMessage(TextUtils.composeSimpleSuccessMessage("Deposited ")
-                .append(Component.text(foodValue, TextUtils.LIVINGMETAL))
-                .append(TextUtils.composeSuccessText(" food for "))
-                .append(focus.getDisplayName())
-                .append(TextUtils.composeSuccessText("!"))
-        );
+        focus.broadcast("<highlight>" + player.getName() + "</highlight> has deposited <livingmetal>" + foodValue + "</livingmetal> food!");
 
         return Command.SINGLE_SUCCESS;
     }
@@ -115,26 +112,21 @@ public class SettlementFoodCommand {
         }
 
         ItemStack ohItem = player.getInventory().getItemInOffHand();
-        if (!ohItem.hasData(DataComponentTypes.FOOD)) {
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("You do not have a food item in your off hand!"));
+        if (ohItem == null || !ohItem.hasData(DataComponentTypes.FOOD)) {
+            player.sendMessage(error("You do not have a food item in your off hand!"));
             return Command.SINGLE_SUCCESS;
         }
 
         int foodValue = (ohItem.getData(DataComponentTypes.FOOD).nutrition() / 2) * ohItem.getAmount();
 
         if (!focus.canHandleFoodDeposit(foodValue)) {
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("Too much food! (" + foodValue + " > " + (focus.getFoodCapacity() - focus.getFood()) + ")"));
+            player.sendMessage(error("Too much food! (<highlight>" + foodValue + "</highlight> > " + (focus.getFoodCapacity() - focus.getFood()) + ")"));
             return Command.SINGLE_SUCCESS;
         }
 
         player.getInventory().setItemInOffHand(null);
         focus.addFood(foodValue);
-        player.sendMessage(TextUtils.composeSimpleSuccessMessage("Deposited ")
-                .append(Component.text(foodValue, TextUtils.LIVINGMETAL))
-                .append(TextUtils.composeSuccessText(" food for "))
-                .append(focus.getDisplayName())
-                .append(TextUtils.composeSuccessText("!"))
-        );
+        focus.broadcast("<highlight>" + player.getName() + "</highlight> has deposited <livingmetal>" + foodValue + "</livingmetal> food!");
 
         return Command.SINGLE_SUCCESS;
     }
@@ -150,6 +142,7 @@ public class SettlementFoodCommand {
         int totalFoodValue = 0;
         for (int slot = 0; slot <= 8; slot++) {
             ItemStack item = player.getInventory().getItem(slot);
+            if (item == null) continue;
             if (!item.hasData(DataComponentTypes.FOOD)) continue;
 
             int itemFoodValue = (item.getData(DataComponentTypes.FOOD).nutrition() / 2) * item.getAmount();
@@ -159,12 +152,7 @@ public class SettlementFoodCommand {
             totalFoodValue += itemFoodValue;
         }
 
-        player.sendMessage(TextUtils.composeSimpleSuccessMessage("Deposited ")
-                .append(Component.text(totalFoodValue, TextUtils.LIVINGMETAL))
-                .append(TextUtils.composeSuccessText(" food for "))
-                .append(focus.getDisplayName())
-                .append(TextUtils.composeSuccessText("!"))
-        );
+        focus.broadcast("<highlight>" + player.getName() + "</highlight> has deposited <livingmetal>" + totalFoodValue + "</livingmetal> food!");
 
         return Command.SINGLE_SUCCESS;
     }
@@ -180,6 +168,7 @@ public class SettlementFoodCommand {
         int totalFoodValue = 0;
         for (int slot = 0; slot <= 35; slot++) {
             ItemStack item = player.getInventory().getItem(slot);
+            if (item == null) continue;
             if (!item.hasData(DataComponentTypes.FOOD)) continue;
 
             int itemFoodValue = (item.getData(DataComponentTypes.FOOD).nutrition() / 2) * item.getAmount();
@@ -189,12 +178,7 @@ public class SettlementFoodCommand {
             totalFoodValue += itemFoodValue;
         }
 
-        player.sendMessage(TextUtils.composeSimpleSuccessMessage("Deposited ")
-                .append(Component.text(totalFoodValue, TextUtils.LIVINGMETAL))
-                .append(TextUtils.composeSuccessText(" food for "))
-                .append(focus.getDisplayName())
-                .append(TextUtils.composeSuccessText("!"))
-        );
+        focus.broadcast("<highlight>" + player.getName() + "</highlight> has deposited <livingmetal>" + totalFoodValue + "</livingmetal> food!");
 
         return Command.SINGLE_SUCCESS;
     }

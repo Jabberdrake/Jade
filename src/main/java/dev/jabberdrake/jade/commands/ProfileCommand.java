@@ -13,28 +13,23 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import static dev.jabberdrake.jade.utils.TextUtils.info;
+
 public class ProfileCommand {
 
     public static LiteralCommandNode<CommandSourceStack> buildCommand(final String label) {
         return Commands.literal(label)
+                .requires(sender -> sender.getExecutor() instanceof Player)
                 .executes(ProfileCommand::runCommand)
                 .then(ProfileEditCommand.buildCommand("edit"))
                 .build();
     }
 
     public static int runCommand(CommandContext<CommandSourceStack> context) {
-        CommandSender sender = context.getSource().getSender();
-        if (!(sender instanceof Player)) {
-            Jade.getPlugin(Jade.class).getLogger().warning("[ProfileEditCommand::runCommand] Only players can run this command!");
-        }
-
-        Player player = (Player) sender;
+        Player player = (Player) context.getSource().getSender();
         String roleplayName = PlayerManager.asJadePlayer(player.getUniqueId()).getRoleplayName();
-        player.sendMessage(TextUtils.composeInfoPrefix()
-                .append(TextUtils.composeInfoText("Roleplay name: \""))
-                .append(Component.text(roleplayName, TextUtils.LIGHT_BRASS))
-                .append(TextUtils.composeInfoText("\"!"))
-        );
+
+        player.sendMessage(info("Roleplay name: \"<light_brass>" + roleplayName + "</light_brass>\"!"));
         return Command.SINGLE_SUCCESS;
     }
 }

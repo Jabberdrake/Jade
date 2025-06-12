@@ -8,20 +8,20 @@ import dev.jabberdrake.jade.commands.SettlementCommand;
 import dev.jabberdrake.jade.players.PlayerManager;
 import dev.jabberdrake.jade.realms.Settlement;
 import dev.jabberdrake.jade.realms.SettlementRole;
-import dev.jabberdrake.jade.utils.TextUtils;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
-import java.util.UUID;
+import static dev.jabberdrake.jade.utils.TextUtils.*;
 
 public class SettlementTransferCommand {
 
     public static LiteralCommandNode<CommandSourceStack> buildCommand(final String label) {
         return Commands.literal(label)
                 .then(Commands.argument("player", StringArgumentType.word())
-                        .suggests(CommonSettlementSuggestions::buildSuggestionsForAllPlayersInSettlement)
+                        .suggests(CommonSettlementSuggestions::suggestAllPlayersInSettlement)
                         .requires(sender -> sender.getExecutor() instanceof Player)
                         .executes(SettlementTransferCommand::runCommand))
                 .build();
@@ -34,17 +34,16 @@ public class SettlementTransferCommand {
         if (!SettlementCommand.validateFocusSettlement(player, focus)) { return Command.SINGLE_SUCCESS; }
         if (!SettlementCommand.validateFocusLeadership(player, focus)) { return Command.SINGLE_SUCCESS; }
 
-        String targetName = StringArgumentType.getString(context, "player");
-        Player target = Bukkit.getPlayer(targetName);
-        UUID targetUUID = target.getUniqueId();
-        if (Bukkit.getPlayer(targetName) == null) {
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("Could not find the specified player."));
+        String targetArgument = StringArgumentType.getString(context, "player");
+        OfflinePlayer target = Bukkit.getOfflinePlayer(targetArgument);
+        if (!player.hasPlayedBefore()) {
+            player.sendMessage(error("Could not find a player named <highlight>" + targetArgument + "</highlight>!"));
             return Command.SINGLE_SUCCESS;
-        } else if (targetName.equals(player.getName())) {
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("You can't transfer the settlement to yourself!"));
+        } else if (targetArgument.equals(player.getName())) {
+            player.sendMessage(error("You can't transfer the settlement to yourself!"));
             return Command.SINGLE_SUCCESS;
-        } else if (!focus.containsPlayer(targetUUID)) {
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("The specified player is not a member of your focus settlement!."));
+        } else if (!focus.containsPlayer(target.getUniqueId())) {
+            player.sendMessage(error("This player (<highlight>" + player.getName() + "</highlight>) is not a member of your settlement!"));
             return Command.SINGLE_SUCCESS;
         }
 
@@ -52,20 +51,12 @@ public class SettlementTransferCommand {
         focus.setPlayerRole(target.getUniqueId(), leaderRole);
         focus.setPlayerRole(player.getUniqueId(), focus.getRoleBelow(leaderRole));
 
-        player.sendMessage(TextUtils.composeSuccessText("Transferred leadership of ")
-                .append(focus.getDisplayName())
-                .append(TextUtils.composeSuccessText(" to "))
-                .append(TextUtils.composeSuccessHighlight(targetName))
-                .append(TextUtils.composeSuccessText("!"))
-        );
+        player.sendMessage(success("Transferred leadership of " + focus.getDisplayNameAsString() + " to <highlight>" + target.getName() + "</highlight>!"));
+        focus.tell((Player) target, "You have been demoted to " + focus.getRoleBelow(leaderRole).getDisplayAsString() + "!");
 
+        focus.broadcast("A high official has <highlight>transferred ownership</highlight> of this settlement: <gold>" + target.getName() + " </gold>is the new <highlight>leader</highlight>!");
         if (target.isOnline()) {
-            target.sendMessage(TextUtils.composeSimpleInfoMessage("You are now the ")
-                    .append(TextUtils.composeInfoHighlight("leader"))
-                    .append(TextUtils.composeInfoText(" of "))
-                    .append(focus.getDisplayName())
-                    .append(TextUtils.composeInfoText("!"))
-            );
+            focus.tell((Player) target, "You have been promoted to " + leaderRole.getDisplayAsString() + "! Congratulations!");
         }
         return Command.SINGLE_SUCCESS;
     }

@@ -15,6 +15,9 @@ import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import org.bukkit.entity.Player;
 
+import static dev.jabberdrake.jade.utils.TextUtils.error;
+import static dev.jabberdrake.jade.utils.TextUtils.info;
+
 public class NationKickCommand {
 
     public static LiteralCommandNode<CommandSourceStack> buildCommand(final String label) {
@@ -36,32 +39,28 @@ public class NationKickCommand {
 
         Nation focusNation = focus.getNation();
 
-        String targetName = StringArgumentType.getString(context, "settlement");
-        Settlement target = RealmManager.getSettlement(targetName);
+        String targetArgument = StringArgumentType.getString(context, "settlement");
+        Settlement target = RealmManager.getSettlement(targetArgument);
         if (target == null) {
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("Could not find the specified settlement!"));
+            player.sendMessage(error("Could not find a settlement named <highlight>" + targetArgument + "</highlight>!"));
             return Command.SINGLE_SUCCESS;
         } else if (target.getNation() == null) {
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("The specified settlement is not part of a nation!"));
+            player.sendMessage(error("This settlement (<highlight>" + targetArgument + "</highlight>) is not part of a nation!"));
             return Command.SINGLE_SUCCESS;
         } else if (!target.getNation().equals(focusNation)) {
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("The specified settlement is not part of your nation!"));
+            player.sendMessage(error("This settlement (<highlight>" + targetArgument + "</highlight>) is not part of your nation!"));
             return Command.SINGLE_SUCCESS;
         } else if (target.equals(focus)) {
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("You can't kick yourself! To leave the nation, do /nation leave."));
+            player.sendMessage(error("You can't kick yourself!"));
+            player.sendMessage(info("To leave the nation, do <highlight>/nation leave <i><settlement></i>"));
             return Command.SINGLE_SUCCESS;
         }
 
         focusNation.removeSettlement(target);
         target.leaveNation();
 
-        player.sendMessage(TextUtils.composeSuccessPrefix()
-                .append(target.getDisplayName())
-                .append(TextUtils.composeSuccessText(" has been kicked from "))
-                .append(focusNation.getDisplayName())
-                .append((TextUtils.composeSuccessText("!")))
-        );
-
+        target.broadcast("We have been kicked from the nation of " + focusNation.getDisplayNameAsString() + "!");
+        focusNation.broadcast("The settlement of " + target.getDisplayNameAsString() + " has been kicked from the nation!");
         return Command.SINGLE_SUCCESS;
     }
 }

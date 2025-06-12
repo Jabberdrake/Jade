@@ -277,6 +277,7 @@ public class RealmManager {
 
     public static Nation createNation(String name, Settlement capital) {
         Nation nation = new Nation(name, capital);
+        capital.setNation(nation);
 
         nationCache.put(nation.getId(), nation);
         return nation;

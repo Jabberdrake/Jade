@@ -10,6 +10,8 @@ import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import org.bukkit.entity.Player;
 
+import static dev.jabberdrake.jade.utils.TextUtils.error;
+
 public class NationCommand {
 
     public static LiteralCommandNode<CommandSourceStack> buildCommand(final String label) {
@@ -36,10 +38,10 @@ public class NationCommand {
     // Auxiliary methods for child command nodes
     public static boolean validateCapitalStatus(Player player, Settlement settlement) {
         if (!settlement.isInNation()) {
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("This settlement is not part of a nation!"));
+            player.sendMessage(error("This settlement is not part of a nation!"));
             return false;
         } else if (settlement.getNation().getCapital().getId() != settlement.getId()) {
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("This settlement is not the capital of a nation!"));
+            player.sendMessage(error("This settlement is not the capital of a nation!"));
             return false;
         } else return true;
     }

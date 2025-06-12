@@ -12,6 +12,8 @@ import io.papermc.paper.command.brigadier.Commands;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 
+import static dev.jabberdrake.jade.utils.TextUtils.error;
+
 public class NationInfoCommand {
 
     private static final String INDENT = "       ";
@@ -26,14 +28,15 @@ public class NationInfoCommand {
     }
 
     public static int runCommand(CommandContext<CommandSourceStack> context) {
-        String natString = StringArgumentType.getString(context, "nation");
+        String nationArgument = StringArgumentType.getString(context, "nation");
         Player player = (Player) context.getSource().getSender();
-        Nation nation = RealmManager.getNation(natString);
+        Nation nation = RealmManager.getNation(nationArgument);
         if (nation == null) {
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("Could not find the specified nation!"));
+            player.sendMessage(error("Could not find a nation named <highlight>" + nationArgument + "</highlight>!"));
             return Command.SINGLE_SUCCESS;
         }
 
+        // TODO: Replace this with calls to the new text formatters
         player.sendMessage(TextUtils.composeSimpleInfoMessage("Nation info:"));
         player.sendMessage(Component.text(INDENT).append(nation.asTextComponent()));
         player.sendMessage(Component.text(INDENT).append(nation.getDescription()));

@@ -11,13 +11,16 @@ import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import org.bukkit.entity.Player;
 
+import static dev.jabberdrake.jade.utils.TextUtils.error;
+import static dev.jabberdrake.jade.utils.TextUtils.success;
+
 public class SettlementJoinCommand {
     public static LiteralCommandNode<CommandSourceStack> buildCommand(final String label) {
         return Commands.literal(label)
                 .requires(sender -> sender.getExecutor() instanceof Player)
                 .executes(SettlementJoinCommand::runCommandWithoutArgs)
                 .then(Commands.argument("settlement", StringArgumentType.string())
-                        .suggests(CommonSettlementSuggestions::buildSuggestionsForAllSettlements)
+                        .suggests(CommonSettlementSuggestions::suggestAllSettlements)
                         .requires(sender -> sender.getExecutor() instanceof Player)
                         .executes(SettlementJoinCommand::runCommandWithArgs))
                 .build();
@@ -28,45 +31,37 @@ public class SettlementJoinCommand {
 
         Settlement inviter = RealmManager.getWhoInvitedPlayer(player);
         if (inviter == null) {
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("You do not have any pending invites."));
+            player.sendMessage(error("You do not have any pending settlement invites."));
             return Command.SINGLE_SUCCESS;
         }
 
         inviter.addMember(player.getUniqueId(), inviter.getDefaultRole());
         RealmManager.clearInviteToSettlement(player);
 
-        player.sendMessage(TextUtils.composeSuccessPrefix()
-                .append(TextUtils.composeSuccessText("You are now a member of "))
-                .append(inviter.getDisplayName())
-                .append(TextUtils.composeSuccessText("!"))
-        );
+        player.sendMessage(success("You have joined the settlement of " + inviter.getDisplayNameAsString() + "!"));
+        inviter.broadcast("<highlight>" + player.getName() + " has joined the settlement!");
         return Command.SINGLE_SUCCESS;
     }
 
     public static int runCommandWithArgs(CommandContext<CommandSourceStack> context) {
         Player player = (Player) context.getSource().getSender();
 
-        String settlementAsString = StringArgumentType.getString(context, "stmArg");
-        Settlement stmArg = RealmManager.getSettlement(settlementAsString);
-        Settlement stmInviter = RealmManager.getWhoInvitedPlayer(player);
-        if (stmArg == null) {
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("Could not find a settlement with that name."));
+        String settlementArgument = StringArgumentType.getString(context, "settlement");
+        Settlement settlement = RealmManager.getSettlement(settlementArgument);
+
+        Settlement inviter = RealmManager.getWhoInvitedPlayer(player);
+        if (settlement == null) {
+            player.sendMessage(error("Could not find a settlement named <highlight>" + settlementArgument + "</highlight>!"));
             return Command.SINGLE_SUCCESS;
-        } else if (!stmArg.equals(stmInviter)) {
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("You do not have a pending invite from ")
-                    .append(TextUtils.composeErrorHighlight(stmInviter.getName()))
-                    .append(TextUtils.composeErrorText("!"))
-            );
+        } else if (!settlement.equals(inviter)) {
+            player.sendMessage(error("You do not have a pending nation invite from <highlight>" + settlementArgument + "</highlight>!"));
         }
 
-        stmArg.addMember(player.getUniqueId(), stmArg.getDefaultRole());
+        settlement.addMember(player.getUniqueId(), settlement.getDefaultRole());
         RealmManager.clearInviteToSettlement(player);
 
-        player.sendMessage(TextUtils.composeSuccessPrefix()
-                .append(TextUtils.composeSuccessText("You are now a member of "))
-                .append(stmArg.getDisplayName())
-                .append(TextUtils.composeSuccessText("!"))
-        );
+        player.sendMessage(success("You have joined the settlement of " + inviter.getDisplayNameAsString() + "!"));
+        inviter.broadcast("<highlight>" + player.getName() + " has joined the settlement!");
         return Command.SINGLE_SUCCESS;
     }
 }

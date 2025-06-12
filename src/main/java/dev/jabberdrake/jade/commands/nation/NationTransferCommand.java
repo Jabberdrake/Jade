@@ -15,6 +15,8 @@ import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import org.bukkit.entity.Player;
 
+import static dev.jabberdrake.jade.utils.TextUtils.error;
+
 public class NationTransferCommand {
 
     public static LiteralCommandNode<CommandSourceStack> buildCommand(final String label) {
@@ -36,31 +38,25 @@ public class NationTransferCommand {
 
         Nation focusNation = focus.getNation();
 
-        String targetName = StringArgumentType.getString(context, "settlement");
-        Settlement target = RealmManager.getSettlement(targetName);
+        String targetArgument = StringArgumentType.getString(context, "settlement");
+        Settlement target = RealmManager.getSettlement(targetArgument);
         if (target == null) {
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("Could not find the specified settlement!"));
+            player.sendMessage(error("Could not find a settlement named <highlight>" + targetArgument + "</highlight>!"));
             return Command.SINGLE_SUCCESS;
         } else if (target.equals(focus)) {
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("...but why? What were you hoping to achieve here?"));
+            player.sendMessage(error("...but why? What were you hoping to achieve here?"));
             return Command.SINGLE_SUCCESS;
         } else if (!target.isInNation()) {
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("The specified settlement is not part of a nation!"));
+            player.sendMessage(TextUtils.composeSimpleErrorMessage("The settlement of <highlight>" + targetArgument + "</highlight> is not part of a nation!"));
             return Command.SINGLE_SUCCESS;
         } else if (!target.getNation().equals(focusNation)) {
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("The specified settlement is not part of your nation!"));
+            player.sendMessage(TextUtils.composeSimpleErrorMessage("The settlement of <highlight>" + targetArgument +"</highlight> is not part of your nation!"));
             return Command.SINGLE_SUCCESS;
         }
 
         focusNation.setCapital(target);
 
-        player.sendMessage(TextUtils.composeSuccessPrefix()
-                .append(target.getDisplayName())
-                .append(TextUtils.composeSuccessText(" is now the capital of "))
-                .append(focusNation.getDisplayName())
-                .append(TextUtils.composeSuccessHighlight("!"))
-        );
-
+        focusNation.broadcast("The settlement of " + target.getDisplayNameAsString() + " is our new <highlight>capital</highlight>!");
         return Command.SINGLE_SUCCESS;
     }
 }

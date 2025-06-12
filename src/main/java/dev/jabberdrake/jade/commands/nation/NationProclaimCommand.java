@@ -4,16 +4,17 @@ import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.LiteralCommandNode;
-import dev.jabberdrake.jade.commands.NationCommand;
 import dev.jabberdrake.jade.commands.SettlementCommand;
 import dev.jabberdrake.jade.players.PlayerManager;
 import dev.jabberdrake.jade.realms.Nation;
 import dev.jabberdrake.jade.realms.RealmManager;
 import dev.jabberdrake.jade.realms.Settlement;
-import dev.jabberdrake.jade.utils.TextUtils;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+
+import static dev.jabberdrake.jade.utils.TextUtils.*;
 
 public class NationProclaimCommand {
 
@@ -33,23 +34,20 @@ public class NationProclaimCommand {
         if (!SettlementCommand.validateFocusLeadership(player, focus)) { return Command.SINGLE_SUCCESS; }
 
         if (focus.isInNation()) {
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("This settlement is already part of a nation!"));
+            player.sendMessage(error("This settlement is already part of a nation!"));
             return Command.SINGLE_SUCCESS;
         }
 
-        String name = StringArgumentType.getString(context, "name");
-        if (!RealmManager.isUniqueNationName(name)) {
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("There is already a nation with that name!"));
+        String nameArgument = StringArgumentType.getString(context, "name");
+        if (!RealmManager.isUniqueNationName(nameArgument)) {
+            player.sendMessage(error("That name (<highlight>" + nameArgument + "</highlight>) is already in use!"));
             return Command.SINGLE_SUCCESS;
         }
 
-        Nation nation = RealmManager.createNation(name, focus);
+        Nation nation = RealmManager.createNation(nameArgument, focus);
 
-        player.sendMessage(TextUtils.composeSimpleSuccessMessage("Successfully created ")
-                .append(nation.getDisplayName())
-                .append(TextUtils.composeSuccessText("!"))
-        );
-
+        player.sendMessage(success("Created the nation of " + nation.getDisplayNameAsString() + "!"));
+        Bukkit.broadcast(info("<highlight>" + player.getName() + "</highlight> has created the nation of " + nation.getDisplayNameAsString() + "!"));
         return Command.SINGLE_SUCCESS;
     }
 }

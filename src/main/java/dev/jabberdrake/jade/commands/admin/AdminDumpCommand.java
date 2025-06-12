@@ -5,8 +5,6 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import dev.jabberdrake.jade.commands.settlement.CommonSettlementSuggestions;
-import dev.jabberdrake.jade.commands.settlement.SettlementJoinCommand;
-import dev.jabberdrake.jade.database.DatabaseManager;
 import dev.jabberdrake.jade.realms.ChunkAnchor;
 import dev.jabberdrake.jade.realms.RealmManager;
 import dev.jabberdrake.jade.realms.Settlement;
@@ -41,7 +39,7 @@ public class AdminDumpCommand {
                         )
                         .then(Commands.literal("settlement_roles")
                                 .then(Commands.argument("settlement", StringArgumentType.string())
-                                        .suggests(CommonSettlementSuggestions::buildSuggestionsForAllSettlements)
+                                        .suggests(CommonSettlementSuggestions::suggestAllSettlements)
                                         .requires(sender -> sender.getExecutor() instanceof Player)
                                         .executes(AdminDumpCommand::runCommandForRoles))
                         )

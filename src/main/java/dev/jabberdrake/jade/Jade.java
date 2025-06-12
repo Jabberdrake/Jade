@@ -16,11 +16,15 @@ import dev.jabberdrake.jade.players.PlayerManager;
 import dev.jabberdrake.jade.titles.TitleManager;
 import dev.jabberdrake.jade.realms.RealmManager;
 import dev.jabberdrake.jade.realms.Settlement;
+import dev.jabberdrake.jade.utils.TextUtils;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -125,8 +129,26 @@ public final class Jade extends JavaPlugin {
             Collection<Cheese> platter = Cheese.createPlatterFromChunks(coordinates);
             int i = 0;
             for (Cheese cheese : platter) {
+                final String[] membersAsString = { "<br>Members:" };
+                settlement.getPopulation().entrySet().stream()
+                        .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+                        .limit(10)
+                        .forEach(entry -> {
+                            membersAsString[0] += "<br>— <i>" + entry.getValue().getDisplayAsString().replaceAll("^(<.*>)", "") + "</i> " + Bukkit.getOfflinePlayer(entry.getKey()).getName();
+                        });
+                if (settlement.getPopulation().size() > 10) {
+                    membersAsString[0] += "<br>— ...";
+                }
+
                 ShapeMarker stmMarker = ShapeMarker.builder()
                         .label(settlement.getName())
+                        .detail("<h1>" + settlement.getName() + "</h1>"
+                                + settlement.getDescriptionAsString()
+                                + "<br>"
+                                + "<br>Food: " + settlement.getFood() + "/" + settlement.getFoodCapacity()
+                                + "<br>Nation: " + (settlement.isInNation() ? "<b>" + settlement.getNation().getName() + "</b>" : "None")
+                                + membersAsString[0]
+                        )
                         .fillColor(mainColor)
                         .lineColor(outlineColor)
                         .lineWidth(2)

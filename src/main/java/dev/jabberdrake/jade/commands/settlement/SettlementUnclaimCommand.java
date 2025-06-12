@@ -13,6 +13,9 @@ import io.papermc.paper.command.brigadier.Commands;
 import org.bukkit.Chunk;
 import org.bukkit.entity.Player;
 
+import static dev.jabberdrake.jade.utils.TextUtils.error;
+import static dev.jabberdrake.jade.utils.TextUtils.success;
+
 public class SettlementUnclaimCommand {
 
     public static LiteralCommandNode<CommandSourceStack> buildCommand(final String label) {
@@ -31,16 +34,9 @@ public class SettlementUnclaimCommand {
         if (!validateUserPermissions(player, focus)) { return Command.SINGLE_SUCCESS; }
 
         if (RealmManager.unclaimChunk(focus, currentChunk)) {
-            player.sendMessage(TextUtils.composeSuccessPrefix()
-                    .append(TextUtils.composeSuccessText("You have successfully unclaimed this chunk for "))
-                    .append(focus.getDisplayName())
-                    .append(TextUtils.composeSuccessText("!"))
-            );
+            player.sendMessage(success("Unclaimed this chunk for " + focus.getDisplayNameAsString() + "!"));
         } else {
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("This chunk is not claimed by ")
-                    .append(TextUtils.composeErrorHighlight(RealmManager.getChunkOwner(currentChunk).getName()))
-                    .append(TextUtils.composeErrorText("!"))
-            );
+            player.sendMessage(error("This chunk is not claimed by your settlement (<highlight>" + focus.getDisplayNameAsString() + "</highlight>)!"));
         }
 
         return Command.SINGLE_SUCCESS;
@@ -48,10 +44,7 @@ public class SettlementUnclaimCommand {
 
     public static boolean validateUserPermissions(Player player, Settlement settlement) {
         if (!settlement.getRoleFromMember(player.getUniqueId()).canUnclaim()) {
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("You are not allowed to unclaim chunks for ")
-                    .append(settlement.getDisplayName())
-                    .append(TextUtils.composeErrorText("!"))
-            );
+            player.sendMessage(error("You are not allowed to unclaim chunks for <highlight>" + settlement.getDisplayNameAsString() + "</highlight>!"));
             return false;
         }
         return true;

@@ -38,7 +38,9 @@ public class CommonArgumentSuggestions {
     }
 
     public static CompletableFuture<Suggestions> suggestNamedTextColors(final CommandContext<CommandSourceStack> context, final SuggestionsBuilder builder) {
-        NamedTextColor.NAMES.keys().forEach(builder::suggest);
+        NamedTextColor.NAMES.keys()
+                .stream().filter(name -> name.contains(builder.getRemainingLowerCase()))
+                .forEach(builder::suggest);
         return builder.buildFuture();
     }
 }

@@ -23,6 +23,8 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.List;
 
+import static dev.jabberdrake.jade.utils.TextUtils.info;
+
 public class SettlementMapCommand {
 
     private static final String INDENT = "       ";
@@ -69,7 +71,7 @@ public class SettlementMapCommand {
                 mapAsText = mapAsText.appendNewline();
             }
         }
-        player.sendMessage(TextUtils.composeSimpleInfoMessage("Settlement map (5 chunk radius):"));
+        player.sendMessage(info("Settlement map (5 chunk radius):"));
         player.sendMessage(Component.text(INDENT + "===========", TextUtils.DARK_ZORBA));
         player.sendMessage(mapAsText);
         player.sendMessage(Component.text(INDENT + "===========", TextUtils.DARK_ZORBA)
