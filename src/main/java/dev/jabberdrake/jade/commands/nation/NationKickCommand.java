@@ -59,8 +59,8 @@ public class NationKickCommand {
         focusNation.removeSettlement(target);
         target.leaveNation();
 
-        target.broadcast("We have been kicked from the nation of " + focusNation.getDisplayNameAsString() + "!");
-        focusNation.broadcast("The settlement of " + target.getDisplayNameAsString() + " has been kicked from the nation!");
+        target.broadcast("We have been kicked from the nation of " + focusNation.getDisplayNameAsString() + "<normal>!");
+        focusNation.broadcast("The settlement of " + target.getDisplayNameAsString() + "<normal> has been kicked from the nation!");
         return Command.SINGLE_SUCCESS;
     }
 }

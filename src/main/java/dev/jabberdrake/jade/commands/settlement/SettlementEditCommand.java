@@ -10,14 +10,11 @@ import dev.jabberdrake.jade.players.PlayerManager;
 import dev.jabberdrake.jade.realms.RealmManager;
 import dev.jabberdrake.jade.realms.Settlement;
 import dev.jabberdrake.jade.utils.JadeTextColor;
-import dev.jabberdrake.jade.utils.TextUtils;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
 import io.papermc.paper.registry.RegistryAccess;
 import io.papermc.paper.registry.RegistryKey;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
@@ -50,7 +47,7 @@ public class SettlementEditCommand {
                 )
                 .then(Commands.literal("mapColor")
                         .then(Commands.argument("color_name_or_hex", StringArgumentType.greedyString())
-                                .suggests(CommonArgumentSuggestions::suggestNamedTextColors)
+                                .suggests(CommonArgumentSuggestions::suggestVanillaTextColors)
                                 .requires(sender -> sender.getExecutor() instanceof Player)
                                 .executes(SettlementEditCommand::runCommandForMapColor)
                         )
@@ -79,7 +76,7 @@ public class SettlementEditCommand {
         }
 
         focus.setName(nameArgument);
-        focus.broadcast("Changed <highlight>reference name<!highlight> to <highlight><i>" + focus.getName() + "</i></highlight>!");
+        focus.broadcast("Changed <highlight>reference name</highlight> to <highlight><i>" + focus.getName() + "</i></highlight>!");
         return Command.SINGLE_SUCCESS;
     }
 
@@ -92,7 +89,7 @@ public class SettlementEditCommand {
 
         String displayArgument = StringArgumentType.getString(context, "display_name");
         focus.setDisplayName(displayArgument);
-        focus.broadcast("Changed <highlight>display name<!highlight> to " + focus.getDisplayNameAsString() + "!");
+        focus.broadcast("Changed <highlight>display name</highlight> to " + focus.getDisplayNameAsString() + "<normal>!");
 
         return Command.SINGLE_SUCCESS;
     }
@@ -109,7 +106,7 @@ public class SettlementEditCommand {
             descArgument = "<white>" + descArgument;
         }
         focus.setDescription(descArgument);
-        focus.broadcast("Changed <highlight>description<!highlight> to :" + focus.getDescriptionAsString());
+        focus.broadcast("Changed <highlight>description</highlight> to: " + focus.getDescriptionAsString());
         return Command.SINGLE_SUCCESS;
     }
 
@@ -133,7 +130,7 @@ public class SettlementEditCommand {
         }
 
         focus.setMapColor(color);
-        focus.broadcast("Changed <highlight>map color<!highlight> to <color:" + color.asHexString() + ">" + colorArgument + "</color>!");
+        focus.broadcast("Changed <highlight>map color</highlight> to <color:" + color.asHexString() + ">" + colorArgument + "</color>!");
         return Command.SINGLE_SUCCESS;
     }
 
@@ -163,13 +160,13 @@ public class SettlementEditCommand {
         }
 
         focus.setIcon(iconArgument);
-        focus.broadcast("Changed <highlight>icon<!highlight> to <highlight>" + focus.getIconAsString() + "</highlight>!");
+        focus.broadcast("Changed <highlight>icon</highlight> to <highlight>" + focus.getIconAsString() + "</highlight>!");
         return Command.SINGLE_SUCCESS;
     }
 
     public static boolean validateUserPermissions(Player player, Settlement settlement) {
         if (!settlement.getRoleFromMember(player.getUniqueId()).canEdit()) {
-            player.sendMessage(error("You are not allowed to edit attributes in <highlight>" + settlement.getDisplayNameAsString() + "</highlight>!"));
+            player.sendMessage(error("You are not allowed to edit attributes in <highlight>" + settlement.getDisplayNameAsString() + "<normal>!"));
             return false;
         }
         return true;

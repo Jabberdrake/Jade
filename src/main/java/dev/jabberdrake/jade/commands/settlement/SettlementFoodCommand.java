@@ -92,14 +92,13 @@ public class SettlementFoodCommand {
         int foodValue = (mhItem.getData(DataComponentTypes.FOOD).nutrition() / 2) * mhItem.getAmount();
 
         if (!focus.canHandleFoodDeposit(foodValue)) {
-            player.sendMessage(error("Too much food! (<highlight>" + foodValue + "</highlight> > " + (focus.getFoodCapacity() - focus.getFood()) + ")"));
+            player.sendMessage(error("Too much food! (<highlight>" + foodValue + "<normal> > " + (focus.getFoodCapacity() - focus.getFood()) + ")"));
             return Command.SINGLE_SUCCESS;
         }
 
         player.getInventory().setItemInMainHand(null);
         focus.addFood(foodValue);
-        focus.broadcast("<highlight>" + player.getName() + "</highlight> has deposited <livingmetal>" + foodValue + "</livingmetal> food!");
-
+        focus.broadcast("<highlight>" + player.getName() + "<normal> has deposited <livingmetal>" + foodValue + "</livingmetal> food!");
         return Command.SINGLE_SUCCESS;
     }
 
@@ -120,14 +119,13 @@ public class SettlementFoodCommand {
         int foodValue = (ohItem.getData(DataComponentTypes.FOOD).nutrition() / 2) * ohItem.getAmount();
 
         if (!focus.canHandleFoodDeposit(foodValue)) {
-            player.sendMessage(error("Too much food! (<highlight>" + foodValue + "</highlight> > " + (focus.getFoodCapacity() - focus.getFood()) + ")"));
+            player.sendMessage(error("Too much food! (<highlight>" + foodValue + "<normal> > " + (focus.getFoodCapacity() - focus.getFood()) + ")"));
             return Command.SINGLE_SUCCESS;
         }
 
         player.getInventory().setItemInOffHand(null);
         focus.addFood(foodValue);
-        focus.broadcast("<highlight>" + player.getName() + "</highlight> has deposited <livingmetal>" + foodValue + "</livingmetal> food!");
-
+        focus.broadcast("<highlight>" + player.getName() + "<normal> has deposited <livingmetal>" + foodValue + "</livingmetal> food!");
         return Command.SINGLE_SUCCESS;
     }
 
@@ -152,8 +150,8 @@ public class SettlementFoodCommand {
             totalFoodValue += itemFoodValue;
         }
 
-        focus.broadcast("<highlight>" + player.getName() + "</highlight> has deposited <livingmetal>" + totalFoodValue + "</livingmetal> food!");
-
+        focus.addFood(totalFoodValue);
+        focus.broadcast("<highlight>" + player.getName() + "<normal> has deposited <livingmetal>" + totalFoodValue + "</livingmetal> food!");
         return Command.SINGLE_SUCCESS;
     }
 
@@ -178,8 +176,8 @@ public class SettlementFoodCommand {
             totalFoodValue += itemFoodValue;
         }
 
-        focus.broadcast("<highlight>" + player.getName() + "</highlight> has deposited <livingmetal>" + totalFoodValue + "</livingmetal> food!");
-
+        focus.addFood(totalFoodValue);
+        focus.broadcast("<highlight>" + player.getName() + "<normal> has deposited <livingmetal>" + totalFoodValue + "</livingmetal> food!");
         return Command.SINGLE_SUCCESS;
     }
 }

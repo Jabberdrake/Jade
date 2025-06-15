@@ -101,7 +101,7 @@ public class TitleDataObject implements DatabaseObject<JadeTitle, Integer> {
         try {
             database.execute(sql, stmt -> {
                 stmt.setString(1, jadeTitle.getName());
-                stmt.setString(2, jadeTitle.getTitleAsString());
+                stmt.setString(2, jadeTitle.getDisplayName());
                 if (jadeTitle.isUniversal()) {
                     stmt.setString(3, "universal");
                 } else {
@@ -131,7 +131,7 @@ public class TitleDataObject implements DatabaseObject<JadeTitle, Integer> {
         try {
             id[0] = Math.toIntExact(database.create(sql, stmt -> {
                 stmt.setString(1, title.getName());
-                stmt.setString(2, title.getTitleAsString());
+                stmt.setString(2, title.getDisplayName());
                 if (title.isUniversal()) {
                     stmt.setString(3, "universal");
                 } else {

@@ -52,8 +52,8 @@ public class NationJoinCommand {
         focus.setNation(inviter);
         RealmManager.clearInviteToNation(focus);
 
-        focus.broadcast("We have joined the nation of " + inviter.getDisplayNameAsString() + "!");
-        inviter.broadcast("The settlement of " + focus.getDisplayNameAsString() + " has joined the nation!");
+        focus.broadcast("We have joined the nation of " + inviter.getDisplayNameAsString() + "<normal>!");
+        inviter.broadcast("The settlement of " + focus.getDisplayNameAsString() + "<normal> has joined the nation!");
         return Command.SINGLE_SUCCESS;
     }
 
@@ -85,8 +85,8 @@ public class NationJoinCommand {
         focus.setNation(inviter);
         RealmManager.clearInviteToNation(focus);
 
-        focus.broadcast("We have joined the nation of " + inviter.getDisplayNameAsString() + "!");
-        inviter.broadcast("The settlement of " + focus.getDisplayNameAsString() + " has joined the nation!");
+        focus.broadcast("We have joined the nation of " + inviter.getDisplayNameAsString() + "<normal>!");
+        inviter.broadcast("The settlement of " + focus.getDisplayNameAsString() + "<normal> has joined the nation!");
         return Command.SINGLE_SUCCESS;
     }
 }

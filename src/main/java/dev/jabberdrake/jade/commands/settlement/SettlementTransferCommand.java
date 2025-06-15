@@ -51,12 +51,12 @@ public class SettlementTransferCommand {
         focus.setPlayerRole(target.getUniqueId(), leaderRole);
         focus.setPlayerRole(player.getUniqueId(), focus.getRoleBelow(leaderRole));
 
-        player.sendMessage(success("Transferred leadership of " + focus.getDisplayNameAsString() + " to <highlight>" + target.getName() + "</highlight>!"));
-        focus.tell((Player) target, "You have been demoted to " + focus.getRoleBelow(leaderRole).getDisplayAsString() + "!");
+        player.sendMessage(success("Transferred leadership of " + focus.getDisplayNameAsString() + "<normal> to <highlight>" + target.getName() + "</highlight>!"));
+        focus.tell((Player) target, "You have been demoted to " + focus.getRoleBelow(leaderRole).getDisplayAsString() + "<normal>!");
 
         focus.broadcast("A high official has <highlight>transferred ownership</highlight> of this settlement: <gold>" + target.getName() + " </gold>is the new <highlight>leader</highlight>!");
         if (target.isOnline()) {
-            focus.tell((Player) target, "You have been promoted to " + leaderRole.getDisplayAsString() + "! Congratulations!");
+            focus.tell((Player) target, "You have been promoted to " + leaderRole.getDisplayAsString() + "<normal>! Congratulations!");
         }
         return Command.SINGLE_SUCCESS;
     }

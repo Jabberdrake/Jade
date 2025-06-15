@@ -13,7 +13,7 @@ public class GlobalChatRenderer implements ChatRenderer {
     public Component render(Player source, Component sourceDisplayName, Component message, Audience audience) {
         JadeTitle titleInUse = PlayerManager.asJadePlayer(source.getUniqueId()).getTitleInUse();
         return Component.text()
-                .append(titleInUse.getTitleAsComponent())
+                .append(titleInUse.getDisplayAsComponent())
                 .append(Component.text(" "))
                 .append(sourceDisplayName.color(titleInUse.getSenderColor()).append(Component.text(": ")))
                 .append(message.color(NamedTextColor.GRAY))

@@ -8,13 +8,13 @@ import dev.jabberdrake.jade.commands.CommonArgumentSuggestions;
 import dev.jabberdrake.jade.players.PlayerManager;
 import dev.jabberdrake.jade.titles.JadeTitle;
 import dev.jabberdrake.jade.titles.TitleManager;
-import dev.jabberdrake.jade.utils.TextUtils;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
-import java.util.UUID;
+import static dev.jabberdrake.jade.utils.TextUtils.*;
 
 public class TitleAllowCommand {
 
@@ -31,42 +31,40 @@ public class TitleAllowCommand {
 
     public static int runCommand(CommandContext<CommandSourceStack> context) {
         Player player = (Player) context.getSource().getSender();
-        String titleAsString = StringArgumentType.getString(context, "title");
+        String titleArgument = StringArgumentType.getString(context, "title");
 
-        JadeTitle title = PlayerManager.asJadePlayer(player.getUniqueId()).getTitleFromName(titleAsString);
+        JadeTitle title = PlayerManager.asJadePlayer(player.getUniqueId()).getTitleFromName(titleArgument);
         if (title == null) {
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("Could not find the specified title!"));
+            player.sendMessage(error("Could not find a title named <highlight>" + titleArgument + "</highlight>!"));
             return Command.SINGLE_SUCCESS;
         } else if (title.isUniversal()) {
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("You cannot allow access to universal titles!"));
+            player.sendMessage(error("This title (<highlight>" + titleArgument + "</highlight>) is <highlight>universal</highlight>!"));
+            return Command.SINGLE_SUCCESS;
         } else if (!title.getOwner().equals(player.getUniqueId())) {
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("You do not own this title!"));
+            player.sendMessage(error("You do not own this title!"));
             return Command.SINGLE_SUCCESS;
         }
 
-        String targetName = StringArgumentType.getString(context, "player");
-        Player target = Bukkit.getPlayer(targetName);
-        UUID targetUUID = target.getUniqueId();
-        if (Bukkit.getPlayer(targetName) == null) {
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("Could not find the specified player."));
+        String targetArgument = StringArgumentType.getString(context, "player");
+        OfflinePlayer target = Bukkit.getOfflinePlayer(targetArgument);
+        if (!target.hasPlayedBefore()) {
+            player.sendMessage(error("Could not find a player named <highlight>" + targetArgument + "</highlight>!"));
             return Command.SINGLE_SUCCESS;
-        } else if (targetName.equals(player.getName())) {
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("You already own the title, silly!"));
+        } else if (targetArgument.equals(player.getName())) {
+            player.sendMessage(error("You can't revoke yourself!"));
+            player.sendMessage(info("To delete the title, do <highlight>/title delete <i><reference_name>"));
             return Command.SINGLE_SUCCESS;
-        } else if (title.isAvailableTo(targetUUID)) {
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("This player can already use the specified title!"));
+        } else if (!title.isAvailableTo(target.getUniqueId())) {
+            player.sendMessage(error("This player (<highlight>" + targetArgument + "</highlight>) is not allowed to use this title!"));
             return Command.SINGLE_SUCCESS;
         }
 
-        TitleManager.allowUseOfTitle(title, player.getUniqueId(), targetUUID);
+        TitleManager.allowUseOfTitle(title, player.getUniqueId(), target.getUniqueId());
 
-        player.sendMessage(TextUtils.composeSuccessPrefix()
-                        .append(TextUtils.composeSuccessHighlight(player.getName()))
-                        .append(TextUtils.composeSuccessText(" can now use the "))
-                        .append(title.getTitleAsComponent())
-                        .append(TextUtils.composeSuccessText(" title!"))
-        );
-
+        player.sendMessage(success("<highlight>" + target.getName() + "</highlight> is now allowed to use to the title of " + title.getDisplayName() + "<normal>!"));
+        if (target.isOnline()) {
+            ((Player) target).sendMessage(info("<highlight>" + player.getName() + "</highlight> has <green>allowed</green> you to use the title of " + title.getDisplayName() + "<normal>!"));
+        }
         return Command.SINGLE_SUCCESS;
     }
 }

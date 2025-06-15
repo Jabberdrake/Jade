@@ -13,13 +13,11 @@ import dev.jabberdrake.jade.menus.implementations.SettlementManageMenu;
 import dev.jabberdrake.jade.players.PlayerManager;
 import dev.jabberdrake.jade.realms.Settlement;
 import dev.jabberdrake.jade.realms.SettlementRole;
-import dev.jabberdrake.jade.utils.TextUtils;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
 import io.papermc.paper.registry.RegistryAccess;
 import io.papermc.paper.registry.RegistryKey;
-import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.NamespacedKey;
@@ -31,7 +29,6 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import static dev.jabberdrake.jade.utils.TextUtils.error;
-import static dev.jabberdrake.jade.utils.TextUtils.success;
 
 public class SettlementManageCommand {
 
@@ -63,7 +60,7 @@ public class SettlementManageCommand {
                         )
                         .then(Commands.literal("color")
                                 .then(Commands.argument("named_color", StringArgumentType.word())
-                                        .suggests(CommonArgumentSuggestions::suggestNamedTextColors)
+                                        .suggests(CommonArgumentSuggestions::suggestVanillaTextColors)
                                         .requires(sender -> sender.getExecutor() instanceof Player)
                                         .executes(SettlementManageCommand::runCommandForColorChange)
                                 )
@@ -109,7 +106,7 @@ public class SettlementManageCommand {
 
     public static boolean validateUserPermissions(Player player, Settlement settlement) {
         if (!settlement.getRoleFromMember(player.getUniqueId()).canManage()) {
-            player.sendMessage(error("You are not allowed to manage roles for <highlight>" + settlement.getDisplayNameAsString() + "</highlight>!"));
+            player.sendMessage(error("You are not allowed to manage roles for <highlight>" + settlement.getDisplayNameAsString() + "<normal>!"));
             return false;
         }
         return true;
@@ -117,7 +114,7 @@ public class SettlementManageCommand {
 
     public static boolean validateRoleArgument(String roleArgument, Player player, Settlement settlement) {
         if (settlement.getRoleFromName(roleArgument) == null) {
-            player.sendMessage(error("Could not find a role named <highlight>" + roleArgument + "</highlight> in " + settlement.getDisplayNameAsString() + "!"));
+            player.sendMessage(error("Could not find a role named <highlight>" + roleArgument + "</highlight> in " + settlement.getDisplayNameAsString() + "<normal>!"));
             return false;
         }
         return true;
@@ -130,6 +127,7 @@ public class SettlementManageCommand {
 
     public static boolean validateAuthorityDynamic(Player player, Settlement settlement, SettlementRole targetRole, int authorityOffset) {
         SettlementRole senderRole = settlement.getRoleFromMember(player.getUniqueId());
+        if (senderRole.isLeader()) return true;
         if (senderRole.getAuthority() <= targetRole.getAuthority() + authorityOffset) {
             player.sendMessage(error("You don't have enough authority to manage that role!"));
             return false;
@@ -162,7 +160,7 @@ public class SettlementManageCommand {
 
         focus.addRole(newRole);
 
-        focus.tell(player, "Created a <highlight>new role</highlight> named " + newRole.getDisplayAsString() + "! Its current authority level is <light_amethyst>" + newRole.getAuthority() + "</light_amethyst>.");
+        focus.tell(player, "Created a <highlight>new role</highlight> named " + newRole.getDisplayAsString() + "<normal>! Its current authority level is <light_amethyst>" + newRole.getAuthority() + "</light_amethyst>.");
         return Command.SINGLE_SUCCESS;
     }
 
@@ -194,7 +192,7 @@ public class SettlementManageCommand {
 
         role.increaseAuthority();
 
-        focus.tell(player, "<green>Increased</green> authority of role " + role.getDisplayAsString() + "!");
+        focus.tell(player, "<green>Increased</green> authority of role " + role.getDisplayAsString() + "<normal>!");
         return Command.SINGLE_SUCCESS;
     }
 
@@ -226,7 +224,7 @@ public class SettlementManageCommand {
 
         role.decreaseAuthority();
 
-        focus.tell(player, "<red>Decreased</red> authority of role " + role.getDisplayAsString() + "!");
+        focus.tell(player, "<red>Decreased</red> authority of role " + role.getDisplayAsString() + "<normal>!");
         return Command.SINGLE_SUCCESS;
     }
 
@@ -254,7 +252,7 @@ public class SettlementManageCommand {
         String oldDisplay = role.getDisplayAsString();
         role.setName(nameArg.substring(0, 1).toUpperCase() + nameArg.substring(1));
 
-        focus.tell(player, "Changed the name of role " + oldDisplay + " to " + role.getDisplayAsString() + "!");
+        focus.tell(player, "Changed the name of role " + oldDisplay + "<normal> to " + role.getDisplayAsString() + "<normal>!");
         return Command.SINGLE_SUCCESS;
     }
 
@@ -286,7 +284,7 @@ public class SettlementManageCommand {
 
         role.setColor(color);
 
-        focus.tell(player, "Changed color of role " + role.getDisplayAsString() + " to <" + colorArgument.toLowerCase() + ">" + colorArgument.toUpperCase() + "</" + colorArgument.toLowerCase() + ">!");
+        focus.tell(player, "Changed color of role " + role.getDisplayAsString() + "<normal> to <" + colorArgument.toLowerCase() + ">" + colorArgument.toUpperCase() + "</" + colorArgument.toLowerCase() + ">!");
         return Command.SINGLE_SUCCESS;
     }
 
@@ -341,10 +339,10 @@ public class SettlementManageCommand {
         boolean valueArgument = BoolArgumentType.getBool(context, "value");
         if (role.setPermission(permArgument, valueArgument)) {
             if (valueArgument) {
-                focus.tell(player, "Changed permission <light_amethyst>" + permArgument + "</light_amethyst> to <green>TRUE</green> for role " + role.getDisplayAsString() + "!");
+                focus.tell(player, "Changed permission <light_amethyst>" + permArgument + "</light_amethyst> to <green>TRUE</green> for role " + role.getDisplayAsString() + "<normal>!");
 
             } else {
-                focus.tell(player, "Changed permission <light_amethyst>" + permArgument + "</light_amethyst> to <red>FALSE</red> for role " + role.getDisplayAsString() + "!");
+                focus.tell(player, "Changed permission <light_amethyst>" + permArgument + "</light_amethyst> to <red>FALSE</red> for role " + role.getDisplayAsString() + "<normal>!");
             }
 
         } else {
@@ -378,7 +376,7 @@ public class SettlementManageCommand {
 
         focus.setDefaultRole(role);
 
-        focus.broadcast("A high official has made " + role.getDisplayAsString() + " the <highlight>default role</highlight>! Newcomers will automatically be assigned this role when they join!");
+        focus.broadcast("A high official has made " + role.getDisplayAsString() + "<normal> the <highlight>default role</highlight>! Newcomers will automatically be assigned this role when they join!");
         return Command.SINGLE_SUCCESS;
     }
 

@@ -1,30 +1,29 @@
 package dev.jabberdrake.jade.titles;
 
 import dev.jabberdrake.jade.database.DatabaseManager;
-import dev.jabberdrake.jade.database.DatabaseObject;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
-import org.bukkit.configuration.file.FileConfiguration;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 
-public class JadeTitle extends NamedTitle {
+public class JadeTitle {
 
     private int id;
+    private String name;
+    private String displayName;
     private UUID owner;
     private TextColor senderColor;
     private String icon;
     private List<UUID> users;
 
     // Used by DatabaseManager when composing runtime object from persistent data
-    public JadeTitle(int id, String name, String title, UUID owner, TextColor senderColor, String iconAsString) {
-        super(name, title);
-
+    public JadeTitle(int id, String name, String displayName, UUID owner, TextColor senderColor, String iconAsString) {
         this.id = id;
+        this.name = name;
+        this.displayName = displayName;
         this.owner = owner;
         this.senderColor = senderColor;
         this.icon = iconAsString;
@@ -34,13 +33,12 @@ public class JadeTitle extends NamedTitle {
         } else {
             this.users = null;
         }
-
     }
 
     // Used by TitleManager when creating new title
-    public JadeTitle(String name, String title, UUID owner, TextColor senderColor, String iconAsString) {
-        super(name, title);
-
+    public JadeTitle(String name, String displayName, UUID owner, TextColor senderColor, String iconAsString) {
+        this.name = name;
+        this.displayName = displayName;
         this.owner = owner;
         this.senderColor = senderColor;
         this.icon = iconAsString;
@@ -57,15 +55,25 @@ public class JadeTitle extends NamedTitle {
 
     public int getId() { return this.id; }
 
-    @Override
+    public String getName() {
+        return this.name;
+    }
+
     public void setName(String name) {
-        super.setName(name);
+        this.name = name;
         DatabaseManager.saveTitle(this);
     }
 
-    @Override
-    public void setTitle(String title) {
-        super.setTitle(title);
+    public String getDisplayName() {
+        return this.displayName;
+    }
+
+    public Component getDisplayAsComponent() {
+        return MiniMessage.miniMessage().deserialize(this.displayName);
+    }
+
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
         DatabaseManager.saveTitle(this);
     }
 
@@ -151,8 +159,8 @@ public class JadeTitle extends NamedTitle {
         return this.getName() + "@" + this.getOwner().toString();
     }
 
-    public static String serializeTitle(Component title) {
-        return MiniMessage.miniMessage().serialize(title);
+    public static String serializeDisplay(Component display) {
+        return MiniMessage.miniMessage().serialize(display);
     }
 
     @Override

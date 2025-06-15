@@ -65,7 +65,7 @@ public class NationDissolveCommand {
         RealmManager.deleteNation(nation);
 
         nation.broadcast("A high official has <red>dissolved</red> the nation. Goodbye...");
-        Bukkit.broadcast(info("The nation of " + nation.getDisplayNameAsString() + " has been dissolved!"));
+        Bukkit.broadcast(info("The nation of " + nation.getDisplayNameAsString() + "<normal> has been dissolved!"));
         return Command.SINGLE_SUCCESS;
     }
 }

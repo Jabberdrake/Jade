@@ -23,18 +23,13 @@ public abstract class NamedTitle {
 
     public void setName(String name) { this.name = name; }
 
-    public String getTitleAsString() {
+    public String getDisplayName() {
         return this.title;
     }
 
-    public Component getTitleAsComponent() {
+    public Component getDisplayAsComponent() {
         MiniMessage mm = MiniMessage.miniMessage();
         return mm.deserialize(this.title);
-    }
-
-    public void setTitle(Component title) {
-        MiniMessage mm = MiniMessage.miniMessage();
-        this.title = mm.serialize(title);
     }
 
     public void setTitle(String title) {

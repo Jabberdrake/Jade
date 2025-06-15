@@ -135,18 +135,22 @@ public class RealmManager {
         settlementCache.remove(settlement.getId());
 
         // Remove all active invites to the deleted settlement
+        List<UUID> invitesToRemove = new ArrayList<>();
         for (UUID playerID : activeSettlementInvites.keySet()) {
             if (activeSettlementInvites.get(playerID).equals(settlement)) {
-                activeSettlementInvites.remove(playerID);
+                invitesToRemove.add(playerID);
             }
         }
+        for (UUID playerID : invitesToRemove) activeSettlementInvites.remove(playerID);
 
         // Remove all territory map entries regarding the deleted settlement
+        List<ChunkAnchor> chunkEntriesToRemove = new ArrayList<>();
         for (ChunkAnchor anchor : territoryMap.keySet()) {
             if (territoryMap.get(anchor).equals(settlement)) {
-                territoryMap.remove(anchor);
+                chunkEntriesToRemove.add(anchor);
             }
         }
+        for (ChunkAnchor anchor : chunkEntriesToRemove) territoryMap.remove(anchor);
 
         DatabaseManager.deleteSettlement(settlement.getId());
     }
@@ -324,11 +328,13 @@ public class RealmManager {
         nationCache.remove(nation.getId());
 
         // Remove all active invites to the deleted nation
+        List<Integer> invitesToRemove = new ArrayList<>();
         for (int stmID : activeNationInvites.keySet()) {
             if (activeNationInvites.get(stmID).equals(nation)) {
-                activeNationInvites.remove(stmID);
+                invitesToRemove.add(stmID);
             }
         }
+        for (int stmID : invitesToRemove) activeNationInvites.remove(stmID);
 
         // Make all member settlements leave deleted nation
         for (Settlement settlement : getAllSettlements()) {

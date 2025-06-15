@@ -4,6 +4,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import dev.jabberdrake.jade.players.PlayerManager;
+import dev.jabberdrake.jade.titles.JadeTitle;
 import dev.jabberdrake.jade.titles.NamedTitle;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import org.bukkit.entity.Player;
@@ -16,7 +17,7 @@ public class CommonTitleSuggestions {
         Player player = (Player) context.getSource().getSender();
         PlayerManager.asJadePlayer(player.getUniqueId()).getOwnedTitles()
                 .stream()
-                .map(NamedTitle::getName)
+                .map(JadeTitle::getName)
                 .forEach(builder::suggest);
 
         return builder.buildFuture();
@@ -26,7 +27,7 @@ public class CommonTitleSuggestions {
         Player player = (Player) context.getSource().getSender();
         PlayerManager.asJadePlayer(player.getUniqueId()).getAvailableTitles()
                 .stream()
-                .map(NamedTitle::getName)
+                .map(JadeTitle::getName)
                 .forEach(builder::suggest);
 
         return builder.buildFuture();

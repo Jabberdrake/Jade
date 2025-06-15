@@ -85,6 +85,7 @@ public class Nation {
         this.members = new ArrayList<>(List.of(capital));
 
         this.id = DatabaseManager.createNation(this);
+        DatabaseManager.addMemberToNation(capital, this);
     }
 
     public int getId() { return this.id; }

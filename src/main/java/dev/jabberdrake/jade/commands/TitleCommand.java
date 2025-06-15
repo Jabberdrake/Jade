@@ -4,8 +4,13 @@ import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import dev.jabberdrake.jade.commands.title.*;
+import dev.jabberdrake.jade.realms.Settlement;
+import dev.jabberdrake.jade.titles.JadeTitle;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
+import org.bukkit.entity.Player;
+
+import static dev.jabberdrake.jade.utils.TextUtils.error;
 
 public class TitleCommand {
 

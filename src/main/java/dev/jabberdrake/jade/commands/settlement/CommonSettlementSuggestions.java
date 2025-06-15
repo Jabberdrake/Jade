@@ -53,7 +53,7 @@ public class CommonSettlementSuggestions {
         Player player = (Player) context.getSource().getSender();
         Settlement focus = PlayerManager.asJadePlayer(player.getUniqueId()).getFocusSettlement();
 
-        if (focus.getRoleFromMember(player.getUniqueId()) == null) {
+        if (focus == null || focus.getRoleFromMember(player.getUniqueId()) == null) {
             return builder.buildFuture();
         }
 
@@ -69,7 +69,7 @@ public class CommonSettlementSuggestions {
         Player player = (Player) context.getSource().getSender();
         Settlement focus = PlayerManager.asJadePlayer(player.getUniqueId()).getFocusSettlement();
 
-        if (focus.getRoleFromMember(player.getUniqueId()) == null) {
+        if (focus == null || focus.getRoleFromMember(player.getUniqueId()) == null) {
             return builder.buildFuture();
         }
 

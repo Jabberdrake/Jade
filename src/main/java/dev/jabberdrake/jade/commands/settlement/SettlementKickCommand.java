@@ -42,7 +42,7 @@ public class SettlementKickCommand {
             player.sendMessage(error("Could not find a matching role for command sender. Please report this to a developer!"));
             return Command.SINGLE_SUCCESS;
         } else if (!senderRole.canKick()) {
-            player.sendMessage(error("You are not allowed to kick members from <highlight>" + focus.getDisplayNameAsString() + "</highlight>!"));
+            player.sendMessage(error("You are not allowed to kick members from <highlight>" + focus.getDisplayNameAsString() + "<normal>!"));
             return Command.SINGLE_SUCCESS;
         }
 
@@ -67,7 +67,7 @@ public class SettlementKickCommand {
 
         focus.broadcast("<highlight>" + target.getName() + "</highlight> has been kicked from the settlement!");
         if (target.isOnline()) {
-            ((Player) target).sendMessage(info("You have been kicked from " + focus.getDisplayNameAsString() + "!"));
+            ((Player) target).sendMessage(info("You have been kicked from " + focus.getDisplayNameAsString() + "<normal>!"));
         }
         return Command.SINGLE_SUCCESS;
     }

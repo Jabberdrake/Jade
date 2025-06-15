@@ -53,7 +53,7 @@ public class SettlementLeaveCommand {
         settlement.removeMember(player.getUniqueId());
 
         settlement.broadcast("<highlight>" + player.getName() + "</highlight> has left the settlement!");
-        player.sendMessage(info("You have left the settlement of " + settlement.getDisplayNameAsString() + "!"));
+        player.sendMessage(info("You have left the settlement of " + settlement.getDisplayNameAsString() + "<normal>!"));
         return Command.SINGLE_SUCCESS;
     }
 }

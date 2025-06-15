@@ -7,10 +7,15 @@ import com.mojang.brigadier.tree.LiteralCommandNode;
 import dev.jabberdrake.jade.players.PlayerManager;
 import dev.jabberdrake.jade.titles.JadeTitle;
 import dev.jabberdrake.jade.titles.TitleManager;
-import dev.jabberdrake.jade.utils.TextUtils;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
+
+import java.util.UUID;
+
+import static dev.jabberdrake.jade.utils.TextUtils.*;
 
 public class TitleDeleteCommand {
 
@@ -25,27 +30,31 @@ public class TitleDeleteCommand {
 
     public static int runCommand(CommandContext<CommandSourceStack> context) {
         Player player = (Player) context.getSource().getSender();
-        String titleAsString = StringArgumentType.getString(context, "title");
+        String titleArgument = StringArgumentType.getString(context, "title");
 
-        JadeTitle title = PlayerManager.asJadePlayer(player.getUniqueId()).getTitleFromName(titleAsString);
+        JadeTitle title = PlayerManager.asJadePlayer(player.getUniqueId()).getTitleFromName(titleArgument);
         if (title == null) {
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("Could not find the specified title!"));
+            player.sendMessage(error("Could not find a title named <highlight>" + titleArgument + "</highlight>!"));
             return Command.SINGLE_SUCCESS;
         } else if (title.isUniversal()) {
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("You cannot delete universal titles!"));
+            player.sendMessage(error("You cannot delete <highlight>universal</highlight> titles!"));
         } else if (!title.getOwner().equals(player.getUniqueId())) {
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("You do not own this title!"));
+            player.sendMessage(error("You do not own this title!"));
             return Command.SINGLE_SUCCESS;
         }
 
         TitleManager.deleteTitle(title);
 
-        player.sendMessage(TextUtils.composeSimpleSuccessMessage("Successfully deleted the ")
-                .append(title.getTitleAsComponent())
-                .append(TextUtils.composeSuccessText(" title!"))
-        );
+        for (UUID userID : title.getUserList()) {
+            if (userID.equals(player.getUniqueId())) continue;
 
-
+            OfflinePlayer oUser = Bukkit.getOfflinePlayer(userID);
+            if (oUser.isOnline()) {
+                Player user = (Player) oUser;
+                user.sendMessage(info("The title of " + title.getDisplayName() + "<normal> has been <red>deleted</red> by its owner!"));
+            }
+        }
+        player.sendMessage(success("<red>Deleted</red> the title of " + title.getDisplayName() + "<normal>!"));
         return Command.SINGLE_SUCCESS;
     }
 }

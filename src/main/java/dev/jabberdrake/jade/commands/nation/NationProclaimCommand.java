@@ -47,7 +47,7 @@ public class NationProclaimCommand {
         Nation nation = RealmManager.createNation(nameArgument, focus);
 
         player.sendMessage(success("Created the nation of " + nation.getDisplayNameAsString() + "!"));
-        Bukkit.broadcast(info("<highlight>" + player.getName() + "</highlight> has created the nation of " + nation.getDisplayNameAsString() + "!"));
+        Bukkit.broadcast(info("<highlight>" + player.getName() + "</highlight> has created the nation of " + nation.getDisplayNameAsString() + "<normal>!"));
         return Command.SINGLE_SUCCESS;
     }
 }

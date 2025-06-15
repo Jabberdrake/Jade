@@ -58,11 +58,11 @@ public class JadeTextColor implements TextColor {
     public static final JadeTextColor LIVINGMETAL = new JadeTextColor("livingmetal", color(0x5afc9f), "minecraft:music_disc_creator");
     public static final JadeTextColor MYTHIC_BLUE = new JadeTextColor("mythic_blue", color(0x30eeb4), "minecraft:light_blue_candle");
 
-    private static final List<JadeTextColor> DEFAULT_VALUES = List.of(
+    private static final List<JadeTextColor> VANILLA_VALUES = List.of(
             BLACK, BLUE, GREEN, CYAN, CARMINE, PURPLE, GOLD, LIGHT_GRAY, GRAY, LIGHT_BLUE, LIME, AQUA, RED, MAGENTA
     );
 
-    private static final List<String> DEFAULT_NAMES = DEFAULT_VALUES.stream().map(JadeTextColor::toString).toList();
+    public static final List<String> VANILLA_NAMES = VANILLA_VALUES.stream().map(JadeTextColor::toString).toList();
 
     private static final List<JadeTextColor> VALUES = List.of(
             BLACK, BLUE, GREEN, CYAN, CARMINE, PURPLE, GOLD, LIGHT_GRAY, GRAY, LIGHT_BLUE, LIME, AQUA, RED, MAGENTA,
@@ -76,7 +76,7 @@ public class JadeTextColor implements TextColor {
             LIVINGMETAL, MYTHIC_BLUE
     );
 
-    private static final List<String> NAMES = VALUES.stream().map(JadeTextColor::toString).toList();
+    public static final List<String> NAMES = VALUES.stream().map(JadeTextColor::toString).toList();
 
     public static String toMessageTag(TextColor color) {
         return "<color:" + color.asHexString().toUpperCase(Locale.ROOT) + ">";
@@ -99,7 +99,7 @@ public class JadeTextColor implements TextColor {
         }
 
         // Otherwise, we'll assume that the string matches a named color:
-        List<JadeTextColor> values = (restrictToDefaultColors) ? DEFAULT_VALUES : VALUES;
+        List<JadeTextColor> values = (restrictToDefaultColors) ? VANILLA_VALUES : VALUES;
         for (JadeTextColor jadeColor : values) {
             if (jadeColor.toString().equals(arg)) {
                 return jadeColor;

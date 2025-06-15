@@ -43,7 +43,7 @@ public class SettlementInviteCommand {
             player.sendMessage(error("Could not find a matching role for command sender. Please report this to a developer!"));
             return Command.SINGLE_SUCCESS;
         } else if (!senderRole.canInvite()) {
-            player.sendMessage(error("You are not allowed to invite members to <highlight>" + focus.getDisplayNameAsString() + "</highlight>!"));
+            player.sendMessage(error("You are not allowed to invite members to <highlight>" + focus.getDisplayNameAsString() + "<normal>!"));
             return Command.SINGLE_SUCCESS;
         }
 
@@ -68,8 +68,8 @@ public class SettlementInviteCommand {
         Player onlineTarget = (Player) target;
         boolean successFlag = RealmManager.registerInviteToSettlement(onlineTarget, focus);
         if (successFlag) {
-            player.sendMessage(success("Invited <highlight>" + target.getName() + "</highlight> to " + focus.getDisplayNameAsString() + "!"));
-            focus.tell(onlineTarget, "<highlight>" + target.getName() + "</highlight> has invited you to join " + focus.getDisplayNameAsString() + "!");
+            player.sendMessage(success("Invited <highlight>" + target.getName() + "</highlight> to " + focus.getDisplayNameAsString() + "<normal>!"));
+            focus.tell(onlineTarget, "<highlight>" + target.getName() + "</highlight> has invited you to join " + focus.getDisplayNameAsString() + "<normal>!");
             onlineTarget.sendMessage(info("To accept a settlement invite, do <highlight>/settlement join"));
         } else {
             player.sendMessage(error("This player (<highlight>" + target.getName() + "</highlight>) already has a pending settlement invite!"));

@@ -53,10 +53,10 @@ public class NationInviteCommand {
 
         boolean successFlag = RealmManager.registerInviteToNation(target, focusNation);
         if (successFlag) {
-            focusNation.broadcast("The settlement of " + target.getDisplayNameAsString() + " has been invited to the nation!");
-            target.broadcast("We have been invited to join the nation of " + focusNation.getDisplayNameAsString() + "!");
+            focusNation.broadcast("The settlement of " + target.getDisplayNameAsString() + "<normal> has been invited to the nation!");
+            target.broadcast("We have been invited to join the nation of " + focusNation.getDisplayNameAsString() + "<normal>!");
         } else {
-            player.sendMessage(error("This settlement (<highlight>" + targetArgument + "</highlight>) already has a pending nation invite!"));
+            player.sendMessage(error("This settlement (<highlight>" + targetArgument + "<normal>) already has a pending nation invite!"));
         }
 
         return Command.SINGLE_SUCCESS;

@@ -3,13 +3,12 @@ package dev.jabberdrake.jade.commands;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
+import dev.jabberdrake.jade.utils.JadeTextColor;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.registry.RegistryAccess;
 import io.papermc.paper.registry.RegistryKey;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemType;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -37,8 +36,8 @@ public class CommonArgumentSuggestions {
         return builder.buildFuture();
     }
 
-    public static CompletableFuture<Suggestions> suggestNamedTextColors(final CommandContext<CommandSourceStack> context, final SuggestionsBuilder builder) {
-        NamedTextColor.NAMES.keys()
+    public static CompletableFuture<Suggestions> suggestVanillaTextColors(final CommandContext<CommandSourceStack> context, final SuggestionsBuilder builder) {
+        JadeTextColor.VANILLA_NAMES
                 .stream().filter(name -> name.contains(builder.getRemainingLowerCase()))
                 .forEach(builder::suggest);
         return builder.buildFuture();

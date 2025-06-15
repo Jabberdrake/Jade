@@ -52,7 +52,7 @@ public class SettlementClaimCommand {
         if (RealmManager.claimChunk(focus, currentChunk)) {
             player.sendMessage(success("Claimed this chunk for " + focus.getDisplayNameAsString() + "!"));
         } else if (!RealmManager.isUnclaimedChunk(currentChunk)) {
-            player.sendMessage(error("This chunk is already claimed by <highlight>" + RealmManager.getChunkOwner(currentChunk).getName() + "</highlight>!"));
+            player.sendMessage(error("This chunk is already claimed by <highlight>" + RealmManager.getChunkOwner(currentChunk).getName() + "<normal>!"));
         } else if (focus.getFood() < JadeSettings.chunkCost) {
             player.sendMessage(error("Not enough food!"));
             player.sendMessage(info("Remember: each chunk costs <highlight>" + JadeSettings.chunkCost + "</highlight> to claim!"));
@@ -88,7 +88,7 @@ public class SettlementClaimCommand {
             }
         }
 
-        player.sendMessage(success("Claimed <highlight>" + chunksToClaim.size() + "</highlight> chunks for " + focus.getDisplayNameAsString() + "!"));
+        player.sendMessage(success("Claimed <highlight>" + chunksToClaim.size() + "</highlight> chunks for " + focus.getDisplayNameAsString() + "<normal>!"));
         return Command.SINGLE_SUCCESS;
     }
 
@@ -103,7 +103,7 @@ public class SettlementClaimCommand {
         jadePlayer.toggleAutoclaim();
 
         if (jadePlayer.isAutoclaiming()) {
-            player.sendMessage(info("Toggled autoclaim <green><bold>ON</bold></green>! Keep walking to claim chunks for " + focus.getDisplayNameAsString() + "!"));
+            player.sendMessage(info("Toggled autoclaim <green><bold>ON</bold></green>! Keep walking to claim chunks for " + focus.getDisplayNameAsString() + "<normal>!"));
             RealmManager.claimChunk(focus, player.getChunk());
 
         } else {
@@ -137,13 +137,13 @@ public class SettlementClaimCommand {
             chunkCount++;
         }
 
-        player.sendMessage(success("Claimed <highlight>" + chunkCount + "</highlight> chunks for " + focus.getDisplayNameAsString() + "!"));
+        player.sendMessage(success("Claimed <highlight>" + chunkCount + "</highlight> chunks for " + focus.getDisplayNameAsString() + "<normal>!"));
         return Command.SINGLE_SUCCESS;
     }
 
     public static boolean validateUserPermissions(Player player, Settlement settlement) {
         if (!settlement.getRoleFromMember(player.getUniqueId()).canClaim()) {
-            player.sendMessage(error("You are not allowed to claim chunks for <highlight>" + settlement.getDisplayNameAsString() + "</highlight>!"));
+            player.sendMessage(error("You are not allowed to claim chunks for <highlight>" + settlement.getDisplayNameAsString() + "<normal>!"));
             return false;
         }
         return true;

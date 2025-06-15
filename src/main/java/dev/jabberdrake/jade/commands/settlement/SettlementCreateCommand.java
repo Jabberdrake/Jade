@@ -46,7 +46,7 @@ public class SettlementCreateCommand {
         PlayerManager.asJadePlayer(player.getUniqueId()).setFocusSettlement(settlement);
 
         player.sendMessage(success("Created the settlement of " + settlement.getDisplayNameAsString() + "!"));
-        Bukkit.broadcast(info("<highlight>" + player.getName() + "</highlight> has created the settlement of " + settlement.getDisplayNameAsString() + "!"));
+        Bukkit.broadcast(info("<highlight>" + player.getName() + "</highlight> has created the settlement of " + settlement.getDisplayNameAsString() + "<normal>!"));
         return Command.SINGLE_SUCCESS;
     }
 }

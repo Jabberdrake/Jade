@@ -24,13 +24,13 @@ public class AdminGameruleCommand {
         return Commands.literal(label)
                 .then(Commands.literal("preventCoralFading")
                         .then(Commands.argument("value", BoolArgumentType.bool())
-                                .suggests(AdminGameruleCommand::suggestRealmProtectionLevels)
                                 .requires(sender -> sender.getExecutor() instanceof Player)
                                 .executes(AdminGameruleCommand::runCommandForCoralFading)
                         )
                 )
                 .then(Commands.literal("realmProtectionLevel")
                         .then(Commands.argument("level", StringArgumentType.word())
+                                .suggests(AdminGameruleCommand::suggestRealmProtectionLevels)
                                 .requires(sender -> sender.getExecutor() instanceof Player)
                                 .executes(AdminGameruleCommand::runCommandForRealmProtectionLevel)
                         )
@@ -62,7 +62,7 @@ public class AdminGameruleCommand {
 
         String levelArg = StringArgumentType.getString(context, "level");
 
-        boolean result = JadeSettings.setGamerule("preventCoralFading", levelArg);
+        boolean result = JadeSettings.setGamerule("realmProtectionLevel", levelArg);
         if (result == true) {
             Bukkit.broadcast(TextUtils.composeSimpleOperatorMessage("An administrator has set gamerule ")
                     .append(TextUtils.composeOperatorHighlight("realmProtectionLevel"))

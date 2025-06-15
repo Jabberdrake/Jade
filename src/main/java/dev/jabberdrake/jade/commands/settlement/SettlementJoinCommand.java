@@ -60,8 +60,8 @@ public class SettlementJoinCommand {
         settlement.addMember(player.getUniqueId(), settlement.getDefaultRole());
         RealmManager.clearInviteToSettlement(player);
 
-        player.sendMessage(success("You have joined the settlement of " + inviter.getDisplayNameAsString() + "!"));
-        inviter.broadcast("<highlight>" + player.getName() + " has joined the settlement!");
+        player.sendMessage(success("You have joined the settlement of " + inviter.getDisplayNameAsString() + "<normal>!"));
+        inviter.broadcast("<highlight>" + player.getName() + "</highlight> has joined the settlement!");
         return Command.SINGLE_SUCCESS;
     }
 }

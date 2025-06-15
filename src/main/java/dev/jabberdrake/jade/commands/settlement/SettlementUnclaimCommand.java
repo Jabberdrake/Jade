@@ -21,7 +21,7 @@ public class SettlementUnclaimCommand {
     public static LiteralCommandNode<CommandSourceStack> buildCommand(final String label) {
         return Commands.literal(label)
                 .requires(sender -> sender.getExecutor() instanceof Player)
-                .executes(SettlementClaimCommand::runCommandWithoutArgs)
+                .executes(SettlementUnclaimCommand::runCommandWithoutArgs)
                 .build();
     }
 
@@ -34,9 +34,9 @@ public class SettlementUnclaimCommand {
         if (!validateUserPermissions(player, focus)) { return Command.SINGLE_SUCCESS; }
 
         if (RealmManager.unclaimChunk(focus, currentChunk)) {
-            player.sendMessage(success("Unclaimed this chunk for " + focus.getDisplayNameAsString() + "!"));
+            player.sendMessage(success("Unclaimed this chunk for " + focus.getDisplayNameAsString() + "<normal>!"));
         } else {
-            player.sendMessage(error("This chunk is not claimed by your settlement (<highlight>" + focus.getDisplayNameAsString() + "</highlight>)!"));
+            player.sendMessage(error("This chunk is not claimed by your settlement (<highlight>" + focus.getDisplayNameAsString() + "<normal>)!"));
         }
 
         return Command.SINGLE_SUCCESS;
@@ -44,7 +44,7 @@ public class SettlementUnclaimCommand {
 
     public static boolean validateUserPermissions(Player player, Settlement settlement) {
         if (!settlement.getRoleFromMember(player.getUniqueId()).canUnclaim()) {
-            player.sendMessage(error("You are not allowed to unclaim chunks for <highlight>" + settlement.getDisplayNameAsString() + "</highlight>!"));
+            player.sendMessage(error("You are not allowed to unclaim chunks for <highlight>" + settlement.getDisplayNameAsString() + "<normal>!"));
             return false;
         }
         return true;

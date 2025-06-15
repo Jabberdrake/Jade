@@ -17,6 +17,8 @@ public class CommonNationSuggestions {
         Player player = (Player) context.getSource().getSender();
         Settlement focus = PlayerManager.asJadePlayer(player.getUniqueId()).getFocusSettlement();
 
+        if (focus == null) return builder.buildFuture();
+
         focus.getNation().getMembers().stream().map(Settlement::getName)
                 .filter(entry -> entry.toLowerCase().startsWith(builder.getRemainingLowerCase()))
                 .forEach(builder::suggest);

@@ -4,17 +4,18 @@ import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.LiteralCommandNode;
-import dev.jabberdrake.jade.players.JadePlayer;
 import dev.jabberdrake.jade.players.PlayerManager;
 import dev.jabberdrake.jade.titles.JadeTitle;
 import dev.jabberdrake.jade.titles.TitleManager;
-import dev.jabberdrake.jade.utils.TextUtils;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.minimessage.MiniMessage;
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
+
+import java.util.UUID;
+
+import static dev.jabberdrake.jade.utils.TextUtils.*;
 
 public class TitleEditCommand {
 
@@ -36,86 +37,70 @@ public class TitleEditCommand {
 
     public static int runCommandForName(CommandContext<CommandSourceStack> context) {
         Player player = (Player) context.getSource().getSender();
-        String titleAsString = StringArgumentType.getString(context, "title");
-        JadePlayer jadePlayer = PlayerManager.asJadePlayer(player.getUniqueId());
-        JadeTitle title = jadePlayer.getTitleFromName(titleAsString);
-        String newName = StringArgumentType.getString(context, "name");
+        String titleArgument = StringArgumentType.getString(context, "title");
 
+        JadeTitle title = PlayerManager.asJadePlayer(player.getUniqueId()).getTitleFromName(titleArgument);
+        String nameArgument = StringArgumentType.getString(context, "name");
         if (title == null) {
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("Could not find the specified title!"));
+            player.sendMessage(error("Could not find a title named <highlight>" + titleArgument + "</highlight>!"));
             return Command.SINGLE_SUCCESS;
         } else if (title.isUniversal()) {
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("You cannot edit universal titles!"));
-        } else if (!title.getOwner().equals(player.getUniqueId())) {
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("You do not own this title!"));
+            player.sendMessage(error("You cannot edit <highlight>universal titles</highlight>!"));
             return Command.SINGLE_SUCCESS;
-        } else if (!TitleManager.isUniqueName(newName)) {
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("There is already a title with this reference name!"));
+        } else if (!title.getOwner().equals(player.getUniqueId())) {
+            player.sendMessage(error("You do not own this title!"));
+            return Command.SINGLE_SUCCESS;
+        } else if (!TitleManager.isUniqueName(nameArgument)) {
+            player.sendMessage(error("That name (<highlight>" + nameArgument + "</highlight>) is already in use!"));
             return Command.SINGLE_SUCCESS;
         }
 
-        Component oldTitleComponent = title.getTitleAsComponent()
-                .append(Component.text(" "))
-                .append(Component.text("(", NamedTextColor.GRAY))
-                .append(Component.text(title.getName(), NamedTextColor.GRAY))
-                .append(Component.text(")", NamedTextColor.GRAY));
+        String oldTitle = title.getDisplayName() + "<normal> <gray>(" + title.getName() + ")</gray>";
+        title.setName(nameArgument);
 
-        Component newTitleComponent = title.getTitleAsComponent()
-                .append(Component.text(" "))
-                .append(Component.text("(", NamedTextColor.GRAY))
-                .append(Component.text(newName, NamedTextColor.GRAY))
-                .append(Component.text(")", NamedTextColor.GRAY));
+        for (UUID userID : title.getUserList()) {
+            if (userID.equals(player.getUniqueId())) continue;
 
-        title.setName(newName);
-
-        player.sendMessage(TextUtils.composeSimpleSuccessMessage("Successfully edit the ")
-                .append(oldTitleComponent)
-                .append(TextUtils.composeSuccessText(" title to "))
-                .append(newTitleComponent)
-                .append(TextUtils.composeSuccessText("!"))
-        );
-
+            OfflinePlayer oUser = Bukkit.getOfflinePlayer(userID);
+            if (oUser.isOnline()) {
+                Player user = (Player) oUser;
+                user.sendMessage(info("The title of " + title.getDisplayName() + "<normal> has been edited: <highlight>reference name</highlight> is now <gray><bold>" + title.getName()));
+            }
+        }
+        player.sendMessage(success("Changed the <highlight>reference name</highlight> of the title " + oldTitle + " to <highlight>" + title.getName() + "<normal>!"));
         return Command.SINGLE_SUCCESS;
     }
 
     public static int runCommandForDisplay(CommandContext<CommandSourceStack> context) {
         Player player = (Player) context.getSource().getSender();
-        String titleAsString = StringArgumentType.getString(context, "title");
-        JadePlayer jadePlayer = PlayerManager.asJadePlayer(player.getUniqueId());
-        JadeTitle title = jadePlayer.getTitleFromName(titleAsString);
-        String display = StringArgumentType.getString(context, "display");
+        String titleArgument = StringArgumentType.getString(context, "title");
 
+        JadeTitle title = PlayerManager.asJadePlayer(player.getUniqueId()).getTitleFromName(titleArgument);
+        String display = StringArgumentType.getString(context, "display");
         if (title == null) {
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("Could not find the specified title!"));
+            player.sendMessage(error("Could not find a title named <highlight>" + titleArgument + "</highlight>!"));
+            return Command.SINGLE_SUCCESS;
+        } else if (title.isUniversal()) {
+            player.sendMessage(error("You cannot edit <highlight>universal titles</highlight>!"));
             return Command.SINGLE_SUCCESS;
         } else if (!title.getOwner().equals(player.getUniqueId())) {
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("You do not own this title!"));
+            player.sendMessage(error("You do not own this title!"));
             return Command.SINGLE_SUCCESS;
         }
 
-        Component newDisplay = MiniMessage.miniMessage().deserialize(display);
+        String oldTitle = title.getDisplayName() + "<normal> <gray>(" + title.getName() + ")</gray>";
+        title.setDisplayName(display);
 
-        Component oldTitleComponent = title.getTitleAsComponent()
-                .append(Component.text(" "))
-                .append(Component.text("(", NamedTextColor.GRAY))
-                .append(Component.text(title.getName(), NamedTextColor.GRAY))
-                .append(Component.text(")", NamedTextColor.GRAY));
+        for (UUID userID : title.getUserList()) {
+            if (userID.equals(player.getUniqueId())) continue;
 
-        Component newTitleComponent = newDisplay
-                .append(Component.text(" "))
-                .append(Component.text("(", NamedTextColor.GRAY))
-                .append(Component.text(title.getName(), NamedTextColor.GRAY))
-                .append(Component.text(")", NamedTextColor.GRAY));
-
-        title.setTitle(display);
-
-        player.sendMessage(TextUtils.composeSimpleSuccessMessage("Successfully edit the ")
-                .append(oldTitleComponent)
-                .append(TextUtils.composeSuccessText(" title to "))
-                .append(newTitleComponent)
-                .append(TextUtils.composeSuccessText("!"))
-        );
-
+            OfflinePlayer oUser = Bukkit.getOfflinePlayer(userID);
+            if (oUser.isOnline()) {
+                Player user = (Player) oUser;
+                user.sendMessage(info("The title of " + title.getDisplayName() + "<normal> has been edited: <highlight>display name</highlight> is now " + title.getDisplayName()));
+            }
+        }
+        player.sendMessage(success("Changed the <highlight>display name</highlight> of the title " + oldTitle + " to <highlight>" + title.getDisplayName() + "<normal>!"));
         return Command.SINGLE_SUCCESS;
     }
 }

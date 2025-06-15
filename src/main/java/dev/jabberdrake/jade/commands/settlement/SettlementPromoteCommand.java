@@ -72,9 +72,9 @@ public class SettlementPromoteCommand {
 
         focus.setPlayerRole(targetUUID, toRole);
 
-        player.sendMessage(success("Promoted <highlight>" + target.getName() + "</highlight> to the role of " + toRole.getDisplayAsString() + "!"));
+        player.sendMessage(success("Promoted <highlight>" + target.getName() + "</highlight> to the role of " + toRole.getDisplayAsString() + "<normal>!"));
         if (target.isOnline()) {
-            focus.tell((Player) target, "You have been promoted to " + toRole.getDisplayAsString() + "! Congratulations!");
+            focus.tell((Player) target, "You have been promoted to " + toRole.getDisplayAsString() + "<normal>! Congratulations!");
         }
         return Command.SINGLE_SUCCESS;
     }
@@ -109,7 +109,7 @@ public class SettlementPromoteCommand {
         String roleArgument = StringArgumentType.getString(context, "role");
         SettlementRole toRole = focus.getRoleFromName(roleArgument);
         if (toRole == null) {
-            player.sendMessage(error("Could not find a role named <highlight>" + roleArgument + "</highlight> in " + focus.getDisplayNameAsString() + "!"));
+            player.sendMessage(error("Could not find a role named <highlight>" + roleArgument + "</highlight> in " + focus.getDisplayNameAsString() + "<normal>!"));
             return Command.SINGLE_SUCCESS;
         }
 
@@ -120,16 +120,16 @@ public class SettlementPromoteCommand {
 
         focus.setPlayerRole(target.getUniqueId(), toRole);
 
-        player.sendMessage(success("Promoted <highlight>" + target.getName() + "</highlight> to the role of " + toRole.getDisplayAsString() + "!"));
+        player.sendMessage(success("Promoted <highlight>" + target.getName() + "</highlight> to the role of " + toRole.getDisplayAsString() + "<normal>!"));
         if (target.isOnline()) {
-            focus.tell((Player) target, "You have been promoted to " + toRole.getDisplayAsString() + "! Congratulations!");
+            focus.tell((Player) target, "You have been promoted to " + toRole.getDisplayAsString() + "<normal>! Congratulations!");
         }
         return Command.SINGLE_SUCCESS;
     }
 
     public static boolean validateUserPermissions(Player player, Settlement settlement) {
         if (!settlement.getRoleFromMember(player.getUniqueId()).canPromote()) {
-            player.sendMessage(error("You are not allowed to promote members in <highlight>" + settlement.getDisplayNameAsString() + "</highlight>!"));
+            player.sendMessage(error("You are not allowed to promote members in <highlight>" + settlement.getDisplayNameAsString() + "<normal>!"));
             return false;
         }
         return true;

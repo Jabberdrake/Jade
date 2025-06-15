@@ -74,9 +74,9 @@ public class SettlementDemoteCommand {
 
         focus.setPlayerRole(target.getUniqueId(), toRole);
 
-        player.sendMessage(success("Demoted <highlight>" + target.getName() + "</highlight> to the role of " + toRole.getDisplayAsString() + "!"));
+        player.sendMessage(success("Demoted <highlight>" + target.getName() + "</highlight> to the role of " + toRole.getDisplayAsString() + "<normal>!"));
         if (target.isOnline()) {
-            focus.tell((Player) target, "You have been demoted to " + toRole.getDisplayAsString() + "!");
+            focus.tell((Player) target, "You have been demoted to " + toRole.getDisplayAsString() + "<normal>!");
         }
         return Command.SINGLE_SUCCESS;
     }
@@ -113,7 +113,7 @@ public class SettlementDemoteCommand {
 
         SettlementRole toRole = focus.getRoleFromName(roleArgument);
         if (toRole == null) {
-            player.sendMessage(error("Could not find a role named <highlight>" + roleArgument + "</highlight> in " + focus.getDisplayNameAsString() + "!"));
+            player.sendMessage(error("Could not find a role named <highlight>" + roleArgument + "</highlight> in " + focus.getDisplayNameAsString() + "<normal>!"));
             return Command.SINGLE_SUCCESS;
         }
 
@@ -124,7 +124,7 @@ public class SettlementDemoteCommand {
 
         focus.setPlayerRole(target.getUniqueId(), toRole);
 
-        player.sendMessage(success("Demoted <highlight>" + target.getName() + "</highlight> to the role of " + toRole.getDisplayAsString() + "!"));
+        player.sendMessage(success("Demoted <highlight>" + target.getName() + "</highlight> to the role of " + toRole.getDisplayAsString() + "<normal>!"));
         if (target.isOnline()) {
             focus.tell((Player) target, "You have been demoted to " + toRole.getDisplayAsString() + "!");
         }
@@ -133,7 +133,7 @@ public class SettlementDemoteCommand {
 
     public static boolean validateUserPermissions(Player player, Settlement settlement) {
         if (!settlement.getRoleFromMember(player.getUniqueId()).canDemote()) {
-            player.sendMessage(error("You are not allowed to demote members in <highlight>" + settlement.getDisplayNameAsString() + "</highlight>!"));
+            player.sendMessage(error("You are not allowed to demote members in <highlight>" + settlement.getDisplayNameAsString() + "<normal>!"));
             return false;
         }
         return true;

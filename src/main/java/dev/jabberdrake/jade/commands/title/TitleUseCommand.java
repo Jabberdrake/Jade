@@ -7,10 +7,11 @@ import com.mojang.brigadier.tree.LiteralCommandNode;
 import dev.jabberdrake.jade.players.JadePlayer;
 import dev.jabberdrake.jade.players.PlayerManager;
 import dev.jabberdrake.jade.titles.JadeTitle;
-import dev.jabberdrake.jade.utils.TextUtils;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import org.bukkit.entity.Player;
+
+import static dev.jabberdrake.jade.utils.TextUtils.error;
 
 public class TitleUseCommand {
 
@@ -25,27 +26,23 @@ public class TitleUseCommand {
 
     public static int runCommand(CommandContext<CommandSourceStack> context) {
         Player player = (Player) context.getSource().getSender();
-        String titleAsString = StringArgumentType.getString(context, "title");
+        String titleArgument = StringArgumentType.getString(context, "title");
 
         JadePlayer jadePlayer = PlayerManager.asJadePlayer(player.getUniqueId());
-        JadeTitle title = jadePlayer.getTitleFromName(titleAsString);
+        JadeTitle title = jadePlayer.getTitleFromName(titleArgument);
         if (title == null) {
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("Could not find the specified title!"));
+            player.sendMessage(error("Could not find a title named <highlight>" + titleArgument + "</highlight>!"));
             return Command.SINGLE_SUCCESS;
         }
 
         if (jadePlayer.getTitleInUse().equals(title)) {
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("You are already using that title!"));
+            player.sendMessage(error("You are already using that title!"));
             return Command.SINGLE_SUCCESS;
         }
 
         jadePlayer.setTitleInUse(title);
 
-        player.sendMessage(TextUtils.composeSimpleInfoMessage("Now using the ")
-                .append(title.getTitleAsComponent())
-                .append(TextUtils.composeInfoText(" title!"))
-        );
-
+        player.sendMessage(error("Now using the title of " + title.getDisplayName() + "<normal>!"));
         return Command.SINGLE_SUCCESS;
     }
 }
