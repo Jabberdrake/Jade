@@ -52,7 +52,12 @@ public class JadePlayer {
         DatabaseManager.savePlayer(this);
     }
 
-    public JadeTitle getTitleInUse() { return this.titleInUse; }
+    public JadeTitle getTitleInUse() {
+        if (!this.titleInUse.isAvailableTo(this.uuid)) {
+            this.setTitleInUse(DefaultJadeTitle.PEASANT);
+        }
+        return this.titleInUse;
+    }
 
     public void setTitleInUse(JadeTitle title) {
         this.titleInUse = title;
