@@ -10,14 +10,11 @@ import dev.jabberdrake.jade.players.PlayerManager;
 import dev.jabberdrake.jade.realms.SettlementRole;
 import dev.jabberdrake.jade.realms.RealmManager;
 import dev.jabberdrake.jade.realms.Settlement;
-import dev.jabberdrake.jade.utils.TextUtils;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
-
-import java.util.UUID;
 
 import static dev.jabberdrake.jade.utils.TextUtils.*;
 
@@ -43,7 +40,7 @@ public class SettlementInviteCommand {
             player.sendMessage(error("Could not find a matching role for command sender. Please report this to a developer!"));
             return Command.SINGLE_SUCCESS;
         } else if (!senderRole.canInvite()) {
-            player.sendMessage(error("You are not allowed to invite members to <highlight>" + focus.getDisplayNameAsString() + "<normal>!"));
+            player.sendMessage(error("You are not allowed to invite members to <highlight>" + focus.getDisplayName() + "<normal>!"));
             return Command.SINGLE_SUCCESS;
         }
 
@@ -68,8 +65,8 @@ public class SettlementInviteCommand {
         Player onlineTarget = (Player) target;
         boolean successFlag = RealmManager.registerInviteToSettlement(onlineTarget, focus);
         if (successFlag) {
-            player.sendMessage(success("Invited <highlight>" + target.getName() + "</highlight> to " + focus.getDisplayNameAsString() + "<normal>!"));
-            focus.tell(onlineTarget, "<highlight>" + target.getName() + "</highlight> has invited you to join " + focus.getDisplayNameAsString() + "<normal>!");
+            player.sendMessage(success("Invited <highlight>" + target.getName() + "</highlight> to " + focus.getDisplayName() + "<normal>!"));
+            focus.tell(onlineTarget, "<highlight>" + player.getName() + "</highlight> has invited you to join " + focus.getDisplayName() + "<normal>!");
             onlineTarget.sendMessage(info("To accept a settlement invite, do <highlight>/settlement join"));
         } else {
             player.sendMessage(error("This player (<highlight>" + target.getName() + "</highlight>) already has a pending settlement invite!"));

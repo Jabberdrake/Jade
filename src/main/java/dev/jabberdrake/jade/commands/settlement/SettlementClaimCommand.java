@@ -11,11 +11,10 @@ import dev.jabberdrake.jade.players.PlayerManager;
 import dev.jabberdrake.jade.realms.ChunkAnchor;
 import dev.jabberdrake.jade.realms.RealmManager;
 import dev.jabberdrake.jade.realms.Settlement;
-import dev.jabberdrake.jade.utils.TextUtils;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
-import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Chunk;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 import java.util.HashSet;
@@ -47,10 +46,11 @@ public class SettlementClaimCommand {
         Settlement focus = PlayerManager.asJadePlayer(player.getUniqueId()).getFocusSettlement();
 
         if (!SettlementCommand.validateFocusSettlement(player, focus)) { return Command.SINGLE_SUCCESS; }
+        if (!validateGameworld(player, focus)) { return Command.SINGLE_SUCCESS; }
         if (!validateUserPermissions(player, focus)) { return Command.SINGLE_SUCCESS; }
 
         if (RealmManager.claimChunk(focus, currentChunk)) {
-            player.sendMessage(success("Claimed this chunk for " + focus.getDisplayNameAsString() + "!"));
+            player.sendMessage(success("Claimed this chunk for " + focus.getDisplayName() + "!"));
         } else if (!RealmManager.isUnclaimedChunk(currentChunk)) {
             player.sendMessage(error("This chunk is already claimed by <highlight>" + RealmManager.getChunkOwner(currentChunk).getName() + "<normal>!"));
         } else if (focus.getFood() < JadeSettings.chunkCost) {
@@ -69,10 +69,12 @@ public class SettlementClaimCommand {
         Settlement focus = PlayerManager.asJadePlayer(player.getUniqueId()).getFocusSettlement();
 
         if (!SettlementCommand.validateFocusSettlement(player, focus)) { return Command.SINGLE_SUCCESS; }
+        if (!validateGameworld(player, focus)) { return Command.SINGLE_SUCCESS; }
         if (!validateUserPermissions(player, focus)) { return Command.SINGLE_SUCCESS; }
 
         Chunk currentChunk = player.getLocation().getChunk();
 
+        World cWorld = currentChunk.getWorld();
         int cX = currentChunk.getX();
         int cZ = currentChunk.getZ();
 
@@ -80,15 +82,15 @@ public class SettlementClaimCommand {
         Set<ChunkAnchor> chunksToClaim = new HashSet<>();
         for (int aX = -value; aX <= value; aX++) {
             for (int aZ = -value; aZ <= value; aZ++) {
-                ChunkAnchor aux = new ChunkAnchor(cX + aX, cZ + aZ);
+                ChunkAnchor aux = new ChunkAnchor(cWorld, cX + aX, cZ + aZ);
                 Settlement auxOwner = RealmManager.getChunkOwner(aux);
 
-                if (auxOwner != null || focus.getFood() < JadeSettings.chunkCost) { continue;}
+                if (auxOwner != null || focus.getFood() < JadeSettings.chunkCost) { continue; }
                 chunksToClaim.add(aux);
             }
         }
 
-        player.sendMessage(success("Claimed <highlight>" + chunksToClaim.size() + "</highlight> chunks for " + focus.getDisplayNameAsString() + "<normal>!"));
+        player.sendMessage(success("Claimed <highlight>" + chunksToClaim.size() + "</highlight> chunks for " + focus.getDisplayName() + "<normal>!"));
         return Command.SINGLE_SUCCESS;
     }
 
@@ -97,13 +99,14 @@ public class SettlementClaimCommand {
         Settlement focus = PlayerManager.asJadePlayer(player.getUniqueId()).getFocusSettlement();
 
         if (!SettlementCommand.validateFocusSettlement(player, focus)) { return Command.SINGLE_SUCCESS; }
+        if (!validateGameworld(player, focus)) { return Command.SINGLE_SUCCESS; }
         if (!validateUserPermissions(player, focus)) { return Command.SINGLE_SUCCESS; }
 
         JadePlayer jadePlayer = PlayerManager.asJadePlayer(player.getUniqueId());
         jadePlayer.toggleAutoclaim();
 
         if (jadePlayer.isAutoclaiming()) {
-            player.sendMessage(info("Toggled autoclaim <green><bold>ON</bold></green>! Keep walking to claim chunks for " + focus.getDisplayNameAsString() + "<normal>!"));
+            player.sendMessage(info("Toggled autoclaim <green><bold>ON</bold></green>! Keep walking to claim chunks for " + focus.getDisplayName() + "<normal>!"));
             RealmManager.claimChunk(focus, player.getChunk());
 
         } else {
@@ -118,6 +121,7 @@ public class SettlementClaimCommand {
         Settlement focus = PlayerManager.asJadePlayer(player.getUniqueId()).getFocusSettlement();
 
         if (!SettlementCommand.validateFocusSettlement(player, focus)) { return Command.SINGLE_SUCCESS; }
+        if (!validateGameworld(player, focus)) { return Command.SINGLE_SUCCESS; }
         if (!validateUserPermissions(player, focus)) { return Command.SINGLE_SUCCESS; }
 
         Set<ChunkAnchor> chunksToClaim = RealmManager.prepareRecursiveChunkClaim(focus, anchor);
@@ -137,13 +141,21 @@ public class SettlementClaimCommand {
             chunkCount++;
         }
 
-        player.sendMessage(success("Claimed <highlight>" + chunkCount + "</highlight> chunks for " + focus.getDisplayNameAsString() + "<normal>!"));
+        player.sendMessage(success("Claimed <highlight>" + chunkCount + "</highlight> chunks for " + focus.getDisplayName() + "<normal>!"));
         return Command.SINGLE_SUCCESS;
     }
 
     public static boolean validateUserPermissions(Player player, Settlement settlement) {
         if (!settlement.getRoleFromMember(player.getUniqueId()).canClaim()) {
-            player.sendMessage(error("You are not allowed to claim chunks for <highlight>" + settlement.getDisplayNameAsString() + "<normal>!"));
+            player.sendMessage(error("You are not allowed to claim chunks for <highlight>" + settlement.getName() + "<normal>!"));
+            return false;
+        }
+        return true;
+    }
+
+    public static boolean validateGameworld(Player player, Settlement settlement) {
+        if (!player.getLocation().getWorld().equals(settlement.getWorld())) {
+            player.sendMessage(error("This settlement (<highlight>" + settlement.getDisplayName() + "</highlight>) can only hold territory in the <highlight>" + settlement.getWorld().getName() + "</highlight> world!"));
             return false;
         }
         return true;

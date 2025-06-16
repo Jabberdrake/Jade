@@ -7,13 +7,14 @@ import dev.jabberdrake.jade.realms.ChunkAnchor;
 import dev.jabberdrake.jade.realms.RealmManager;
 import dev.jabberdrake.jade.realms.Settlement;
 import dev.jabberdrake.jade.realms.SettlementRole;
-import net.kyori.adventure.text.format.TextColor;
+import org.bukkit.Bukkit;
 
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.*;
 
 import static dev.jabberdrake.jade.utils.ItemUtils.parseKey;
+import static net.kyori.adventure.text.format.TextColor.fromHexString;
 
 public class SettlementDataObject implements DatabaseObject<Settlement, Integer> {
 
@@ -35,7 +36,7 @@ public class SettlementDataObject implements DatabaseObject<Settlement, Integer>
     @Override
     public Settlement fetch(Integer id) {
         Settlement[] result = {null};
-        String sql = "SELECT name, display_name, description, map_color, icon, food, creation_time, nation_id FROM settlements WHERE id = ?";
+        String sql = "SELECT name, display_name, description, map_color, icon, world, food, creation_time, nation_id, settings FROM settlements WHERE id = ?";
         try {
             database.query(sql, stmt -> {
                 stmt.setInt(1, id);
@@ -46,18 +47,20 @@ public class SettlementDataObject implements DatabaseObject<Settlement, Integer>
                     String description = resultSet.getString("description");
                     String mapColor = resultSet.getString("map_color");
                     String icon = resultSet.getString("icon");
+                    String world = resultSet.getString("world");
                     int food = resultSet.getInt("food");
                     long creationTime = resultSet.getLong("creation_time");
                     int nationId = resultSet.getInt("nation_id");
+                    String settings = resultSet.getString("settings");
 
                     // If the nationID value is set to 0, then the requested settlement
                     // does not belong to any nation. As a result, we'll simply return null.
                     // Otherwise, we'll request the RealmManager to hand over the relevant
                     // nation object.
                     if (nationId == 0) {
-                        result[0] = new Settlement(id, name, displayName, description, TextColor.fromHexString(mapColor), parseKey(icon), food, creationTime, null);
+                        result[0] = new Settlement(id, name, displayName, description, fromHexString(mapColor), parseKey(icon), Bukkit.getWorld(world), food, creationTime, null, settings);
                     } else {
-                        result[0] = new Settlement(id, name, displayName, description, TextColor.fromHexString(mapColor), parseKey(icon), food, creationTime, RealmManager.getNation(nationId));
+                        result[0] = new Settlement(id, name, displayName, description, fromHexString(mapColor), parseKey(icon), Bukkit.getWorld(world), food, creationTime, RealmManager.getNation(nationId), settings);
                     }
                 }
             });
@@ -81,7 +84,7 @@ public class SettlementDataObject implements DatabaseObject<Settlement, Integer>
 
     public Settlement fetchByName(String name) {
         Settlement[] result = {null};
-        String sql = "SELECT id, display_name, description, map_color, icon, food, creation_time, nation_id FROM settlements WHERE name = ?";
+        String sql = "SELECT id, display_name, description, map_color, icon, world, food, creation_time, nation_id, settings FROM settlements WHERE name = ?";
         try {
             database.query(sql, stmt -> {
                 stmt.setString(1, name);
@@ -92,18 +95,20 @@ public class SettlementDataObject implements DatabaseObject<Settlement, Integer>
                     String description = resultSet.getString("description");
                     String mapColor = resultSet.getString("map_color");
                     String icon = resultSet.getString("icon");
+                    String world = resultSet.getString("world");
                     int food = resultSet.getInt("food");
                     long creationTime = resultSet.getLong("creation_time");
                     int nationId = resultSet.getInt("nation_id");
+                    String settings = resultSet.getString("settings");
 
                     // If the nationID value is set to 0, then the requested settlement
                     // does not belong to any nation. As a result, we'll simply return null.
                     // Otherwise, we'll request the RealmManager to hand over the relevant
                     // nation object.
                     if (nationId == 0) {
-                        result[0] = new Settlement(id, name, displayName, description, TextColor.fromHexString(mapColor), parseKey(icon), food, creationTime, null);
+                        result[0] = new Settlement(id, name, displayName, description, fromHexString(mapColor), parseKey(icon), Bukkit.getWorld(world), food, creationTime, null, settings);
                     } else {
-                        result[0] = new Settlement(id, name, displayName, description, TextColor.fromHexString(mapColor), parseKey(icon), food, creationTime, RealmManager.getNation(nationId));
+                        result[0] = new Settlement(id, name, displayName, description, fromHexString(mapColor), parseKey(icon), Bukkit.getWorld(world), food, creationTime, RealmManager.getNation(nationId), settings);
                     }
                 }
             });
@@ -148,7 +153,7 @@ public class SettlementDataObject implements DatabaseObject<Settlement, Integer>
                     boolean canEdit = resultSet.getBoolean("can_edit");
                     boolean canManage = resultSet.getBoolean("can_manage");
 
-                    SettlementRole role = new SettlementRole(id, name, TextColor.fromHexString(color), settlement, authority, SettlementRole.parseTypeFromString(type), parseKey(icon), canInvite, canKick, canClaim, canUnclaim, canPromote, canDemote, canEdit, canManage);
+                    SettlementRole role = new SettlementRole(id, name, fromHexString(color), settlement, authority, SettlementRole.parseTypeFromString(type), parseKey(icon), canInvite, canKick, canClaim, canUnclaim, canPromote, canDemote, canEdit, canManage);
                     roles.add(role);
                 }
             });
@@ -183,15 +188,16 @@ public class SettlementDataObject implements DatabaseObject<Settlement, Integer>
 
     public Set<ChunkAnchor> fetchTerritory(Settlement settlement) {
         Set<ChunkAnchor> territory = new HashSet<>();
-        String sql = "SELECT chunk_x, chunk_z FROM settlement_chunks WHERE settlement_id = ?;";
+        String sql = "SELECT chunk_world, chunk_x, chunk_z FROM settlement_chunks WHERE settlement_id = ?;";
         try {
             database.query(sql, stmt -> {
                 stmt.setInt(1, settlement.getId());
             }, resultSet -> {
                 while (resultSet.next()) {
+                    String chunkWorld = resultSet.getString("chunk_world");
                     int chunkX = resultSet.getInt("chunk_x");
                     int chunkZ = resultSet.getInt("chunk_z");
-                    territory.add(new ChunkAnchor(chunkX, chunkZ));
+                    territory.add(new ChunkAnchor(chunkWorld, chunkX, chunkZ));
                 }
             });
         } catch (SQLException e) {
@@ -205,7 +211,7 @@ public class SettlementDataObject implements DatabaseObject<Settlement, Integer>
     @Override
     public List<Settlement> fetchAll() {
         List<Settlement> settlements = new ArrayList<>();
-        String sql = "SELECT id, name, display_name, description, map_color, icon, food, creation_time, nation_id FROM settlements;";
+        String sql = "SELECT id, name, display_name, description, map_color, icon, world, food, creation_time, nation_id, settings FROM settlements;";
         try {
             database.query(sql,resultSet -> {
                 while (resultSet.next()) {
@@ -215,9 +221,11 @@ public class SettlementDataObject implements DatabaseObject<Settlement, Integer>
                     String description = resultSet.getString("description");
                     String mapColor = resultSet.getString("map_color");
                     String icon = resultSet.getString("icon");
+                    String world = resultSet.getString("world");
                     int food = resultSet.getInt("food");
                     long creationTime = resultSet.getLong("creation_time");
                     int nationId = resultSet.getInt("nation_id"); // If this settlement is not part of any nation (nation_id is set to NULL), this int is set to 0 due to how java.sql works
+                    String settings = resultSet.getString("settings");
 
                     // If the nationID value is set to 0, then the requested settlement
                     // does not belong to any nation. As a result, we'll simply return null.
@@ -225,9 +233,9 @@ public class SettlementDataObject implements DatabaseObject<Settlement, Integer>
                     // nation object.
                     Settlement stm;
                     if (nationId == 0) {
-                        stm = new Settlement(id, name, displayName, description, TextColor.fromHexString(mapColor), parseKey(icon), food, creationTime, null);
+                        stm = new Settlement(id, name, displayName, description, fromHexString(mapColor), parseKey(icon), Bukkit.getWorld(world), food, creationTime, null, settings);
                     } else {
-                        stm = new Settlement(id, name, displayName, description, TextColor.fromHexString(mapColor), parseKey(icon), food, creationTime, RealmManager.getNation(nationId));
+                        stm = new Settlement(id, name, displayName, description, fromHexString(mapColor), parseKey(icon), Bukkit.getWorld(world), food, creationTime, RealmManager.getNation(nationId), settings);
                     }
 
                     stm.setRoles(this.fetchRoles(stm));
@@ -247,21 +255,21 @@ public class SettlementDataObject implements DatabaseObject<Settlement, Integer>
 
     @Override
     public void save(Settlement settlement) {
-        String sql = "UPDATE settlements SET name = ?, display_name = ?, description = ?, map_color = ?, icon = ?, food = ?, creation_time = ?, nation_id = ? WHERE id = ?;";
+        String sql = "UPDATE settlements SET name = ?, display_name = ?, description = ?, map_color = ?, icon = ?, food = ?, nation_id = ?, settings = ? WHERE id = ?;";
         try {
             database.execute(sql, stmt -> {
                 stmt.setString(1, settlement.getName());
-                stmt.setString(2, settlement.getDisplayNameAsString());
-                stmt.setString(3, settlement.getDescriptionAsString());
+                stmt.setString(2, settlement.getDisplayName());
+                stmt.setString(3, settlement.getDescription());
                 stmt.setString(4, settlement.getMapColor().asHexString());
                 stmt.setString(5, settlement.getIconAsString());
                 stmt.setInt(6, settlement.getFood());
-                stmt.setLong(7, settlement.getCreationTimeAsLong());
                 if (settlement.getNation() == null) {
-                    stmt.setNull(8, Types.INTEGER);
+                    stmt.setNull(7, Types.INTEGER);
                 } else {
-                    stmt.setInt(8, settlement.getNation().getId());
+                    stmt.setInt(7, settlement.getNation().getId());
                 }
+                stmt.setString(8, settlement.serializeSettings());
                 stmt.setInt(9, settlement.getId());
             });
         } catch (SQLException e) {
@@ -281,17 +289,19 @@ public class SettlementDataObject implements DatabaseObject<Settlement, Integer>
     @Override
     public Integer create(Settlement settlement) {
         final Integer[] id = {null};
-        String sql = "INSERT INTO settlements (name, display_name, description, map_color, icon, food, creation_time, nation_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
+        String sql = "INSERT INTO settlements (name, display_name, description, map_color, icon, world, food, creation_time, nation_id, settings) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
         try {
             id[0] = Math.toIntExact(database.create(sql, stmt -> {
                 stmt.setString(1, settlement.getName());
-                stmt.setString(2, settlement.getDisplayNameAsString());
-                stmt.setString(3, settlement.getDescriptionAsString());
+                stmt.setString(2, settlement.getDisplayName());
+                stmt.setString(3, settlement.getDescription());
                 stmt.setString(4, settlement.getMapColor().asHexString());
                 stmt.setString(5, settlement.getIconAsString());
-                stmt.setInt(6, settlement.getFood());
-                stmt.setLong(7, settlement.getCreationTimeAsLong());
-                stmt.setNull(8, Types.INTEGER);     // This code is run whenever the settlement is created, so it's safe to assume that it doesn't belong to a nation yet.
+                stmt.setString(6, settlement.getWorld().getName());
+                stmt.setInt(7, settlement.getFood());
+                stmt.setLong(8, settlement.getCreationTimeAsLong());
+                stmt.setNull(9, Types.INTEGER);     // This code is run whenever the settlement is created, so it's safe to assume that it doesn't belong to a nation yet.
+                stmt.setString(10, settlement.serializeSettings());
             }));
         } catch (SQLException e) {
             plugin.getLogger().warning("[SettlementDataObject::create] Caught SQLException while creating settlement object for " + settlement.getName() + ": ");
@@ -442,12 +452,13 @@ public class SettlementDataObject implements DatabaseObject<Settlement, Integer>
     }
 
     public void addChunkToSettlement(ChunkAnchor anchor, Settlement settlement) {
-        String sql = "INSERT INTO settlement_chunks (settlement_id, chunk_x, chunk_z) VALUES (?, ?, ?);";
+        String sql = "INSERT INTO settlement_chunks (settlement_id, chunk_world, chunk_x, chunk_z) VALUES (?, ?, ?, ?);";
         try {
             database.execute(sql, stmt -> {
                 stmt.setInt(1, settlement.getId());
-                stmt.setInt(2, anchor.getX());
-                stmt.setInt(3, anchor.getZ());
+                stmt.setString(2, anchor.getWorld().getName());
+                stmt.setInt(3, anchor.getX());
+                stmt.setInt(4, anchor.getZ());
             });
         } catch (SQLException e) {
             plugin.getLogger().warning("[SettlementDataObject::addChunkToSettlement] Caught SQLException while adding " + anchor.toString() + " to settlement " + settlement.getName() + ": ");
@@ -456,11 +467,12 @@ public class SettlementDataObject implements DatabaseObject<Settlement, Integer>
     }
 
     public void removeChunkFromSettlement(ChunkAnchor anchor, Settlement settlement) {
-        String sql = "DELETE FROM settlement_chunks WHERE chunk_x = ? AND chunk_z = ?;";
+        String sql = "DELETE FROM settlement_chunks WHERE chunk_world = ? AND chunk_x = ? AND chunk_z = ?;";
         try {
             database.execute(sql, stmt -> {
-                stmt.setInt(1, anchor.getX());
-                stmt.setInt(2, anchor.getZ());
+                stmt.setString(1, anchor.getWorld().getName());
+                stmt.setInt(2, anchor.getX());
+                stmt.setInt(3, anchor.getZ());
             });
         } catch (SQLException e) {
             plugin.getLogger().warning("[SettlementDataObject::removeChunkFromSettlement] Caught SQLException while removing " + anchor.toString() + " from settlement " + settlement.getName() + ": ");
@@ -471,15 +483,16 @@ public class SettlementDataObject implements DatabaseObject<Settlement, Integer>
     public Map<ChunkAnchor, Settlement> fetchTerritoryMap(List<Settlement> settlements) {
         Map<ChunkAnchor, Settlement> map = new HashMap<>();
         for (Settlement settlement : settlements) {
-            String sql = "SELECT chunk_x, chunk_z FROM settlement_chunks WHERE settlement_id = ?;";
+            String sql = "SELECT chunk_world, chunk_x, chunk_z FROM settlement_chunks WHERE settlement_id = ?;";
             try {
                 database.query(sql, stmt -> {
                     stmt.setInt(1, settlement.getId());
                 }, resultSet -> {
                     while (resultSet.next()) {
+                        String chunkWorld = resultSet.getString("chunk_world");
                         int chunkX = resultSet.getInt("chunk_x");
                         int chunkZ = resultSet.getInt("chunk_z");
-                        map.put(new ChunkAnchor(chunkX, chunkZ), settlement);
+                        map.put(new ChunkAnchor(chunkWorld, chunkX, chunkZ), settlement);
                     }
                 });
             } catch (SQLException e) {
@@ -500,9 +513,11 @@ public class SettlementDataObject implements DatabaseObject<Settlement, Integer>
                   description TEXT NOT NULL,
                   map_color TEXT(7) DEFAULT '#FFAA00' NOT NULL,
                   icon TEXT DEFAULT 'minecraft:oak_planks' NOT NULL,
+                  world STRING NOT NULL,
                   food INTEGER DEFAULT 20 NOT NULL,
                   creation_time INTEGER DEFAULT CURRENT_TIMESTAMP NOT NULL,
                   nation_id INTEGER DEFAULT NULL,
+                  settings TEXT NOT NULL,
                     CONSTRAINT stms_nation_id_fk
                       FOREIGN KEY (nation_id) REFERENCES nations (id)
                       ON DELETE SET NULL
@@ -550,10 +565,11 @@ public class SettlementDataObject implements DatabaseObject<Settlement, Integer>
                 """
                 CREATE TABLE IF NOT EXISTS settlement_chunks (
                   settlement_id INTEGER NOT NULL,
+                  chunk_world STRING NOT NULL,
                   chunk_x INTEGER NOT NULL,
                   chunk_z INTEGER NOT NULL,
                     CONSTRAINT settlement_chunks_pk
-                      PRIMARY KEY (chunk_x, chunk_z),
+                      PRIMARY KEY (chunk_world, chunk_x, chunk_z),
                     CONSTRAINT stmchunks_settlement_id_fk
                       FOREIGN KEY (settlement_id) REFERENCES settlements (id)
                       ON DELETE CASCADE

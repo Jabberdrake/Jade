@@ -2,7 +2,9 @@ package dev.jabberdrake.jade.realms;
 
 import dev.jabberdrake.jade.JadeSettings;
 import dev.jabberdrake.jade.database.DatabaseManager;
+import dev.jabberdrake.jade.realms.settings.BlockProtectionSetting;
 import dev.jabberdrake.jade.utils.ItemUtils;
+import dev.jabberdrake.jade.utils.AbstractSetting;
 import dev.jabberdrake.jade.utils.TextUtils;
 import dev.jabberdrake.jade.utils.message.SettlementStrategy;
 import io.papermc.paper.datacomponent.DataComponentTypes;
@@ -11,12 +13,11 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -27,44 +28,47 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.*;
 
+import static dev.jabberdrake.jade.utils.JadeTextColor.*;
+
 public class Settlement {
 
-    private static final String DEFAULT_NAME_DECORATION = "<gold><bold>";
+    private static final String DEFAULT_NAME_DECORATION = "<gold>";
     private static final String DEFAULT_DESC = "<green>Settlement of <gold>";
-    private static final TextColor DEFAULT_MAP_COLOR = TextUtils.ZORBA;
+    private static final TextColor DEFAULT_MAP_COLOR = ZORBA;
     private static final int DEFAULT_MAX_FOOD = 1000;
 
-    private int id;
+    private final int id;
     private String name;
     private String displayName;
     private String description;
     private TextColor mapColor;
     private NamespacedKey icon;
+    private final World world;
     private int food;
     private int foodCapacity;
-    private long creationTime;
+    private final long creationTime;
     private Nation nation;
-    private List<SettlementRole> roles;
-    private Map<UUID, SettlementRole> population;
-    private Set<ChunkAnchor> territory;
+    private List<SettlementRole> roles = new ArrayList<>();
+    private Map<UUID, SettlementRole> population = new HashMap<>();
+    private Set<ChunkAnchor> territory = new HashSet<>();
+    private final Map<Class<? extends AbstractSetting<?>>, AbstractSetting<?>> settings = new HashMap<>();
 
-    private SettlementStrategy broadcastFormatter = new SettlementStrategy(this);
+    private final SettlementStrategy broadcastFormatter = new SettlementStrategy(this);
 
     // Used by DatabaseManager when composing runtime object from persistent data
-    public Settlement(int id, String name, String displayName, String description, TextColor mapColor, NamespacedKey icon, int food, long creationTime, Nation nation) {
+    public Settlement(int id, String name, String displayName, String description, TextColor mapColor, NamespacedKey icon, World world, int food, long creationTime, Nation nation, String settings) {
         this.id = id;
         this.name = name;
         this.displayName = displayName;
         this.description = description;
         this.mapColor = mapColor;
         this.icon = icon;
+        this.world = world;
         this.food = food;
         this.creationTime = creationTime;
         this.nation = nation;
-        this.roles = new ArrayList<>();
-        this.population = new HashMap<>();
-        this.territory = new HashSet<>();
 
+        deserializeSettings(settings);
         calculateFoodCapacity();
     }
 
@@ -75,36 +79,23 @@ public class Settlement {
         this.description = DEFAULT_DESC + leader.getName();
         this.mapColor = DEFAULT_MAP_COLOR;
         this.icon = NamespacedKey.minecraft("oak_planks");
+        this.world = startingChunk.getWorld();
         this.food = 20;
         this.calculateFoodCapacity();
         this.creationTime = System.currentTimeMillis() / 1000L;
         this.nation = null;
+        this.defaultSettings();
 
         this.id = DatabaseManager.createSettlement(this);
 
-        this.roles = new ArrayList<>();
         this.addRole(DefaultSettlementRole.leader(this));
         this.addRole(DefaultSettlementRole.officer(this));
         this.addRole(DefaultSettlementRole.member(this));
 
-        this.population = new HashMap<>();
         this.addMember(leader.getUniqueId(), this.getLeaderRole());
 
-        this.territory = new LinkedHashSet<>();
         RealmManager.claimChunk(this, startingChunk); //This will call Settlement::addChunk
     }
-
-    /*
-    public Settlement(int id, String name, String displayName, String description, TextColor mapColor) {
-        this.id = id;
-        this.name = name;
-        this.displayName = displayName;
-        this.description = description;
-        this.mapColor = mapColor;
-        this.roles = new ArrayList<>();
-        this.population = new HashMap<>();
-        this.territory = new HashSet<>();
-    }*/
 
     public int getId() {
         return this.id;
@@ -119,12 +110,12 @@ public class Settlement {
         DatabaseManager.saveSettlement(this);
     }
 
-    public String getDisplayNameAsString() {
+    public String getDisplayName() {
         return this.displayName;
     }
 
-    public Component getDisplayName() {
-        return MiniMessage.miniMessage().deserialize(this.getDisplayNameAsString());
+    public Component getDisplayNameAsComponent() {
+        return TextUtils.deserialize(this.getDisplayName());
     }
 
     public void setDisplayName(String displayName) {
@@ -132,12 +123,23 @@ public class Settlement {
         DatabaseManager.saveSettlement(this);
     }
 
-    public String getDescriptionAsString() {
+    public Component asTextComponent() {
+        return Component.text()
+                .append(this.getDisplayNameAsComponent())
+                .append(Component.text(" (" + this.getName() + ")", TextUtils.LIGHT_ZORBA))
+                .build();
+    }
+
+    public String asDisplayString() {
+        return this.getDisplayName() + "<normal> <light_zorba>(" + this.getName() + ")</light_zorba>";
+    }
+
+    public String getDescription() {
         return this.description;
     }
 
-    public Component getDescription() {
-        return MiniMessage.miniMessage().deserialize(this.getDescriptionAsString());
+    public Component getDescriptionAsComponent() {
+        return TextUtils.deserialize(this.getDescription());
     }
 
     public void setDescription(String description) {
@@ -168,6 +170,8 @@ public class Settlement {
         this.icon = icon;
         DatabaseManager.saveSettlement(this);
     }
+
+    public World getWorld() { return this.world; }
 
     public int getFood() {
         return this.food;
@@ -414,25 +418,6 @@ public class Settlement {
         return true;
     }
 
-    @Override
-    public boolean equals(Object object) {
-        if (object instanceof Settlement) {
-            Settlement other = (Settlement) object;
-            return this.getId() == other.getId();
-        } else return false;
-    }
-
-    public Component asTextComponent() {
-        return Component.text()
-                .append(this.getDisplayName())
-                .append(Component.text(" (" + this.getName() + ")", TextUtils.LIGHT_ZORBA))
-                .build();
-    }
-
-    public String asDisplayString() {
-        return this.getDisplayNameAsString() + "<light_zorba>(" + this.getName() + ")</light_zorba>";
-    }
-
     public ItemStack asDisplayItem() {
         return this.asDisplayItem(null);
     }
@@ -446,7 +431,7 @@ public class Settlement {
                 .decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE)
                 .build());
         ItemLore.Builder loreBuilder = ItemLore.lore()
-                .addLine(Component.text().append(this.getDescription())
+                .addLine(Component.text().append(this.getDescriptionAsComponent())
                         .decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE).build())
                 .addLine(Component.text(""))
                 .addLine(Component.text().append(this.presentFoodAsComponent())
@@ -464,7 +449,7 @@ public class Settlement {
             loreBuilder.addLine(Component.text("— ", TextUtils.LIGHT_BRASS)
                     .append(member.getValue().getDisplayAsComponent())
                     .append(Component.space())
-                    .append(Component.text(Bukkit.getPlayer(member.getKey()).getName(), TextUtils.LIGHT_ZORBA))
+                    .append(Component.text(Bukkit.getOfflinePlayer(member.getKey()).getName(), TextUtils.LIGHT_ZORBA))
                     .decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE)
             );
         }
@@ -508,9 +493,50 @@ public class Settlement {
                     .build();
         } else {
             return Component.text().content("Nation: ").color(TextUtils.LIGHT_BRASS)
-                    .append(this.getNation().getDisplayName())
+                    .append(this.getNation().getDisplayNameAsComponent())
                     .build();
         }
+    }
+
+    public void defaultSettings() {
+        this.settings.put(BlockProtectionSetting.class, new BlockProtectionSetting());
+        // more settings...
+    }
+
+    public void deserializeSettings(String serializedSettings) {
+        String[] chunks = serializedSettings.split(";");
+        // I'm blindingly trusting that the serialization was done well, which is bound to end in shit but oh well
+
+        this.settings.put(BlockProtectionSetting.class, BlockProtectionSetting.deserialize(chunks[0]));
+        // more settings...
+    }
+
+    public String serializeSettings() {
+        String serialized = "";
+        serialized += this.getSetting(BlockProtectionSetting.class).toString();
+        serialized += ";";
+        // more settings...
+
+        return serialized;
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T extends AbstractSetting<?>> T getSetting(Class<T> clazz) {
+        return this.settings.get(clazz) == null ? null : (T) this.settings.get(clazz);
+    }
+
+    public Map<Class<? extends AbstractSetting<?>>, AbstractSetting<?>> getSettings() {
+        return this.settings;
+    }
+
+    public <T extends AbstractSetting<?>> boolean cycleSettingValue(Class<T> clazz) {
+        T setting = this.getSetting(clazz);
+        Object value = setting.cycleValue();
+        if (setting.setValue(value)) {
+            this.broadcast("Changed value of setting <highlight>" + setting.displayName() + "</highlight> to <light_amethyst>" + value.toString());
+            DatabaseManager.saveSettlement(this);
+            return true;
+        } else return false;
     }
 
     public void broadcast(String message, TagResolver... resolvers) {
@@ -527,6 +553,14 @@ public class Settlement {
         //  - player matches a valid known player;
         //  - player is online;
         player.sendMessage(this.broadcastFormatter.process(message, resolvers));
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (object instanceof Settlement) {
+            Settlement other = (Settlement) object;
+            return this.getId() == other.getId();
+        } else return false;
     }
 
     @Override

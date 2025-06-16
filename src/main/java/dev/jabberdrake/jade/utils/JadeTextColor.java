@@ -24,7 +24,7 @@ public class JadeTextColor implements TextColor {
     public static final JadeTextColor BLUE = new JadeTextColor("blue", NamedTextColor.DARK_BLUE.value(), "minecraft:blue_dye");
     public static final JadeTextColor GREEN = new JadeTextColor("green", NamedTextColor.DARK_GREEN.value(), "minecraft:green_dye");
     public static final JadeTextColor CYAN = new JadeTextColor("cyan", NamedTextColor.DARK_AQUA.value(), "minecraft:cyan_dye");
-    public static final JadeTextColor CARMINE = new JadeTextColor("blood_red", NamedTextColor.DARK_RED.value(), "minecraft:redstone");
+    public static final JadeTextColor CARMINE = new JadeTextColor("carmine", NamedTextColor.DARK_RED.value(), "minecraft:redstone");
     public static final JadeTextColor PURPLE = new JadeTextColor("purple", NamedTextColor.DARK_PURPLE.value(), "minecraft:purple_dye");
     public static final JadeTextColor GOLD = new JadeTextColor("gold", NamedTextColor.GOLD.value(), "minecraft:raw_gold");
     public static final JadeTextColor LIGHT_GRAY = new JadeTextColor("light_gray", NamedTextColor.GRAY.value(), "minecraft:light_gray_dye");

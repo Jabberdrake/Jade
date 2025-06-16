@@ -8,14 +8,11 @@ import dev.jabberdrake.jade.commands.SettlementCommand;
 import dev.jabberdrake.jade.players.PlayerManager;
 import dev.jabberdrake.jade.realms.SettlementRole;
 import dev.jabberdrake.jade.realms.Settlement;
-import dev.jabberdrake.jade.utils.TextUtils;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
-
-import java.util.UUID;
 
 import static dev.jabberdrake.jade.utils.TextUtils.error;
 import static dev.jabberdrake.jade.utils.TextUtils.info;
@@ -42,7 +39,7 @@ public class SettlementKickCommand {
             player.sendMessage(error("Could not find a matching role for command sender. Please report this to a developer!"));
             return Command.SINGLE_SUCCESS;
         } else if (!senderRole.canKick()) {
-            player.sendMessage(error("You are not allowed to kick members from <highlight>" + focus.getDisplayNameAsString() + "<normal>!"));
+            player.sendMessage(error("You are not allowed to kick members from <highlight>" + focus.getDisplayName() + "<normal>!"));
             return Command.SINGLE_SUCCESS;
         }
 
@@ -67,7 +64,7 @@ public class SettlementKickCommand {
 
         focus.broadcast("<highlight>" + target.getName() + "</highlight> has been kicked from the settlement!");
         if (target.isOnline()) {
-            ((Player) target).sendMessage(info("You have been kicked from " + focus.getDisplayNameAsString() + "<normal>!"));
+            ((Player) target).sendMessage(info("You have been kicked from " + focus.getDisplayName() + "<normal>!"));
         }
         return Command.SINGLE_SUCCESS;
     }

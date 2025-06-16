@@ -4,7 +4,6 @@ import dev.jabberdrake.jade.database.DatabaseManager;
 import dev.jabberdrake.jade.utils.ItemUtils;
 import dev.jabberdrake.jade.utils.TextUtils;
 import dev.jabberdrake.jade.utils.message.NationStrategy;
-import dev.jabberdrake.jade.utils.message.SettlementStrategy;
 import io.papermc.paper.datacomponent.DataComponentTypes;
 import io.papermc.paper.datacomponent.item.ItemLore;
 import net.kyori.adventure.text.Component;
@@ -16,7 +15,6 @@ import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -97,21 +95,21 @@ public class Nation {
         DatabaseManager.saveNation(this);
     }
 
-    public String getDisplayNameAsString() { return this.displayName; }
+    public String getDisplayName() { return this.displayName; }
 
-    public Component getDisplayName() { return MiniMessage.miniMessage().deserialize(this.displayName); }
+    public Component getDisplayNameAsComponent() { return TextUtils.deserialize(this.displayName); }
 
     public void setDisplayName(String displayName) {
         this.displayName = displayName;
         DatabaseManager.saveNation(this);
     }
 
-    public String getDescriptionAsString() {
+    public String getDescription() {
         return this.description;
     }
 
-    public Component getDescription() {
-        return MiniMessage.miniMessage().deserialize(this.getDescriptionAsString());
+    public Component getDescriptionAsComponent() {
+        return TextUtils.deserialize(this.getDescription());
     }
 
     public void setDescription(String description) {
@@ -190,7 +188,7 @@ public class Nation {
 
     public Component asTextComponent() {
         return Component.text()
-                .append(this.getDisplayName())
+                .append(this.getDisplayNameAsComponent())
                 .append(Component.text(" (" + this.getName() + ")", TextUtils.LIGHT_ZORBA))
                 .build();
     }
@@ -208,11 +206,11 @@ public class Nation {
                 .decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE)
                 .build());
         ItemLore.Builder loreBuilder = ItemLore.lore()
-                .addLine(Component.text().append(this.getDescription())
+                .addLine(Component.text().append(this.getDescriptionAsComponent())
                         .decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE).build())
                 .addLine(Component.text(""))
                 .addLine(Component.text().content("Capital: ").color(TextUtils.LIGHT_BRASS)
-                        .append(this.getCapital().getDisplayName())
+                        .append(this.getCapital().getDisplayNameAsComponent())
                         .decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE).build())
                 .addLine(Component.text("Members: ", TextUtils.LIGHT_BRASS)
                         .decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE));

@@ -26,7 +26,7 @@ public class SettlementStrategy implements JadeMessageStrategy {
     public Component prefix() {
         return Component.text()
                 .content("(").color(highlightColor())
-                .append(settlement.getDisplayName())
+                .append(settlement.getDisplayNameAsComponent())
                 .append(Component.text(") [⚐] > "))
                 .build();
     }

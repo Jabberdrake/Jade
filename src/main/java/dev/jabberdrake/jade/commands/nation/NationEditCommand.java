@@ -92,7 +92,7 @@ public class NationEditCommand {
 
         String displayArgument = StringArgumentType.getString(context, "display_name");
         focus.getNation().setDisplayName(displayArgument);
-        focus.getNation().broadcast("Changed <highlight>display name</highlight> to " + focus.getNation().getDisplayNameAsString() + "!");
+        focus.getNation().broadcast("Changed <highlight>display name</highlight> to " + focus.getNation().getDisplayName() + "<normal>!");
         return Command.SINGLE_SUCCESS;
     }
 
@@ -109,7 +109,7 @@ public class NationEditCommand {
             descArgument = "<white>" + descArgument;
         }
         focus.getNation().setDescription(descArgument);
-        focus.getNation().broadcast("Changed <highlight>description</highlight> to: " + focus.getNation().getDescriptionAsString());
+        focus.getNation().broadcast("Changed <highlight>description</highlight> to: " + focus.getNation().getDescription());
         return Command.SINGLE_SUCCESS;
     }
 

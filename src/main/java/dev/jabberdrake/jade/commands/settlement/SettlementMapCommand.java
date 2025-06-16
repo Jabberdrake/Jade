@@ -17,11 +17,9 @@ import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-
-import java.util.List;
 
 import static dev.jabberdrake.jade.utils.TextUtils.info;
 
@@ -38,6 +36,7 @@ public class SettlementMapCommand {
 
     public static int runCommand(CommandContext<CommandSourceStack> context) {
         Player player = (Player) context.getSource().getSender();
+        World currentWorld = player.getWorld();
         int currentX = player.getChunk().getX();
         int currentZ = player.getChunk().getZ();
 
@@ -46,7 +45,7 @@ public class SettlementMapCommand {
         for (int cZ = -mapRange; cZ <= mapRange; cZ++) {
             mapAsText = mapAsText.append(Component.text(INDENT));
             for (int cX = -mapRange; cX <= mapRange; cX++) {
-                Settlement owner = RealmManager.getChunkOwner(new ChunkAnchor(currentX + cX, currentZ + cZ));
+                Settlement owner = RealmManager.getChunkOwner(new ChunkAnchor(currentWorld, currentX + cX, currentZ + cZ));
                 if (owner == null) {
                     mapAsText = mapAsText.append(Component.text("■", TextUtils.LAUREL)
                             .hoverEvent(HoverEvent.showText(Component.text("Wilderness", TextUtils.LAUREL))));
@@ -54,7 +53,7 @@ public class SettlementMapCommand {
                     ItemStack hoverItem = ItemStack.of(Material.STONE);
                     hoverItem.setData(DataComponentTypes.CUSTOM_NAME, owner.asTextComponent().decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE));
                     hoverItem.setData(DataComponentTypes.LORE, ItemLore.lore()
-                                    .addLine(owner.getDescription().decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE))
+                                    .addLine(owner.getDescriptionAsComponent().decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE))
                                     .addLine(Component.text(""))
                                     .addLine(Component.text()
                                             .content("Left click").color(NamedTextColor.GREEN).decorate(TextDecoration.BOLD)

@@ -16,9 +16,7 @@ import dev.jabberdrake.jade.players.PlayerManager;
 import dev.jabberdrake.jade.titles.TitleManager;
 import dev.jabberdrake.jade.realms.RealmManager;
 import dev.jabberdrake.jade.realms.Settlement;
-import dev.jabberdrake.jade.utils.TextUtils;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
-import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -111,60 +109,62 @@ public final class Jade extends JavaPlugin {
             blueMapWorlds.put(worldName, world);
         }
 
-        BlueMapWorld gameworld = blueMapWorlds.get(JadeSettings.gameworld);
-        Collection<BlueMapMap> blueMapMaps = gameworld.getMaps();
+        for (String gameworldName : JadeSettings.gameworlds) {
+            BlueMapWorld gameworld = blueMapWorlds.get(gameworldName);
+            Collection<BlueMapMap> blueMapMaps = gameworld.getMaps();
 
-        MarkerSet settlementSet = MarkerSet.builder().label("Settlements").build();
+            MarkerSet settlementSet = MarkerSet.builder().label("Settlements").build();
 
-        for (Settlement settlement : RealmManager.getAllSettlements()) {
+            for (Settlement settlement : RealmManager.getAllSettlements()) {
 
-            TextColor referenceColor = settlement.getMapColor();
-            Color outlineColor = new Color(referenceColor.red(), referenceColor.green(), referenceColor.blue());
-            Color mainColor = new Color((int) (outlineColor.getRed() * 0.9), (int) (outlineColor.getGreen() * 0.9), (int) (outlineColor.getBlue() * 0.9), 0.2f);
+                TextColor referenceColor = settlement.getMapColor();
+                Color outlineColor = new Color(referenceColor.red(), referenceColor.green(), referenceColor.blue());
+                Color mainColor = new Color((int) (outlineColor.getRed() * 0.9), (int) (outlineColor.getGreen() * 0.9), (int) (outlineColor.getBlue() * 0.9), 0.2f);
 
-            Vector2i[] coordinates = settlement.getTerritory().stream()
-                    .map(anchor -> new Vector2i(anchor.getX(), anchor.getZ()))
-                    .toArray(Vector2i[]::new);
+                Vector2i[] coordinates = settlement.getTerritory().stream()
+                        .map(anchor -> new Vector2i(anchor.getX(), anchor.getZ()))
+                        .toArray(Vector2i[]::new);
 
-            Collection<Cheese> platter = Cheese.createPlatterFromChunks(coordinates);
-            int i = 0;
-            for (Cheese cheese : platter) {
-                final String[] membersAsString = { "<br>Members:" };
-                settlement.getPopulation().entrySet().stream()
-                        .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
-                        .limit(10)
-                        .forEach(entry -> {
-                            membersAsString[0] += "<br>— <i>" + entry.getValue().getDisplayAsString().replaceAll("^(<.*>)", "") + "</i> " + Bukkit.getOfflinePlayer(entry.getKey()).getName();
-                        });
-                if (settlement.getPopulation().size() > 10) {
-                    membersAsString[0] += "<br>— ...";
+                Collection<Cheese> platter = Cheese.createPlatterFromChunks(coordinates);
+                int i = 0;
+                for (Cheese cheese : platter) {
+                    final String[] membersAsString = {"<br>Members:"};
+                    settlement.getPopulation().entrySet().stream()
+                            .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+                            .limit(10)
+                            .forEach(entry -> {
+                                membersAsString[0] += "<br>— <i>" + entry.getValue().getDisplayAsString().replaceAll("^(<.*>)", "") + "</i> " + Bukkit.getOfflinePlayer(entry.getKey()).getName();
+                            });
+                    if (settlement.getPopulation().size() > 10) {
+                        membersAsString[0] += "<br>— ...";
+                    }
+
+                    ShapeMarker stmMarker = ShapeMarker.builder()
+                            .label(settlement.getName())
+                            .detail("<h1>" + settlement.getName() + "</h1>"
+                                    + settlement.getDescription()
+                                    + "<br>"
+                                    + "<br>Food: " + settlement.getFood() + "/" + settlement.getFoodCapacity()
+                                    + "<br>Nation: " + (settlement.isInNation() ? "<b>" + settlement.getNation().getName() + "</b>" : "None")
+                                    + membersAsString[0]
+                            )
+                            .fillColor(mainColor)
+                            .lineColor(outlineColor)
+                            .lineWidth(2)
+                            .depthTestEnabled(false)
+                            .shape(cheese.getShape(), 62)
+                            .holes(cheese.getHoles().toArray(Shape[]::new))
+                            .centerPosition()
+                            .build();
+
+                    stmMarker.setMinDistance(50);
+                    settlementSet.put("jade.settlements." + settlement.getName().toLowerCase() + ".segment-" + i++, stmMarker);
                 }
-
-                ShapeMarker stmMarker = ShapeMarker.builder()
-                        .label(settlement.getName())
-                        .detail("<h1>" + settlement.getName() + "</h1>"
-                                + settlement.getDescriptionAsString()
-                                + "<br>"
-                                + "<br>Food: " + settlement.getFood() + "/" + settlement.getFoodCapacity()
-                                + "<br>Nation: " + (settlement.isInNation() ? "<b>" + settlement.getNation().getName() + "</b>" : "None")
-                                + membersAsString[0]
-                        )
-                        .fillColor(mainColor)
-                        .lineColor(outlineColor)
-                        .lineWidth(2)
-                        .depthTestEnabled(false)
-                        .shape(cheese.getShape(), 62)
-                        .holes(cheese.getHoles().toArray(Shape[]::new))
-                        .centerPosition()
-                        .build();
-
-                stmMarker.setMinDistance(50);
-                settlementSet.put("jade.settlements." + settlement.getName().toLowerCase() + ".segment-" + i++, stmMarker);
             }
-        }
 
-        for (BlueMapMap map : blueMapMaps) {
-            map.getMarkerSets().put("settlements", settlementSet);
+            for (BlueMapMap map : blueMapMaps) {
+                map.getMarkerSets().put("settlements", settlementSet);
+            }
         }
 
     }

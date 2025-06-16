@@ -1,6 +1,7 @@
 package dev.jabberdrake.jade.titles;
 
 import dev.jabberdrake.jade.database.DatabaseManager;
+import dev.jabberdrake.jade.utils.TextUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -69,7 +70,7 @@ public class JadeTitle {
     }
 
     public Component getDisplayAsComponent() {
-        return MiniMessage.miniMessage().deserialize(this.displayName);
+        return TextUtils.deserialize(this.displayName);
     }
 
     public void setDisplayName(String displayName) {

@@ -26,8 +26,8 @@ public class PlayerMoveHandler implements Listener {
         Location from = event.getFrom();
         Location to = event.getTo();
 
-        ChunkAnchor fromAnchor = new ChunkAnchor(from.getBlockX() >> 4, from.getBlockZ() >> 4);
-        ChunkAnchor toAnchor = new ChunkAnchor(to.getBlockX() >> 4, to.getBlockZ() >> 4);
+        ChunkAnchor fromAnchor = new ChunkAnchor(player.getWorld(), from.getBlockX() >> 4, from.getBlockZ() >> 4);
+        ChunkAnchor toAnchor = new ChunkAnchor(player.getWorld(), to.getBlockX() >> 4, to.getBlockZ() >> 4);
 
         if (fromAnchor.equals(toAnchor)) { return; }
 
@@ -39,7 +39,7 @@ public class PlayerMoveHandler implements Listener {
                 if (RealmManager.claimChunk(jadePlayer.getFocusSettlement(), toAnchor)) {
                     player.clearTitle();
                     player.sendActionBar(TextUtils.composeSuccessText("Claimed this chunk for ")
-                            .append(jadePlayer.getFocusSettlement().getDisplayName())
+                            .append(jadePlayer.getFocusSettlement().getDisplayNameAsComponent())
                             .append(TextUtils.composeSuccessText("!"))
                     );
                 } else if (jadePlayer.getFocusSettlement().getFood() < JadeSettings.chunkCost) {
@@ -75,8 +75,8 @@ public class PlayerMoveHandler implements Listener {
                 // - from an unclaimed chunk to a claimed chunk
                 // - from a chunk claimed by A to a chunk claimed by B
                 // When this happens, present the settlement name (decorated) and description:
-                Component mainTitle = owner.getDisplayName();
-                Component subTitle = owner.getDescription();
+                Component mainTitle = owner.getDisplayNameAsComponent();
+                Component subTitle = owner.getDescriptionAsComponent();
 
                 final Title stmTitle = Title.title(mainTitle, subTitle);
 

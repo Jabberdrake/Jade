@@ -155,8 +155,8 @@ public class NationDataObject implements DatabaseObject<Nation, Integer> {
         try {
             database.execute(sql, stmt -> {
                 stmt.setString(1, nation.getName());
-                stmt.setString(2, nation.getDisplayNameAsString());
-                stmt.setString(3, nation.getDescriptionAsString());
+                stmt.setString(2, nation.getDisplayName());
+                stmt.setString(3, nation.getDescription());
                 stmt.setString(4, nation.getMapColor().asHexString());
                 stmt.setString(5, nation.getIconAsString());
                 stmt.setLong(6, nation.getCreationTimeAsLong());
@@ -176,8 +176,8 @@ public class NationDataObject implements DatabaseObject<Nation, Integer> {
         try {
             id[0] = Math.toIntExact(database.create(sql, stmt -> {
                 stmt.setString(1, nation.getName());
-                stmt.setString(2, nation.getDisplayNameAsString());
-                stmt.setString(3, nation.getDescriptionAsString());
+                stmt.setString(2, nation.getDisplayName());
+                stmt.setString(3, nation.getDescription());
                 stmt.setString(4, nation.getMapColor().asHexString());
                 stmt.setString(5, nation.getIconAsString());
                 stmt.setLong(6, nation.getCreationTimeAsLong());

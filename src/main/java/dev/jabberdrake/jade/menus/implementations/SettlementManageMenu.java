@@ -14,7 +14,6 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
-import org.w3c.dom.Text;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -74,7 +73,7 @@ public class SettlementManageMenu extends SimpleJadeMenu {
         ItemLore.Builder loreBuilder = ItemLore.lore()
                 .addLine(text()
                     .content("Role in ").color(TextUtils.ZORBA)
-                    .append(role.getSettlement().getDisplayName())
+                    .append(role.getSettlement().getDisplayNameAsComponent())
                     .decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE)
                     .build())
                 .addLine(text()

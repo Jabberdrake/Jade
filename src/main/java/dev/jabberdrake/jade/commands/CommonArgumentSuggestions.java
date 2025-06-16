@@ -38,7 +38,7 @@ public class CommonArgumentSuggestions {
 
     public static CompletableFuture<Suggestions> suggestVanillaTextColors(final CommandContext<CommandSourceStack> context, final SuggestionsBuilder builder) {
         JadeTextColor.VANILLA_NAMES
-                .stream().filter(name -> name.contains(builder.getRemainingLowerCase()))
+                .stream().filter(name -> name.toLowerCase().contains(builder.getRemainingLowerCase()) || name.equals(builder.getRemainingLowerCase()))
                 .forEach(builder::suggest);
         return builder.buildFuture();
     }

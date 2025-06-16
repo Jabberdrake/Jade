@@ -17,7 +17,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
-import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 import static dev.jabberdrake.jade.utils.TextUtils.error;
@@ -113,7 +112,7 @@ public class SettlementDemoteCommand {
 
         SettlementRole toRole = focus.getRoleFromName(roleArgument);
         if (toRole == null) {
-            player.sendMessage(error("Could not find a role named <highlight>" + roleArgument + "</highlight> in " + focus.getDisplayNameAsString() + "<normal>!"));
+            player.sendMessage(error("Could not find a role named <highlight>" + roleArgument + "</highlight> in " + focus.getDisplayName() + "<normal>!"));
             return Command.SINGLE_SUCCESS;
         }
 
@@ -133,7 +132,7 @@ public class SettlementDemoteCommand {
 
     public static boolean validateUserPermissions(Player player, Settlement settlement) {
         if (!settlement.getRoleFromMember(player.getUniqueId()).canDemote()) {
-            player.sendMessage(error("You are not allowed to demote members in <highlight>" + settlement.getDisplayNameAsString() + "<normal>!"));
+            player.sendMessage(error("You are not allowed to demote members in <highlight>" + settlement.getDisplayName() + "<normal>!"));
             return false;
         }
         return true;

@@ -6,7 +6,6 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import dev.jabberdrake.jade.realms.RealmManager;
 import dev.jabberdrake.jade.realms.Settlement;
-import dev.jabberdrake.jade.utils.TextUtils;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import org.bukkit.entity.Player;
@@ -38,7 +37,7 @@ public class SettlementJoinCommand {
         inviter.addMember(player.getUniqueId(), inviter.getDefaultRole());
         RealmManager.clearInviteToSettlement(player);
 
-        player.sendMessage(success("You have joined the settlement of " + inviter.getDisplayNameAsString() + "!"));
+        player.sendMessage(success("You have joined the settlement of " + inviter.getDisplayName() + "!"));
         inviter.broadcast("<highlight>" + player.getName() + " has joined the settlement!");
         return Command.SINGLE_SUCCESS;
     }
@@ -60,7 +59,7 @@ public class SettlementJoinCommand {
         settlement.addMember(player.getUniqueId(), settlement.getDefaultRole());
         RealmManager.clearInviteToSettlement(player);
 
-        player.sendMessage(success("You have joined the settlement of " + inviter.getDisplayNameAsString() + "<normal>!"));
+        player.sendMessage(success("You have joined the settlement of " + inviter.getDisplayName() + "<normal>!"));
         inviter.broadcast("<highlight>" + player.getName() + "</highlight> has joined the settlement!");
         return Command.SINGLE_SUCCESS;
     }

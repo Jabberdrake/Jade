@@ -89,7 +89,7 @@ public class SettlementEditCommand {
 
         String displayArgument = StringArgumentType.getString(context, "display_name");
         focus.setDisplayName(displayArgument);
-        focus.broadcast("Changed <highlight>display name</highlight> to " + focus.getDisplayNameAsString() + "<normal>!");
+        focus.broadcast("Changed <highlight>display name</highlight> to " + focus.getDisplayName() + "<normal>!");
 
         return Command.SINGLE_SUCCESS;
     }
@@ -106,7 +106,7 @@ public class SettlementEditCommand {
             descArgument = "<white>" + descArgument;
         }
         focus.setDescription(descArgument);
-        focus.broadcast("Changed <highlight>description</highlight> to: " + focus.getDescriptionAsString());
+        focus.broadcast("Changed <highlight>description</highlight> to: " + focus.getDescription());
         return Command.SINGLE_SUCCESS;
     }
 
@@ -166,7 +166,7 @@ public class SettlementEditCommand {
 
     public static boolean validateUserPermissions(Player player, Settlement settlement) {
         if (!settlement.getRoleFromMember(player.getUniqueId()).canEdit()) {
-            player.sendMessage(error("You are not allowed to edit attributes in <highlight>" + settlement.getDisplayNameAsString() + "<normal>!"));
+            player.sendMessage(error("You are not allowed to edit attributes in <highlight>" + settlement.getDisplayName() + "<normal>!"));
             return false;
         }
         return true;

@@ -1,5 +1,5 @@
 name: Jade
-version: '0.7'
+version: '0.8'
 main: dev.jabberdrake.jade.Jade
 description: "A lightweight territory management plugin."
 author: Jabberdrake

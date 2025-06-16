@@ -17,6 +17,8 @@ import static dev.jabberdrake.jade.utils.TextUtils.*;
 
 public class TitleCreateCommand {
 
+    private static final int MAX_NAME_LENGTH = 20;
+
     public static LiteralCommandNode<CommandSourceStack> buildCommand(final String label) {
         return Commands.literal(label)
                 .then(Commands.argument("name", StringArgumentType.string())
@@ -34,6 +36,9 @@ public class TitleCreateCommand {
         nameArgument = nameArgument.replace(" ", "_");
         if (!TitleManager.isUniqueName(nameArgument)) {
             player.sendMessage(error("That name (<highlight>" + nameArgument + "</highlight>) is already in use!"));
+            return Command.SINGLE_SUCCESS;
+        } else if (nameArgument.length() > 20) {
+            player.sendMessage(error("That name (<highlight>" + nameArgument + "</highlight>) is too long! Title names should not be longer than 20 characters."));
             return Command.SINGLE_SUCCESS;
         }
 

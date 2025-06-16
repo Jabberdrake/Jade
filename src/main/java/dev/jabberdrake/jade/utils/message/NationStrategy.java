@@ -1,7 +1,6 @@
 package dev.jabberdrake.jade.utils.message;
 
 import dev.jabberdrake.jade.realms.Nation;
-import dev.jabberdrake.jade.realms.Settlement;
 import dev.jabberdrake.jade.utils.JadeTextColor;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
@@ -27,7 +26,7 @@ public class NationStrategy implements JadeMessageStrategy {
     public Component prefix() {
         return Component.text()
                 .content("(").color(highlightColor())
-                .append(nation.getDisplayName())
+                .append(nation.getDisplayNameAsComponent())
                 .append(Component.text(") [⁂] > "))
                 .build();
     }

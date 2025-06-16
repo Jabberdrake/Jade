@@ -56,7 +56,7 @@ public class NationTransferCommand {
 
         focusNation.setCapital(target);
 
-        focusNation.broadcast("The settlement of " + target.getDisplayNameAsString() + "<normal> is our new <highlight>capital</highlight>!");
+        focusNation.broadcast("The settlement of " + target.getDisplayName() + "<normal> is our new <highlight>capital</highlight>!");
         return Command.SINGLE_SUCCESS;
     }
 }

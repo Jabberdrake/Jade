@@ -7,7 +7,6 @@ import com.mojang.brigadier.tree.LiteralCommandNode;
 import dev.jabberdrake.jade.realms.SettlementRole;
 import dev.jabberdrake.jade.realms.RealmManager;
 import dev.jabberdrake.jade.realms.Settlement;
-import dev.jabberdrake.jade.utils.TextUtils;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import org.bukkit.Bukkit;
@@ -60,7 +59,7 @@ public class SettlementDisbandCommand {
         RealmManager.deleteSettlement(settlement);
 
         settlement.broadcast("A high official has <red>disbanded</red> the settlement. Goodbye...");
-        Bukkit.broadcast(info("The settlement of " + settlement.getDisplayNameAsString() + "<normal> has been disbanded!"));
+        Bukkit.broadcast(info("The settlement of " + settlement.getDisplayName() + "<normal> has been disbanded!"));
         return Command.SINGLE_SUCCESS;
     }
 }

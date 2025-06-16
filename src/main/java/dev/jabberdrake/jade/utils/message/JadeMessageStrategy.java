@@ -13,7 +13,7 @@ public interface JadeMessageStrategy {
         return Component.text().color(normalColor())
                 .append(prefix())
                 .append(MiniMessage.miniMessage().deserialize(message,
-                        Placeholder.parsed("normal", "<reset>" + JadeTextColor.toMessageTag(highlightColor())),
+                        Placeholder.parsed("normal", "<reset>" + JadeTextColor.toMessageTag(normalColor())),
                         Placeholder.styling("highlight", highlightColor()),
                         JadeTextColor.asAdventureTags(),
                         TagResolver.resolver(resolvers)))

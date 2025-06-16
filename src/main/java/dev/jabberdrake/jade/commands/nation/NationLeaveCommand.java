@@ -67,8 +67,8 @@ public class NationLeaveCommand {
         settlement.getNation().removeSettlement(settlement);
         settlement.leaveNation();
 
-        settlement.broadcast("We have left the nation of " + nation.getDisplayNameAsString() + "<normal>!");
-        nation.broadcast("The settlement of " + settlement.getDisplayNameAsString() + "<normal> has left the nation!");
+        settlement.broadcast("We have left the nation of " + nation.getDisplayName() + "<normal>!");
+        nation.broadcast("The settlement of " + settlement.getDisplayName() + "<normal> has left the nation!");
         return Command.SINGLE_SUCCESS;
     }
 }

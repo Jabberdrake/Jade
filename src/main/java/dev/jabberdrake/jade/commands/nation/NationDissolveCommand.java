@@ -8,7 +8,6 @@ import dev.jabberdrake.jade.commands.settlement.CommonSettlementSuggestions;
 import dev.jabberdrake.jade.realms.Nation;
 import dev.jabberdrake.jade.realms.RealmManager;
 import dev.jabberdrake.jade.realms.Settlement;
-import dev.jabberdrake.jade.utils.TextUtils;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import org.bukkit.Bukkit;
@@ -65,7 +64,7 @@ public class NationDissolveCommand {
         RealmManager.deleteNation(nation);
 
         nation.broadcast("A high official has <red>dissolved</red> the nation. Goodbye...");
-        Bukkit.broadcast(info("The nation of " + nation.getDisplayNameAsString() + "<normal> has been dissolved!"));
+        Bukkit.broadcast(info("The nation of " + nation.getDisplayName() + "<normal> has been dissolved!"));
         return Command.SINGLE_SUCCESS;
     }
 }

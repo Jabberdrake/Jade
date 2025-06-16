@@ -1,16 +1,27 @@
 package dev.jabberdrake.jade.realms;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
+import org.bukkit.World;
 
-public record ChunkAnchor(int x, int z) {
+public record ChunkAnchor(World world, int x, int z) {
 
-    public ChunkAnchor(int x, int z) {
+    public ChunkAnchor(String world, int x, int z) {
+        this(Bukkit.getWorld(world), x, z);
+    }
+
+    public ChunkAnchor(World world, int x, int z) {
+        this.world = world;
         this.x = x;
         this.z = z;
     }
 
     public ChunkAnchor(Chunk chunk) {
-        this(chunk.getX(), chunk.getZ());
+        this(chunk.getWorld(), chunk.getX(), chunk.getZ());
+    }
+
+    public World getWorld() {
+        return this.world;
     }
 
     public int getX() {
@@ -22,30 +33,31 @@ public record ChunkAnchor(int x, int z) {
     }
 
     public ChunkAnchor getRelativeChunk(int dx, int dz) {
-        return new ChunkAnchor(this.x + dx, this.z + dz);
+        return new ChunkAnchor(this.world, this.x + dx, this.z + dz);
     }
 
     public String serialize() {
-        return this.x + ";" + this.z;
+        return this.world.getName() + ";" + this.x + ";" + this.z;
     }
 
     public static ChunkAnchor deserialize(String serializedAnchor) {
         String[] split = serializedAnchor.split(";");
-        int x = Integer.parseInt(split[0]);
-        int z = Integer.parseInt(split[1]);
-        return new ChunkAnchor(x, z);
+        String world = split[0];
+        int x = Integer.parseInt(split[1]);
+        int z = Integer.parseInt(split[2]);
+        return new ChunkAnchor(world, x, z);
     }
 
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof ChunkAnchor) {
             ChunkAnchor other = (ChunkAnchor) obj;
-            return this.x == other.x && this.z == other.z;
+            return this.world.equals(other.world) && this.x == other.x && this.z == other.z;
         } else return false;
     }
 
     @Override
     public String toString() {
-        return "ChunkAnchor{x=" + this.x + ", z=" + this.z + "}";
+        return "ChunkAnchor{world=" + this.world.getName() + "x=" + this.x + ", z=" + this.z + "}";
     }
 }

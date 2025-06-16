@@ -109,7 +109,7 @@ public class SettlementPromoteCommand {
         String roleArgument = StringArgumentType.getString(context, "role");
         SettlementRole toRole = focus.getRoleFromName(roleArgument);
         if (toRole == null) {
-            player.sendMessage(error("Could not find a role named <highlight>" + roleArgument + "</highlight> in " + focus.getDisplayNameAsString() + "<normal>!"));
+            player.sendMessage(error("Could not find a role named <highlight>" + roleArgument + "</highlight> in " + focus.getDisplayName() + "<normal>!"));
             return Command.SINGLE_SUCCESS;
         }
 
@@ -129,7 +129,7 @@ public class SettlementPromoteCommand {
 
     public static boolean validateUserPermissions(Player player, Settlement settlement) {
         if (!settlement.getRoleFromMember(player.getUniqueId()).canPromote()) {
-            player.sendMessage(error("You are not allowed to promote members in <highlight>" + settlement.getDisplayNameAsString() + "<normal>!"));
+            player.sendMessage(error("You are not allowed to promote members in <highlight>" + settlement.getDisplayName() + "<normal>!"));
             return false;
         }
         return true;

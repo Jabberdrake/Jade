@@ -1,7 +1,5 @@
 package dev.jabberdrake.jade.utils;
 
-import com.mojang.brigadier.Command;
-import dev.jabberdrake.jade.Jade;
 import io.papermc.paper.datacomponent.DataComponentTypes;
 import io.papermc.paper.registry.RegistryAccess;
 import io.papermc.paper.registry.RegistryKey;
@@ -9,8 +7,6 @@ import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ItemType;
-
-import java.util.Arrays;
 
 public class ItemUtils {
 
@@ -38,6 +34,9 @@ public class ItemUtils {
                 ItemStack iconItem = ItemStack.of(Material.matchMaterial(itemKey.asString()));
                 if (iconItem.hasData(DataComponentTypes.ATTRIBUTE_MODIFIERS)) {
                     iconItem.unsetData(DataComponentTypes.ATTRIBUTE_MODIFIERS);
+                }
+                if (iconItem.hasData(DataComponentTypes.FOOD)) {
+                    iconItem.unsetData(DataComponentTypes.FOOD);
                 }
                 return iconItem;
             case "jade":

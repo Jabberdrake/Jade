@@ -12,6 +12,7 @@ import io.papermc.paper.command.brigadier.Commands;
 import org.bukkit.entity.Player;
 
 import static dev.jabberdrake.jade.utils.TextUtils.error;
+import static dev.jabberdrake.jade.utils.TextUtils.info;
 
 public class TitleUseCommand {
 
@@ -42,7 +43,7 @@ public class TitleUseCommand {
 
         jadePlayer.setTitleInUse(title);
 
-        player.sendMessage(error("Now using the title of " + title.getDisplayName() + "<normal>!"));
+        player.sendMessage(info("Now using the title of " + title.getDisplayName() + "<normal>!"));
         return Command.SINGLE_SUCCESS;
     }
 }

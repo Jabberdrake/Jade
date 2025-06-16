@@ -6,7 +6,6 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import dev.jabberdrake.jade.realms.RealmManager;
 import dev.jabberdrake.jade.realms.Settlement;
-import dev.jabberdrake.jade.utils.TextUtils;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import org.bukkit.entity.Player;
@@ -53,7 +52,7 @@ public class SettlementLeaveCommand {
         settlement.removeMember(player.getUniqueId());
 
         settlement.broadcast("<highlight>" + player.getName() + "</highlight> has left the settlement!");
-        player.sendMessage(info("You have left the settlement of " + settlement.getDisplayNameAsString() + "<normal>!"));
+        player.sendMessage(info("You have left the settlement of " + settlement.getDisplayName() + "<normal>!"));
         return Command.SINGLE_SUCCESS;
     }
 }

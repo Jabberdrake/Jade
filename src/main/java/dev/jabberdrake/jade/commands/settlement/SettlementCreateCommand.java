@@ -4,11 +4,11 @@ import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.LiteralCommandNode;
+import dev.jabberdrake.jade.JadeSettings;
 import dev.jabberdrake.jade.players.PlayerManager;
 import dev.jabberdrake.jade.realms.ChunkAnchor;
 import dev.jabberdrake.jade.realms.RealmManager;
 import dev.jabberdrake.jade.realms.Settlement;
-import dev.jabberdrake.jade.utils.TextUtils;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import org.bukkit.Bukkit;
@@ -30,6 +30,11 @@ public class SettlementCreateCommand {
         Player player = (Player) context.getSource().getSender();
         ChunkAnchor anchor = new ChunkAnchor(player.getChunk());
 
+        if (!JadeSettings.gameworlds.contains(player.getWorld().getName())) {
+            player.sendMessage(error("Cannot create a settlement in this world (<highlight>" + player.getWorld().getName() + "</highlight>)! If you believe this is in error, please contact an administrator!"));
+            return Command.SINGLE_SUCCESS;
+        }
+
         if (!RealmManager.isUnclaimedChunk(anchor)) {
             player.sendMessage(error("Cannot create a settlement on a claimed chunk!"));
             return Command.SINGLE_SUCCESS;
@@ -45,8 +50,16 @@ public class SettlementCreateCommand {
 
         PlayerManager.asJadePlayer(player.getUniqueId()).setFocusSettlement(settlement);
 
-        player.sendMessage(success("Created the settlement of " + settlement.getDisplayNameAsString() + "!"));
-        Bukkit.broadcast(info("<highlight>" + player.getName() + "</highlight> has created the settlement of " + settlement.getDisplayNameAsString() + "<normal>!"));
+        player.sendMessage(success("Created the settlement of " + settlement.getDisplayName() + "<normal>!"));
+        Bukkit.broadcast(info("<highlight>" + player.getName() + "</highlight> has created the settlement of " + settlement.getDisplayName() + "<normal>!"));
         return Command.SINGLE_SUCCESS;
+    }
+
+    public static boolean validateGameworld(Player player, Settlement settlement) {
+        if (!player.getLocation().getWorld().equals(settlement.getWorld())) {
+            player.sendMessage(error("This settlement (<highlight>" + settlement.getDisplayName() + "</highlight>) can only hold territory in the <highlight>" + settlement.getWorld().getName() + "</highlight> world!"));
+            return false;
+        }
+        return true;
     }
 }

@@ -7,6 +7,7 @@ import dev.jabberdrake.jade.utils.message.SuccessStrategy;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 
 public class TextUtils {
 
@@ -148,6 +149,10 @@ public class TextUtils {
 
     public static Component success(String message) {
         return SUCCESS_STRATEGY.process(message);
+    }
+
+    public static Component deserialize(String text) {
+        return MiniMessage.miniMessage().deserialize(text, JadeTextColor.asAdventureTags());
     }
 
 }

@@ -58,7 +58,7 @@ public class AdminDumpCommand {
             ItemStack hoverItem = ItemStack.of(Material.STONE);
             hoverItem.setData(DataComponentTypes.CUSTOM_NAME, settlement.asTextComponent().decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE));
             hoverItem.setData(DataComponentTypes.LORE, ItemLore.lore()
-                    .addLine(settlement.getDescription().decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE))
+                    .addLine(settlement.getDescriptionAsComponent().decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE))
                     .addLine(Component.text(""))
                     .addLine(Component.text()
                             .content("Left click").color(NamedTextColor.GREEN).decorate(TextDecoration.BOLD)
@@ -92,7 +92,7 @@ public class AdminDumpCommand {
             ItemStack hoverItem = ItemStack.of(Material.STONE);
             hoverItem.setData(DataComponentTypes.CUSTOM_NAME, settlement.asTextComponent().decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE));
             hoverItem.setData(DataComponentTypes.LORE, ItemLore.lore()
-                    .addLine(settlement.getDescription().decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE))
+                    .addLine(settlement.getDescriptionAsComponent().decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE))
                     .addLine(Component.text(""))
                     .addLine(Component.text()
                             .content("Left click").color(NamedTextColor.GREEN).decorate(TextDecoration.BOLD)
@@ -124,7 +124,7 @@ public class AdminDumpCommand {
         player.sendMessage(TextUtils.composeSimpleOperatorMessage("Dumping ")
                 .append(TextUtils.composeOperatorHighlight("role list"))
                 .append(TextUtils.composeOperatorText(" for "))
-                .append(settlement.getDisplayName())
+                .append(settlement.getDisplayNameAsComponent())
                 .append(TextUtils.composeOperatorText(":")));
 
         for (SettlementRole role : settlement.getRoles()) {

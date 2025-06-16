@@ -106,7 +106,7 @@ public class SettlementManageCommand {
 
     public static boolean validateUserPermissions(Player player, Settlement settlement) {
         if (!settlement.getRoleFromMember(player.getUniqueId()).canManage()) {
-            player.sendMessage(error("You are not allowed to manage roles for <highlight>" + settlement.getDisplayNameAsString() + "<normal>!"));
+            player.sendMessage(error("You are not allowed to manage roles for <highlight>" + settlement.getDisplayName() + "<normal>!"));
             return false;
         }
         return true;
@@ -114,7 +114,7 @@ public class SettlementManageCommand {
 
     public static boolean validateRoleArgument(String roleArgument, Player player, Settlement settlement) {
         if (settlement.getRoleFromName(roleArgument) == null) {
-            player.sendMessage(error("Could not find a role named <highlight>" + roleArgument + "</highlight> in " + settlement.getDisplayNameAsString() + "<normal>!"));
+            player.sendMessage(error("Could not find a role named <highlight>" + roleArgument + "</highlight> in " + settlement.getDisplayName() + "<normal>!"));
             return false;
         }
         return true;
@@ -424,7 +424,7 @@ public class SettlementManageCommand {
         permissionNodes.add("canEdit");
         permissionNodes.add("canManage");
 
-        permissionNodes.stream().filter(str -> str.contains(builder.getRemainingLowerCase())).forEach(builder::suggest);
+        permissionNodes.stream().filter(str -> str.toLowerCase().contains(builder.getRemainingLowerCase())).forEach(builder::suggest);
 
         return builder.buildFuture();
     }
@@ -439,7 +439,7 @@ public class SettlementManageCommand {
         permissionNodes.add("minecraft:iron_helmet");
         permissionNodes.add("minecraft:leather_helmet");
 
-        permissionNodes.stream().filter(str -> str.contains(builder.getRemainingLowerCase())).forEach(builder::suggest);
+        permissionNodes.stream().filter(str -> str.toLowerCase().contains(builder.getRemainingLowerCase())).forEach(builder::suggest);
 
         return builder.buildFuture();
     }

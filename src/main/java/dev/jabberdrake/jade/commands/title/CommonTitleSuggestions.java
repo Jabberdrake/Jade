@@ -5,7 +5,6 @@ import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import dev.jabberdrake.jade.players.PlayerManager;
 import dev.jabberdrake.jade.titles.JadeTitle;
-import dev.jabberdrake.jade.titles.NamedTitle;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import org.bukkit.entity.Player;
 

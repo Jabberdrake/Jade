@@ -28,9 +28,9 @@ public class TitleEditCommand {
                                         .requires(sender -> sender.getExecutor() instanceof Player)
                                         .executes(TitleEditCommand::runCommandForName)))
                         .then(Commands.literal("display")
-                                .then(Commands.argument("display", StringArgumentType.string()))
+                                .then(Commands.argument("display", StringArgumentType.string())
                                 .requires(sender -> sender.getExecutor() instanceof Player)
-                                .executes(TitleEditCommand::runCommandForDisplay))
+                                .executes(TitleEditCommand::runCommandForDisplay)))
                 )
                 .build();
     }

@@ -39,7 +39,7 @@ public class NationInfoCommand {
         // TODO: Replace this with calls to the new text formatters
         player.sendMessage(TextUtils.composeSimpleInfoMessage("Nation info:"));
         player.sendMessage(Component.text(INDENT).append(nation.asTextComponent()));
-        player.sendMessage(Component.text(INDENT).append(nation.getDescription()));
+        player.sendMessage(Component.text(INDENT).append(nation.getDescriptionAsComponent()));
         player.sendMessage(Component.text()); //evil \n
 
         player.sendMessage(Component.text(INDENT + "Capital: ", TextUtils.LIGHT_BRASS)

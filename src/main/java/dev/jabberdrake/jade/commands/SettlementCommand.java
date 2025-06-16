@@ -5,7 +5,6 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import dev.jabberdrake.jade.commands.settlement.*;
 import dev.jabberdrake.jade.realms.Settlement;
-import dev.jabberdrake.jade.utils.TextUtils;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import org.bukkit.entity.Player;
@@ -36,6 +35,7 @@ public class SettlementCommand {
                 .then(SettlementFoodCommand.buildCommand("food"))
                 .then(SettlementViewCommand.buildCommand("view"))
                 .then(SettlementFocusCommand.buildCommand("focus"))
+                .then(SettlementSettingsCommand.buildCommand("settings"))
                 .build();
     }
 
@@ -51,7 +51,7 @@ public class SettlementCommand {
             return false;
         } else if (!settlement.containsPlayer(player.getUniqueId())) {
             // NOTE: Since it just uses whichever settlement you're focusing on, this shouldn't ever happen.
-            player.sendMessage(error("You are not a member of " + settlement.getDisplayNameAsString() + "!"));
+            player.sendMessage(error("You are not a member of " + settlement.getDisplayName() + "!"));
             return false;
         }
         return true;

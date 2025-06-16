@@ -4,13 +4,11 @@ import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.LiteralCommandNode;
-import dev.jabberdrake.jade.commands.NationCommand;
 import dev.jabberdrake.jade.commands.SettlementCommand;
 import dev.jabberdrake.jade.players.PlayerManager;
 import dev.jabberdrake.jade.realms.Nation;
 import dev.jabberdrake.jade.realms.RealmManager;
 import dev.jabberdrake.jade.realms.Settlement;
-import dev.jabberdrake.jade.utils.TextUtils;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import org.bukkit.entity.Player;
@@ -52,8 +50,8 @@ public class NationJoinCommand {
         focus.setNation(inviter);
         RealmManager.clearInviteToNation(focus);
 
-        focus.broadcast("We have joined the nation of " + inviter.getDisplayNameAsString() + "<normal>!");
-        inviter.broadcast("The settlement of " + focus.getDisplayNameAsString() + "<normal> has joined the nation!");
+        focus.broadcast("We have joined the nation of " + inviter.getDisplayName() + "<normal>!");
+        inviter.broadcast("The settlement of " + focus.getDisplayName() + "<normal> has joined the nation!");
         return Command.SINGLE_SUCCESS;
     }
 
@@ -85,8 +83,8 @@ public class NationJoinCommand {
         focus.setNation(inviter);
         RealmManager.clearInviteToNation(focus);
 
-        focus.broadcast("We have joined the nation of " + inviter.getDisplayNameAsString() + "<normal>!");
-        inviter.broadcast("The settlement of " + focus.getDisplayNameAsString() + "<normal> has joined the nation!");
+        focus.broadcast("We have joined the nation of " + inviter.getDisplayName() + "<normal>!");
+        inviter.broadcast("The settlement of " + focus.getDisplayName() + "<normal> has joined the nation!");
         return Command.SINGLE_SUCCESS;
     }
 }

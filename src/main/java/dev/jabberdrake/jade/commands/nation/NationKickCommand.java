@@ -10,7 +10,6 @@ import dev.jabberdrake.jade.players.PlayerManager;
 import dev.jabberdrake.jade.realms.Nation;
 import dev.jabberdrake.jade.realms.RealmManager;
 import dev.jabberdrake.jade.realms.Settlement;
-import dev.jabberdrake.jade.utils.TextUtils;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import org.bukkit.entity.Player;
@@ -59,8 +58,8 @@ public class NationKickCommand {
         focusNation.removeSettlement(target);
         target.leaveNation();
 
-        target.broadcast("We have been kicked from the nation of " + focusNation.getDisplayNameAsString() + "<normal>!");
-        focusNation.broadcast("The settlement of " + target.getDisplayNameAsString() + "<normal> has been kicked from the nation!");
+        target.broadcast("We have been kicked from the nation of " + focusNation.getDisplayName() + "<normal>!");
+        focusNation.broadcast("The settlement of " + target.getDisplayName() + "<normal> has been kicked from the nation!");
         return Command.SINGLE_SUCCESS;
     }
 }

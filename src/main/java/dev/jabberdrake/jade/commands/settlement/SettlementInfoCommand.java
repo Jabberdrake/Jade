@@ -43,14 +43,14 @@ public class SettlementInfoCommand {
 
         player.sendMessage(info("Settlement info:"));
         player.sendMessage(Component.text(INDENT).append(settlement.asTextComponent()));
-        player.sendMessage(Component.text(INDENT).append(settlement.getDescription()));
+        player.sendMessage(Component.text(INDENT).append(settlement.getDescriptionAsComponent()));
         player.sendMessage(Component.text()); //evil \n
 
         player.sendMessage(Component.text(INDENT + "Food: ", TextUtils.LIGHT_BRASS)
                 .append(Component.text(settlement.getFood() + "/" + settlement.getFoodCapacity(), TextUtils.LIVINGMETAL)));
         if (settlement.isInNation()) {
             player.sendMessage(Component.text(INDENT + "Nation: ", TextUtils.LIGHT_BRASS)
-                    .append(settlement.getNation().getDisplayName()));
+                    .append(settlement.getNation().getDisplayNameAsComponent()));
         } else {
             player.sendMessage(Component.text(INDENT + "Nation: ", TextUtils.LIGHT_BRASS)
                     .append(Component.text("None", TextUtils.DARK_ZORBA)));
@@ -64,7 +64,7 @@ public class SettlementInfoCommand {
                     player.sendMessage(Component.text(INDENT + "— ", TextUtils.LIGHT_BRASS)
                             .append(entry.getValue().getDisplayAsComponent())
                             .append(Component.space())
-                            .append(Component.text(Bukkit.getPlayer(entry.getKey()).getName(), TextUtils.LIGHT_ZORBA))
+                            .append(Component.text(Bukkit.getOfflinePlayer(entry.getKey()).getName(), TextUtils.LIGHT_ZORBA))
                     );
                 });
         if (settlement.getPopulation().size() > 10) {

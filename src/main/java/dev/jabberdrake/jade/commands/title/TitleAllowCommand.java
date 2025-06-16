@@ -54,8 +54,8 @@ public class TitleAllowCommand {
             player.sendMessage(error("You can't revoke yourself!"));
             player.sendMessage(info("To delete the title, do <highlight>/title delete <i><reference_name>"));
             return Command.SINGLE_SUCCESS;
-        } else if (!title.isAvailableTo(target.getUniqueId())) {
-            player.sendMessage(error("This player (<highlight>" + targetArgument + "</highlight>) is not allowed to use this title!"));
+        } else if (title.isAvailableTo(target.getUniqueId())) {
+            player.sendMessage(error("This player (<highlight>" + targetArgument + "</highlight>) is already allowed to use this title!"));
             return Command.SINGLE_SUCCESS;
         }
 
