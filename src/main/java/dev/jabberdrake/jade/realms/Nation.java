@@ -234,10 +234,10 @@ public class Nation {
         if (addon == null) {
             item.setData(DataComponentTypes.LORE, loreBuilder.build());
         } else {
-            loreBuilder = loreBuilder.addLine(Component.text(""));
+            loreBuilder.addLine(Component.text(""));
             switch (addon) {
                 case "INFO":
-                    loreBuilder = loreBuilder.addLine(Component.text()
+                    loreBuilder.addLine(Component.text()
                             .append(Component.text("Left Click", NamedTextColor.GREEN))
                             .append(Component.text(" to read more", NamedTextColor.DARK_GREEN))
                             .decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE)

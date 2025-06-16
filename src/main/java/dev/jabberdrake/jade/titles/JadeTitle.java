@@ -1,14 +1,24 @@
 package dev.jabberdrake.jade.titles;
 
 import dev.jabberdrake.jade.database.DatabaseManager;
+import dev.jabberdrake.jade.realms.SettlementRole;
+import dev.jabberdrake.jade.utils.ItemUtils;
+import dev.jabberdrake.jade.utils.JadeTextColor;
 import dev.jabberdrake.jade.utils.TextUtils;
+import io.papermc.paper.datacomponent.DataComponentTypes;
+import io.papermc.paper.datacomponent.item.ItemLore;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import org.bukkit.Bukkit;
+import org.bukkit.NamespacedKey;
+import org.bukkit.inventory.ItemStack;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+
+import static net.kyori.adventure.text.Component.text;
 
 public class JadeTitle {
 
@@ -17,17 +27,17 @@ public class JadeTitle {
     private String displayName;
     private UUID owner;
     private TextColor senderColor;
-    private String icon;
+    private NamespacedKey icon;
     private List<UUID> users;
 
     // Used by DatabaseManager when composing runtime object from persistent data
-    public JadeTitle(int id, String name, String displayName, UUID owner, TextColor senderColor, String iconAsString) {
+    public JadeTitle(int id, String name, String displayName, UUID owner, TextColor senderColor, NamespacedKey icon) {
         this.id = id;
         this.name = name;
         this.displayName = displayName;
         this.owner = owner;
         this.senderColor = senderColor;
-        this.icon = iconAsString;
+        this.icon = icon;
         if (this.owner != null) {
             this.users = new ArrayList<>();
             this.users.add(owner);
@@ -37,12 +47,12 @@ public class JadeTitle {
     }
 
     // Used by TitleManager when creating new title
-    public JadeTitle(String name, String displayName, UUID owner, TextColor senderColor, String iconAsString) {
+    public JadeTitle(String name, String displayName, UUID owner, TextColor senderColor, NamespacedKey icon) {
         this.name = name;
         this.displayName = displayName;
         this.owner = owner;
         this.senderColor = senderColor;
-        this.icon = iconAsString;
+        this.icon = icon;
 
         this.id = DatabaseManager.createTitle(this);
 
@@ -78,6 +88,17 @@ public class JadeTitle {
         DatabaseManager.saveTitle(this);
     }
 
+    public Component asTextComponent() {
+        return text()
+                .append(this.getDisplayAsComponent())
+                .append(text(" (" + this.getName() + ")", TextUtils.LIGHT_ZORBA))
+                .build();
+    }
+
+    public String asDisplayString() {
+        return this.getDisplayName() + "<normal> <light_zorba>(" + this.getName() + ")</light_zorba>";
+    }
+
     public UUID getOwner() {
         return this.owner;
     }
@@ -101,17 +122,16 @@ public class JadeTitle {
     }
 
     public String getIconAsString() {
-        return this.icon;
+        return this.icon.asString();
     }
 
-    public boolean setIcon(String iconAsString) {
-        if (!this.icon.equals(iconAsString)) {
-            this.icon = iconAsString;
-            DatabaseManager.saveTitle(this);
-            return true;
-        } else {
-            return false;
-        }
+    public ItemStack getIconAsItem() {
+        return ItemUtils.asDisplayItem(this.icon);
+    }
+
+    public void setIcon(NamespacedKey icon) {
+        this.icon = icon;
+        DatabaseManager.saveTitle(this);
     }
 
     public List<UUID> getUserList() {
@@ -162,6 +182,50 @@ public class JadeTitle {
 
     public static String serializeDisplay(Component display) {
         return MiniMessage.miniMessage().serialize(display);
+    }
+
+    public ItemStack asDisplayItem() {
+        return this.asDisplayItem(null);
+    }
+
+    public ItemStack asDisplayItem(String addon) {
+
+        ItemStack item = this.getIconAsItem();
+        item.setData(DataComponentTypes.CUSTOM_NAME, text()
+                .append(this.asTextComponent())
+                .decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE)
+                .build());
+        ItemLore.Builder loreBuilder = ItemLore.lore();
+
+        if (this.isUniversal()) {
+            loreBuilder.addLine(text("Universal Title", JadeTextColor.LIVINGMETAL)
+                    .decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE));
+        } else {
+            loreBuilder.addLine(text()
+                    .content("Owned by ").color(JadeTextColor.ZORBA)
+                    .append(text(Bukkit.getOfflinePlayer(this.getOwner()).getName(), JadeTextColor.LIGHT_ZORBA))
+                    .decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE)
+                    .build()
+            );
+        }
+
+        if (addon == null) {
+            item.setData(DataComponentTypes.LORE, loreBuilder.build());
+        } else {
+            loreBuilder.addLine(Component.empty());
+            switch (addon) {
+                case "USE":
+                    loreBuilder.addLine(text()
+                            .append(text("Left Click", NamedTextColor.GREEN))
+                            .append(text(" to use this title", NamedTextColor.DARK_GREEN))
+                            .decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE)
+                            .build());
+                default:
+                    item.setData(DataComponentTypes.LORE, loreBuilder.build());
+            }
+        }
+
+        return item;
     }
 
     @Override

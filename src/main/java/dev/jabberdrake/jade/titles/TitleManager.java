@@ -7,6 +7,7 @@ import dev.jabberdrake.jade.players.PlayerManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
+import org.bukkit.NamespacedKey;
 
 import java.util.*;
 import java.util.logging.Logger;
@@ -43,7 +44,7 @@ public class TitleManager {
 
     public static JadeTitle createTitle(String name, TextColor color, UUID owner) {
         Component titleComponent = Component.text(name, color);
-        JadeTitle title = new JadeTitle(name, JadeTitle.serializeDisplay(titleComponent), owner, NamedTextColor.WHITE, "minecraft:book");
+        JadeTitle title = new JadeTitle(name, JadeTitle.serializeDisplay(titleComponent), owner, NamedTextColor.WHITE, NamespacedKey.minecraft("book"));
 
         cache.put(title.getId(), title);
         return title;

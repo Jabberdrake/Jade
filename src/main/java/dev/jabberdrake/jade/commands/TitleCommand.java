@@ -20,6 +20,7 @@ public class TitleCommand {
                 .then(TitleCreateCommand.buildCommand("create"))
                 .then(TitleDeleteCommand.buildCommand("delete"))
                 .then(TitleEditCommand.buildCommand("edit"))
+                .then(TitleListCommand.buildCommand("list"))
                 .then(TitleUseCommand.buildCommand("use"))
                 .then(TitleAllowCommand.buildCommand("allow"))
                 .then(TitleRevokeCommand.buildCommand("revoke"))

@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import static dev.jabberdrake.jade.utils.ItemUtils.parseKey;
+
 public class TitleDataObject implements DatabaseObject<JadeTitle, Integer> {
 
     private Jade plugin;
@@ -46,9 +48,9 @@ public class TitleDataObject implements DatabaseObject<JadeTitle, Integer> {
                     String senderColor = resultSet.getString("sender_color");
                     String icon = resultSet.getString("icon");
                     if (ownerId.equals("universal")) {
-                        title[0] = new JadeTitle(id, name, serializedTitle, null, TextColor.fromHexString(senderColor), icon);
+                        title[0] = new JadeTitle(id, name, serializedTitle, null, TextColor.fromHexString(senderColor), parseKey(icon));
                     } else {
-                        title[0] = new JadeTitle(id, name, serializedTitle, UUID.fromString(ownerId), TextColor.fromHexString(senderColor), icon);
+                        title[0] = new JadeTitle(id, name, serializedTitle, UUID.fromString(ownerId), TextColor.fromHexString(senderColor), parseKey(icon));
                     }
                 }
             });

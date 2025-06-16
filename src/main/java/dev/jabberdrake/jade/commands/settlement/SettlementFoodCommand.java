@@ -46,7 +46,7 @@ public class SettlementFoodCommand {
                                 .requires(sender -> sender.getExecutor() instanceof Player)
                                 .executes(SettlementFoodCommand::runCommandForHotbar)
                         )
-                        .then(Commands.literal("inventory")
+                        .then(Commands.literal("all")
                                 .requires(sender -> sender.getExecutor() instanceof Player)
                                 .executes(SettlementFoodCommand::runCommandForInventory)
                         )
