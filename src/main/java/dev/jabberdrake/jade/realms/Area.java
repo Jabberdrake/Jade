@@ -1,5 +1,6 @@
 package dev.jabberdrake.jade.realms;
 
+import dev.jabberdrake.jade.database.DatabaseManager;
 import dev.jabberdrake.jade.utils.CuboidSelection;
 import dev.jabberdrake.jade.utils.ItemUtils;
 import dev.jabberdrake.jade.utils.JadeTextColor;
@@ -9,12 +10,12 @@ import io.papermc.paper.datacomponent.item.ItemLore;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import javax.xml.crypto.Data;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -35,19 +36,23 @@ public class Area {
     private List<UUID> members = new ArrayList<>();
 
     // Used by DatabaseManager when composing runtime object from persistent data
-    public Area(int id, String name, String displayName, Settlement settlement, NamespacedKey icon, String pos1, String pos2, UUID holder) {
+    public Area(int id, String name, String displayName, Settlement settlement, NamespacedKey icon, String serializedPos1, String serializedPos2, UUID holder) {
         this.id = id;
         this.name = name;
         this.displayName = displayName;
         this.settlement = settlement;
         this.icon = icon;
         this.selection = new CuboidSelection(settlement.getWorld());
-        this.selection.setPos1(deserializeLocation(pos1));
-        this.selection.setPos2(deserializeLocation(pos2));
         this.holder = holder;
+
+        Location pos1 = deserializeLocation(serializedPos1);
+        if (pos1 != null) this.selection.setPos1(pos1);
+
+        Location pos2 = deserializeLocation(serializedPos2);
+        if (pos2 != null) this.selection.setPos2(pos2);
     }
 
-    // Used by Settlement when creating new area
+    // Used by SettlementAreasCommand when creating new area
     public Area(String name, Settlement settlement, Player founder) {
         this.name = name;
         this.displayName = DEFAULT_NAME_DECORATION + name;
@@ -62,13 +67,17 @@ public class Area {
         return this.id;
     }
 
+    public void setID(int id) {
+        this.id = id;
+    }
+
     public String getName() {
         return this.name;
     }
 
     public void setName(String name) {
         this.name = name;
-        //DatabaseManager.saveSettlementArea(this);
+        DatabaseManager.saveArea(this);
     }
 
     public String getDisplayName() {
@@ -81,7 +90,7 @@ public class Area {
 
     public void setDisplayName(String displayName) {
         this.displayName = displayName;
-        //DatabaseManager.saveSettlementArea(this);
+        DatabaseManager.saveArea(this);
     }
 
     public Component asTextComponent() {
@@ -99,7 +108,10 @@ public class Area {
         return this.settlement;
     }
 
-    public void setIcon(NamespacedKey icon) { this.icon = icon; }
+    public void setIcon(NamespacedKey icon) {
+        this.icon = icon;
+        DatabaseManager.saveArea(this);
+    }
 
     public String getIconAsString() {
         return this.icon.asString();
@@ -109,30 +121,44 @@ public class Area {
         return ItemUtils.asDisplayItem(this.icon);
     }
 
+    public int getVolume() {
+        return this.selection.getVolume();
+    }
+
+    public boolean hasPos1() {
+        return this.selection.hasPos1();
+    }
+
+    public boolean hasPos2() {
+        return this.selection.hasPos2();
+    }
+
     public Location getPos1() {
         return this.selection.getPos1();
-    }
-
-    public String getPos1AsString() {
-        Location pos1 = this.getPos1();
-        return "(" + pos1.getBlockX() + "," + pos1.getBlockY() + "," + pos1.getBlockZ() + ")";
-    }
-
-    public String getPos2AsString() {
-        Location pos2 = this.getPos2();
-        return "(" + pos2.getBlockX() + "," + pos2.getBlockY() + "," + pos2.getBlockZ() + ")";
     }
 
     public Location getPos2() {
         return this.selection.getPos2();
     }
 
+    public String displayPos1() {
+        Location pos1 = this.getPos1();
+        return "(" + pos1.getBlockX() + "," + pos1.getBlockY() + "," + pos1.getBlockZ() + ")";
+    }
+
+    public String displayPos2() {
+        Location pos2 = this.getPos2();
+        return "(" + pos2.getBlockX() + "," + pos2.getBlockY() + "," + pos2.getBlockZ() + ")";
+    }
+
     public void setPos1(double x, double y, double z) {
         this.selection.setPos1(new Location(this.selection.getWorld(), x, y, z));
+        DatabaseManager.saveArea(this);
     }
 
     public void setPos2(double x, double y, double z) {
         this.selection.setPos2(new Location(this.selection.getWorld(), x, y, z));
+        DatabaseManager.saveArea(this);
     }
 
     public boolean hasFinishedSelection() {
@@ -149,12 +175,14 @@ public class Area {
 
     public void setHolder(UUID playerID) {
         this.holder = playerID;
+        DatabaseManager.saveArea(this);
     }
 
     public List<UUID> getMemberList() {
         return this.members;
     }
 
+    // Used by DatabaseManager
     public void setMemberList(List<UUID> memberList) {
         this.members = memberList;
     }
@@ -166,7 +194,13 @@ public class Area {
     public void addMember(UUID playerID) {
         if (!this.getMemberList().contains(playerID)) {
             this.getMemberList().add(playerID);
+            DatabaseManager.addMemberToArea(playerID, this);
         }
+    }
+
+    public void removeMember(UUID playerID) {
+        this.getMemberList().remove(playerID);
+        DatabaseManager.removeMemberFromArea(playerID, this);
     }
 
     public List<Location> getFrameForPos1() {
@@ -177,16 +211,26 @@ public class Area {
         return this.selection.getFrameForPos2();
     }
 
-    public List<Location> getWireframe(boolean trimEnds) {
-        return this.selection.getWireframe(trimEnds);
+    public List<Location> getWireframe() {
+        return this.selection.getWireframe();
     }
 
     public boolean intersectsChunk(ChunkAnchor anchor) {
         return this.selection.intersectsChunk(anchor);
     }
 
+    public boolean containsPosition(double x, double y, double z) {
+        return this.selection.containsPosition(x, y, z);
+    }
+
+    public int getShortestChunkDistanceTo(ChunkAnchor anchor) {
+        return this.selection.getShortestChunkDistanceTo(anchor);
+    }
+
     private Location deserializeLocation(String serializedLocation) {
         if (this.settlement == null) return null;
+
+        if (serializedLocation.equalsIgnoreCase("NONE")) return null;
 
         String[] parts = serializedLocation.split(";");
         Location loc;
@@ -200,6 +244,18 @@ public class Area {
 
     private String serializeLocation(Location location) {
         return location.getX() + ";" + location.getY() + ";" + location.getZ();
+    }
+
+    public String serializePos1() {
+        if (!hasPos1()) return "NONE";
+
+        return serializeLocation(getPos1());
+    }
+
+    public String serializePos2() {
+        if (!hasPos2()) return "NONE";
+
+        return serializeLocation(getPos2());
     }
 
     public ItemStack asDisplayItem() {
@@ -218,20 +274,32 @@ public class Area {
                 .decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE));
         loreBuilder.addLine(text()
                         .content("— ").color(JadeTextColor.LIGHT_BRASS)
-                .append(this.getPos1() == null ? text("Not set.", JadeTextColor.DARK_ZORBA) : text(getPos1AsString(), JadeTextColor.LIGHT_BLUE))
+                .append(this.getPos1() == null ? text("Not set.", JadeTextColor.DARK_ZORBA) : text(displayPos1(), JadeTextColor.LIGHT_BLUE))
                 .append(text(" (Position 1)", JadeTextColor.DARK_ZORBA))
                 .decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE)
                 .build()
         );
         loreBuilder.addLine(text()
                 .content("— ").color(JadeTextColor.LIGHT_BRASS)
-                .append(this.getPos2() == null ? text("Not set.", JadeTextColor.DARK_ZORBA) : text(getPos2AsString(), JadeTextColor.GOLD))
+                .append(this.getPos2() == null ? text("Not set.", JadeTextColor.DARK_ZORBA) : text(displayPos2(), JadeTextColor.GOLD))
                 .append(text(" (Position 2)", JadeTextColor.DARK_ZORBA))
                 .decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE)
                 .build()
         );
         loreBuilder.addLine(Component.empty());
-        loreBuilder.addLine(text("WIP!", JadeTextColor.RED));
+        loreBuilder.addLine(text("Holder: ", JadeTextColor.LIGHT_BRASS)
+                .append(getSettlement().getMemberAsComponent(holder)));
+
+        this.getMemberList().stream().filter(id -> !id.equals(holder))
+                .limit(10)
+                .forEach(member -> {
+                    loreBuilder.addLine(Component.text().content("— ").color(JadeTextColor.LIGHT_BRASS)
+                            .append(getSettlement().getMemberAsComponent(member)));
+                });
+
+        if (this.getMemberList().size() > 10) {
+            loreBuilder.addLine(Component.text().content("— ").color(JadeTextColor.LIGHT_BRASS).append(Component.text("...", JadeTextColor.LIGHT_ZORBA)));
+        }
 
         if (addon == null) {
             item.setData(DataComponentTypes.LORE, loreBuilder.build());
@@ -250,5 +318,13 @@ public class Area {
         }
 
         return item;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof Area) {
+            Area other = (Area) o;
+            return this.getId() == other.getId();
+        } else return false;
     }
 }

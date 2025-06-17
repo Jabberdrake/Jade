@@ -34,6 +34,11 @@ public class RealmManager {
             nationCache.put(nation.getId(), nation);
         }
 
+        List<Area> areas = DatabaseManager.fetchAllAreas();
+        for (Area area : areas) {
+            area.getSettlement().registerArea(area);
+        }
+
         logger.info("[RealmManager::initialize] Successfully loaded " + settlements.size() + " settlements and " + nations.size() + " nations!");
 
 

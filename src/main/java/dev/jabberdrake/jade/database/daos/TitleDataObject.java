@@ -82,7 +82,7 @@ public class TitleDataObject implements DatabaseObject<JadeTitle, Integer> {
 
     @Override
     public List<JadeTitle> fetchAll() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException("Not supported.");
     }
 
     @Override

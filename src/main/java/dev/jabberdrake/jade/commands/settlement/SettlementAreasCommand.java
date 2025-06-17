@@ -8,6 +8,7 @@ import com.mojang.brigadier.tree.LiteralCommandNode;
 import dev.jabberdrake.jade.commands.CommonArgumentSuggestions;
 import dev.jabberdrake.jade.commands.SettlementCommand;
 import dev.jabberdrake.jade.menus.implementations.AreasListMenu;
+import dev.jabberdrake.jade.players.JadePlayer;
 import dev.jabberdrake.jade.players.PlayerManager;
 import dev.jabberdrake.jade.realms.Area;
 import dev.jabberdrake.jade.realms.Settlement;
@@ -18,12 +19,13 @@ import io.papermc.paper.command.brigadier.argument.resolvers.BlockPositionResolv
 import io.papermc.paper.math.BlockPosition;
 import io.papermc.paper.registry.RegistryAccess;
 import io.papermc.paper.registry.RegistryKey;
+import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemType;
 
-import static dev.jabberdrake.jade.utils.TextUtils.error;
-import static dev.jabberdrake.jade.utils.TextUtils.info;
+import static dev.jabberdrake.jade.utils.TextUtils.*;
 
 public class SettlementAreasCommand {
 
@@ -76,23 +78,23 @@ public class SettlementAreasCommand {
                                 )
                         )
                 )
-                .then(Commands.literal("allow")
+                .then(Commands.literal("trust")
                         .then(Commands.argument("area", StringArgumentType.word())
                                 .suggests(CommonSettlementSuggestions::suggestAllAreasInSettlement)
                                 .then(Commands.argument("player", StringArgumentType.word())
                                         .suggests(CommonSettlementSuggestions::suggestAllPlayersInSettlement)
                                         .requires(sender -> sender.getExecutor() instanceof Player)
-                                        .executes(SettlementAreasCommand::runCommandForWand)
+                                        .executes(SettlementAreasCommand::runCommandForTrust)
                                 )
                         )
                 )
-                .then(Commands.literal("revoke")
+                .then(Commands.literal("untrust")
                         .then(Commands.argument("area", StringArgumentType.word())
                                 .suggests(CommonSettlementSuggestions::suggestAllAreasInSettlement)
                                 .then(Commands.argument("player", StringArgumentType.word())
                                         .suggests(CommonSettlementSuggestions::suggestAllPlayersInSettlement)
                                         .requires(sender -> sender.getExecutor() instanceof Player)
-                                        .executes(SettlementAreasCommand::runCommandForWand)
+                                        .executes(SettlementAreasCommand::runCommandForUntrust)
                                 )
                         )
                 )
@@ -100,11 +102,15 @@ public class SettlementAreasCommand {
                         .requires(sender -> sender.getExecutor() instanceof Player)
                         .executes(SettlementAreasCommand::runCommandForList)
                 )
+                .then(Commands.literal("viewall")
+                        .requires(sender -> sender.getExecutor() instanceof Player)
+                        .executes(SettlementAreasCommand::runCommandForViewAll)
+                )
                 .then(Commands.literal("view")
                         .then(Commands.argument("area", StringArgumentType.word())
                                 .suggests(CommonSettlementSuggestions::suggestAllAreasInSettlement)
                                 .requires(sender -> sender.getExecutor() instanceof Player)
-                                .executes(SettlementAreasCommand::runCommandForWand)
+                                .executes(SettlementAreasCommand::runCommandForView)
                         )
                 )
                 .then(Commands.literal("transfer")
@@ -113,7 +119,7 @@ public class SettlementAreasCommand {
                                 .then(Commands.argument("player", StringArgumentType.word())
                                         .suggests(CommonSettlementSuggestions::suggestAllPlayersInSettlement)
                                         .requires(sender -> sender.getExecutor() instanceof Player)
-                                        .executes(SettlementAreasCommand::runCommandForWand)
+                                        .executes(SettlementAreasCommand::runCommandForTransfer)
                                 )
                         )
                 )
@@ -121,7 +127,7 @@ public class SettlementAreasCommand {
                         .then(Commands.argument("area", StringArgumentType.word())
                                 .suggests(CommonSettlementSuggestions::suggestAllAreasInSettlement)
                                 .requires(sender -> sender.getExecutor() instanceof Player)
-                                .executes(SettlementAreasCommand::runCommandForWand)
+                                .executes(SettlementAreasCommand::runCommandForDelete)
                         )
                 )
                 .build();
@@ -291,7 +297,7 @@ public class SettlementAreasCommand {
             return Command.SINGLE_SUCCESS;
         }
 
-        focus.tell(player, "Changed the <highlight>pos1</highlight> attribute of the area <highlight>" + area.asDisplayString() + "<normal> to <highlight>" + area.getPos1AsString() + "</highlight>!");
+        focus.tell(player, "Changed the <highlight>pos1</highlight> attribute of the area <highlight>" + area.asDisplayString() + "<normal> to <highlight>" + area.displayPos1() + "</highlight>!");
         return Command.SINGLE_SUCCESS;
     }
 
@@ -330,7 +336,7 @@ public class SettlementAreasCommand {
             return Command.SINGLE_SUCCESS;
         }
 
-        focus.tell(player, "Changed the <highlight>pos2</highlight> attribute of the area <highlight>" + area.asDisplayString() + "<normal> to <highlight>" + area.getPos2AsString() + "</highlight>!");
+        focus.tell(player, "Changed the <highlight>pos2</highlight> attribute of the area <highlight>" + area.asDisplayString() + "<normal> to <highlight>" + area.displayPos2() + "</highlight>!");
         return Command.SINGLE_SUCCESS;
     }
 
@@ -339,6 +345,199 @@ public class SettlementAreasCommand {
         Settlement focus = PlayerManager.asJadePlayer(player.getUniqueId()).getFocusSettlement();
 
         new AreasListMenu(focus).open(player);
+        return Command.SINGLE_SUCCESS;
+    }
+
+    public static int runCommandForViewAll(CommandContext<CommandSourceStack> context) {
+        Player player = (Player) context.getSource().getSender();
+        JadePlayer jadePlayer = PlayerManager.asJadePlayer(player.getUniqueId());
+        Settlement focus = jadePlayer.getFocusSettlement();
+
+        if (!SettlementCommand.validateFocusSettlement(player, focus)) { return Command.SINGLE_SUCCESS; }
+
+        if (!player.getWorld().equals(focus.getWorld())) {
+            player.sendMessage(error("This settlement (<highlight>" + focus.getName() + "</highlight>) does not hold any areas in the world you're currently in!"));
+            return Command.SINGLE_SUCCESS;
+        }
+
+        boolean result = jadePlayer.toggleAreaView(focus);
+        if (result) {
+            player.sendMessage(info("You are now viewing all nearby areas in <highlight>" + focus.getDisplayName() + "<normal>!"));
+        } else {
+            player.sendMessage(info("You are no longer viewing nearby areas in <highlight>" + focus.getDisplayName() + "<normal>!"));
+        }
+        return Command.SINGLE_SUCCESS;
+    }
+
+    public static int runCommandForView(CommandContext<CommandSourceStack> context) {
+        Player player = (Player) context.getSource().getSender();
+        JadePlayer jadePlayer = PlayerManager.asJadePlayer(player.getUniqueId());
+        Settlement focus = jadePlayer.getFocusSettlement();
+
+        if (!SettlementCommand.validateFocusSettlement(player, focus)) { return Command.SINGLE_SUCCESS; }
+
+        if (!player.getWorld().equals(focus.getWorld())) {
+            player.sendMessage(error("This settlement (<highlight>" + focus.getName() + "</highlight>) does not hold any areas in the world you're currently in!"));
+            return Command.SINGLE_SUCCESS;
+        }
+
+        String areaArgument = StringArgumentType.getString(context, "area");
+        Area area = focus.getAreaByName(areaArgument);
+        if (area == null) {
+            player.sendMessage(error("Could not find an area named <highlight>" + areaArgument + "</highlight>!"));
+            return Command.SINGLE_SUCCESS;
+        }
+
+        boolean result = jadePlayer.toggleAreaView(area);
+        if (result) {
+            player.sendMessage(info("You are now viewing borders for the <highlight>" + area.getDisplayName() + "<normal> area!"));
+        } else {
+            player.sendMessage(info("You are no longer viewing the <highlight>" + area.getDisplayName() + "<normal> area!"));
+        }
+        return Command.SINGLE_SUCCESS;
+    }
+
+    public static int runCommandForTrust(CommandContext<CommandSourceStack> context) {
+        Player player = (Player) context.getSource().getSender();
+        JadePlayer jadePlayer = PlayerManager.asJadePlayer(player.getUniqueId());
+        Settlement focus = jadePlayer.getFocusSettlement();
+
+        if (!SettlementCommand.validateFocusSettlement(player, focus)) { return Command.SINGLE_SUCCESS; }
+
+        String areaArgument = StringArgumentType.getString(context, "area");
+        Area area = focus.getAreaByName(areaArgument);
+        if (area == null) {
+            player.sendMessage(error("Could not find an area named <highlight>" + areaArgument + "</highlight>!"));
+            return Command.SINGLE_SUCCESS;
+        } else if (!area.isHolder(player.getUniqueId()) && !focus.getRoleFromMember(player.getUniqueId()).isLeader()) {
+            player.sendMessage(error("You are not allowed to manage members for the <highlight>" + areaArgument + "</highlight> area!"));
+            return Command.SINGLE_SUCCESS;
+        }
+
+        String targetArgument = StringArgumentType.getString(context, "player");
+        OfflinePlayer target = Bukkit.getOfflinePlayer(targetArgument);
+        if (!target.hasPlayedBefore()) {
+            player.sendMessage(error("Could not find a player named <highlight>" + targetArgument + "</highlight>!"));
+            return Command.SINGLE_SUCCESS;
+        } else if (targetArgument.equals(player.getName())) {
+            player.sendMessage(error("You can't trust yourself!"));
+            return Command.SINGLE_SUCCESS;
+        } else if (area.isMember(target.getUniqueId())) {
+            player.sendMessage(error("This player (<highlight>" + targetArgument + "</highlight>) is already trusted in the <highlight>" + area.getName() + "</highlight> area)!"));
+            return Command.SINGLE_SUCCESS;
+        }
+
+        area.addMember(target.getUniqueId());
+
+        focus.tell(player, "<highlight>" + target.getName() + "</highlight> is now trusted in the <highlight>" + area.getDisplayName() + "<normal> area!");
+        if (target.isOnline()) {
+            focus.tell((Player) target, "You are now trusted in the <highlight>" + area.getDisplayName() + "<normal> area!");
+        }
+        return Command.SINGLE_SUCCESS;
+    }
+
+    public static int runCommandForUntrust(CommandContext<CommandSourceStack> context) {
+        Player player = (Player) context.getSource().getSender();
+        JadePlayer jadePlayer = PlayerManager.asJadePlayer(player.getUniqueId());
+        Settlement focus = jadePlayer.getFocusSettlement();
+
+        if (!SettlementCommand.validateFocusSettlement(player, focus)) { return Command.SINGLE_SUCCESS; }
+
+        String areaArgument = StringArgumentType.getString(context, "area");
+        Area area = focus.getAreaByName(areaArgument);
+        if (area == null) {
+            player.sendMessage(error("Could not find an area named <highlight>" + areaArgument + "</highlight>!"));
+            return Command.SINGLE_SUCCESS;
+        } else if (!area.isHolder(player.getUniqueId()) && !focus.getRoleFromMember(player.getUniqueId()).isLeader()) {
+            player.sendMessage(error("You are not allowed to manage members for the <highlight>" + areaArgument + "</highlight> area!"));
+            return Command.SINGLE_SUCCESS;
+        }
+
+        String targetArgument = StringArgumentType.getString(context, "player");
+        OfflinePlayer target = Bukkit.getOfflinePlayer(targetArgument);
+        if (!target.hasPlayedBefore()) {
+            player.sendMessage(error("Could not find a player named <highlight>" + targetArgument + "</highlight>!"));
+            return Command.SINGLE_SUCCESS;
+        } else if (targetArgument.equals(player.getName())) {
+            player.sendMessage(error("You can't untrust yourself!"));
+            player.sendMessage(info("To delete the area, do <highlight>/settlement areas delete <i><area>"));
+            return Command.SINGLE_SUCCESS;
+        } else if (!area.isMember(target.getUniqueId())) {
+            player.sendMessage(error("This player (<highlight>" + targetArgument + "</highlight>) is already not trusted in the <highlight>" + area.getName() + "</highlight> area)!"));
+            return Command.SINGLE_SUCCESS;
+        } else if (focus.getRoleFromMember(target.getUniqueId()).isLeader()) {
+            player.sendMessage(error("This player (<highlight>" + targetArgument + "</highlight>) is the <highlight>leader</highlight>, and cannot be removed from any area!"));
+            return Command.SINGLE_SUCCESS;
+        }
+
+        area.removeMember(target.getUniqueId());
+
+        focus.tell(player, "<highlight>" + target.getName() + "</highlight> is no longer trusted in the <highlight>" + area.getDisplayName() + "<normal> area!");
+        if (target.isOnline()) {
+            focus.tell((Player) target, "You are no longer trusted in the <highlight>" + area.getDisplayName() + "<normal> area!");
+        }
+        return Command.SINGLE_SUCCESS;
+    }
+
+    public static int runCommandForDelete(CommandContext<CommandSourceStack> context) {
+        Player player = (Player) context.getSource().getSender();
+        JadePlayer jadePlayer = PlayerManager.asJadePlayer(player.getUniqueId());
+        Settlement focus = jadePlayer.getFocusSettlement();
+
+        if (!SettlementCommand.validateFocusSettlement(player, focus)) { return Command.SINGLE_SUCCESS; }
+
+        String areaArgument = StringArgumentType.getString(context, "area");
+        Area area = focus.getAreaByName(areaArgument);
+        if (area == null) {
+            player.sendMessage(error("Could not find an area named <highlight>" + areaArgument + "</highlight>!"));
+            return Command.SINGLE_SUCCESS;
+        } else if (!focus.getRoleFromMember(player.getUniqueId()).isLeader()) {
+            player.sendMessage(error("Only the <highlight>leader</highlight> is allowed to delete areas!"));
+            return Command.SINGLE_SUCCESS;
+        }
+
+        focus.removeArea(area);
+
+        focus.broadcast("A high official has <red>deleted</red> the <highlight>" + area.getDisplayName() + "<normal> area!");
+        return Command.SINGLE_SUCCESS;
+    }
+
+    public static int runCommandForTransfer(CommandContext<CommandSourceStack> context) {
+        Player player = (Player) context.getSource().getSender();
+        JadePlayer jadePlayer = PlayerManager.asJadePlayer(player.getUniqueId());
+        Settlement focus = jadePlayer.getFocusSettlement();
+
+        if (!SettlementCommand.validateFocusSettlement(player, focus)) { return Command.SINGLE_SUCCESS; }
+
+        String areaArgument = StringArgumentType.getString(context, "area");
+        Area area = focus.getAreaByName(areaArgument);
+        if (area == null) {
+            player.sendMessage(error("Could not find an area named <highlight>" + areaArgument + "</highlight>!"));
+            return Command.SINGLE_SUCCESS;
+        } else if (!area.isHolder(player.getUniqueId())) {
+            player.sendMessage(error("You are not the rightful holder of the <highlight>" + areaArgument + "</highlight> area!"));
+            return Command.SINGLE_SUCCESS;
+        }
+
+        String targetArgument = StringArgumentType.getString(context, "player");
+        OfflinePlayer target = Bukkit.getOfflinePlayer(targetArgument);
+        if (!target.hasPlayedBefore()) {
+            player.sendMessage(error("Could not find a player named <highlight>" + targetArgument + "</highlight>!"));
+            return Command.SINGLE_SUCCESS;
+        } else if (targetArgument.equals(player.getName())) {
+            player.sendMessage(error("You can't transfer an area to yourself!"));
+            return Command.SINGLE_SUCCESS;
+        } else if (!area.isMember(target.getUniqueId())) {
+            player.sendMessage(error("This player (<highlight>" + targetArgument + "</highlight>) is not a member of the <highlight>" + area.getName() + "</highlight> area)!"));
+            return Command.SINGLE_SUCCESS;
+        }
+
+        area.setHolder(target.getUniqueId());
+
+        focus.broadcast("<gold>" + player.getName() + " has <highlight>transferred holdership</highlight> of the <highlight>" + area.getDisplayName() + "<normal> area to <gold>" + target.getName() + " </gold>!");
+        if (target.isOnline()) {
+            focus.tell((Player) target, "You are now the <highlight>holder</highlight> of the " + area.getDisplayName() + "<normal> area! Congratulations!");
+        }
         return Command.SINGLE_SUCCESS;
     }
 }

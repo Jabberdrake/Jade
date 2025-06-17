@@ -63,7 +63,7 @@ public class SettlementDisbandCommand {
 
         RealmManager.deleteSettlement(settlement);
 
-        settlement.broadcast("A high official has <red>disbanded</red> the settlement. Goodbye...");
+        settlement.broadcast("A high official has <red>disbanded</red> the settlement. Goodbye everyone...");
         Bukkit.broadcast(info("The settlement of " + settlement.getDisplayName() + "<normal> has been disbanded!"));
         return Command.SINGLE_SUCCESS;
     }

@@ -44,6 +44,7 @@ public class PlayerManager {
     }
 
     public static void handleLogout(UUID uuid) {
+        cache.get(uuid).clearViewTasks();
         cache.remove(uuid);
     }
 

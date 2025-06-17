@@ -2,15 +2,9 @@ package dev.jabberdrake.jade.database;
 
 import dev.jabberdrake.jade.Jade;
 import dev.jabberdrake.jade.JadeSettings;
-import dev.jabberdrake.jade.database.daos.NationDataObject;
-import dev.jabberdrake.jade.database.daos.PlayerDataObject;
-import dev.jabberdrake.jade.database.daos.SettlementDataObject;
-import dev.jabberdrake.jade.database.daos.TitleDataObject;
+import dev.jabberdrake.jade.database.daos.*;
 import dev.jabberdrake.jade.players.JadePlayer;
-import dev.jabberdrake.jade.realms.ChunkAnchor;
-import dev.jabberdrake.jade.realms.Nation;
-import dev.jabberdrake.jade.realms.Settlement;
-import dev.jabberdrake.jade.realms.SettlementRole;
+import dev.jabberdrake.jade.realms.*;
 import dev.jabberdrake.jade.titles.JadeTitle;
 import net.kyori.adventure.text.format.TextColor;
 import org.sqlite.SQLiteDataSource;
@@ -58,6 +52,7 @@ public class DatabaseManager {
         dataObjectRegistry.put(JadeTitle.class, new TitleDataObject(plugin, database));
         dataObjectRegistry.put(Settlement.class, new SettlementDataObject(plugin, database));
         dataObjectRegistry.put(Nation.class, new NationDataObject(plugin, database));
+        dataObjectRegistry.put(Area.class, new AreaDataObject(plugin, database));
 
         plugin.getLogger().info("[DatabaseManager::initialize] Finished database initialization!");
     }
@@ -77,6 +72,10 @@ public class DatabaseManager {
 
     public static NationDataObject getNationDao() {
         return (NationDataObject) dataObjectRegistry.get(Nation.class);
+    }
+
+    public static AreaDataObject getAreaDao() {
+        return (AreaDataObject) dataObjectRegistry.get(Area.class);
     }
 
     // PLAYER METHODS
@@ -237,6 +236,35 @@ public class DatabaseManager {
 
     public static void alterCapitalForNation(Settlement settlement, Nation nation) {
         getNationDao().alterCapitalForNation(settlement, nation);
+    }
+
+    // AREA METHODS
+    public static int createArea(Area area) {
+        return getAreaDao().create(area);
+    }
+
+    public static Area fetchAreaByID(int id) {
+        return getAreaDao().fetch(id);
+    }
+
+    public static List<Area> fetchAllAreas() {
+        return getAreaDao().fetchAll();
+    }
+
+    public static void saveArea(Area area) {
+        getAreaDao().save(area);
+    }
+
+    public static void deleteArea(int id) {
+        getAreaDao().delete(id);
+    }
+
+    public static void addMemberToArea(UUID memberID, Area area) {
+        getAreaDao().addMemberToArea(memberID, area);
+    }
+
+    public static void removeMemberFromArea(UUID memberID, Area area) {
+        getAreaDao().removeMemberFromArea(memberID, area);
     }
 
     public static void shutdown() {

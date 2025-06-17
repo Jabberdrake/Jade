@@ -5,6 +5,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import dev.jabberdrake.jade.commands.SettlementCommand;
 import dev.jabberdrake.jade.players.PlayerManager;
+import dev.jabberdrake.jade.realms.ChunkAnchor;
 import dev.jabberdrake.jade.realms.RealmManager;
 import dev.jabberdrake.jade.realms.Settlement;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
@@ -33,6 +34,9 @@ public class SettlementUnclaimCommand {
 
         if (focus.getTerritory().size() <= 1) {
             player.sendMessage(error("This settlement (<highlight>" + focus.getName() + "</highlight>) only has one chunk of territory left!"));
+            return Command.SINGLE_SUCCESS;
+        } else if (focus.hasAreaInChunk(new ChunkAnchor(currentChunk))) {
+            player.sendMessage(error("There is an area in this settlement (<highlight>" + focus.getName() + "</highlight>) occupying this chunk!"));
             return Command.SINGLE_SUCCESS;
         }
 

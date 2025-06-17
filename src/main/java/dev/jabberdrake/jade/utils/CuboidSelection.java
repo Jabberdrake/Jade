@@ -1,12 +1,13 @@
 package dev.jabberdrake.jade.utils;
 
 import dev.jabberdrake.jade.realms.ChunkAnchor;
+import net.kyori.adventure.text.Component;
+import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
 
 import java.util.*;
-import java.util.stream.Stream;
 
 public class CuboidSelection {
     private final World world;
@@ -21,6 +22,11 @@ public class CuboidSelection {
 
     private Location pos1;
     private Location pos2;
+
+    // cached frames
+    private List<Location> pos1Frame;
+    private List<Location> pos2Frame;
+    private List<Location> wireframe;
 
     private Set<ChunkAnchor> chunks = new HashSet<>();
 
@@ -43,8 +49,9 @@ public class CuboidSelection {
     public void setPos1(Location pos1) {
         if (!pos1.getWorld().equals(this.world)) return;
         this.pos1 = pos1;
+        this.pos1Frame = generateFrameForLocation(this.pos1);
         if (this.pos2 != null) {
-            this.setAnchors();
+            this.updateInternals();
         }
     }
 
@@ -59,12 +66,13 @@ public class CuboidSelection {
     public void setPos2(Location pos2) {
         if (!pos2.getWorld().equals(this.world)) return;
         this.pos2 = pos2;
+        this.pos2Frame = generateFrameForLocation(this.pos2);
         if (this.pos1 != null) {
-            this.setAnchors();
+            this.updateInternals();
         }
     }
 
-    private void setAnchors() {
+    private void updateInternals() {
         if (pos1 == null || pos2 == null) return;
 
         // Setting X coordinates
@@ -101,127 +109,69 @@ public class CuboidSelection {
                 chunks.add(new ChunkAnchor(chunk));
             }
         }
+
+        // Recalculating frames
+        pos1Frame = generateFrameForLocation(pos1);
+        pos2Frame = generateFrameForLocation(pos2);
+
+        wireframe = generateWireframe();
     }
 
-    public List<Location> getFrameForLocation(Location location) {
-        return List.of(
-                location.offset(1, 1, 1).toLocation(world),
-                location.offset(1, 1, 0).toLocation(world),
-                location.offset(0, 1, 1).toLocation(world),
-                location.offset(0, 1, 0).toLocation(world),
-                location.offset(1, 0, 1).toLocation(world),
-                location.offset(1, 0, 0).toLocation(world),
-                location.offset(0, 0, 1).toLocation(world),
-                location.offset(0, 0, 0).toLocation(world)
-        );
+    public int getVolume() {
+        if (this.hasPos1() && this.hasPos2()) {
+            return (int) (Math.abs(maxX - minX) * Math.abs(maxY - minY) * Math.abs(maxZ - minZ));
+        } else return -1;
+    }
+
+    public List<Location> generateFrameForLocation(Location location) {
+        double x = location.x();
+        double y = location.y();
+        double z = location.z();
+        List<Location> frame = new ArrayList<>();
+        frame.addAll(PositionUtils.traceNorthEdge(world, x, x+1, y, z, 0.25, true));
+        frame.addAll(PositionUtils.traceNorthEdge(world, x, x+1, y, z, 0.25, false));
+        frame.addAll(PositionUtils.traceWestEdge(world, x, y, z, z+1, 0.25, true));
+        frame.addAll(PositionUtils.traceWestEdge(world, x, y, z, z+1, 0.25, false));
+        frame.addAll(PositionUtils.traceEastEdge(world, x, y, z, z+1, 0.25, true));
+        frame.addAll(PositionUtils.traceEastEdge(world, x, y, z, z+1, 0.25, false));
+        frame.addAll(PositionUtils.traceSouthEdge(world, x, x+1, y, z, 0.25, true));
+        frame.addAll(PositionUtils.traceSouthEdge(world, x, x+1, y, z, 0.25, false));
+        frame.addAll(PositionUtils.traceNorthwestColumn(world, x, y, y+1, z, 0.25));
+        frame.addAll(PositionUtils.traceNortheastColumn(world, x, y, y+1, z, 0.25));
+        frame.addAll(PositionUtils.traceSouthwestColumn(world, x, y, y+1, z, 0.25));
+        frame.addAll(PositionUtils.traceSoutheastColumn(world, x, y, y+1, z, 0.25));
+
+        return frame;
     }
 
     public List<Location> getFrameForPos1() {
-        return this.getFrameForLocation(this.pos1);
+        return this.pos1Frame;
     }
 
     public List<Location> getFrameForPos2() {
-        return this.getFrameForLocation(this.pos2);
+        return this.pos2Frame;
     }
 
-    public List<Location> getWireframe(boolean trimEnds) {
-        if (hasPos1() && hasPos2()) {
-            List<Location> wireframe = new ArrayList<>();
+    public List<Location> generateWireframe() {
+        List<Location> wireframe = new ArrayList<>();
+        wireframe.addAll(PositionUtils.traceNorthEdge(world, minX, maxX+1, maxY, minZ, 0.25, true));
+        wireframe.addAll(PositionUtils.traceNorthEdge(world, minX, maxX+1, minY, minZ, 0.25, false));
+        wireframe.addAll(PositionUtils.traceWestEdge(world, minX, maxY, minZ, maxZ+1, 0.25, true));
+        wireframe.addAll(PositionUtils.traceWestEdge(world, minX, minY, minZ, maxZ+1, 0.25, false));
+        wireframe.addAll(PositionUtils.traceEastEdge(world, maxX, maxY, minZ, maxZ+1, 0.25, true));
+        wireframe.addAll(PositionUtils.traceEastEdge(world, maxX, minY, minZ, maxZ+1, 0.25, false));
+        wireframe.addAll(PositionUtils.traceSouthEdge(world, minX, maxX+1, maxY, maxZ, 0.25, true));
+        wireframe.addAll(PositionUtils.traceSouthEdge(world, minX, maxX+1, minY, maxZ, 0.25, false));
+        wireframe.addAll(PositionUtils.traceNorthwestColumn(world, maxX, minY, maxY+1, maxZ, 0.25));
+        wireframe.addAll(PositionUtils.traceNortheastColumn(world, minX, minY, maxY+1, maxZ, 0.25));
+        wireframe.addAll(PositionUtils.traceSouthwestColumn(world, maxX, minY, maxY+1, minZ, 0.25));
+        wireframe.addAll(PositionUtils.traceSoutheastColumn(world, minX, minY, maxY+1, minZ, 0.25));
 
-            wireframe.addAll(this.traceEdge("HIGH", "MAX -> E", trimEnds));
-            wireframe.addAll(this.traceEdge("HIGH", "MAX -> W", trimEnds));
-            wireframe.addAll(this.traceEdge("HIGH", "E -> MIN", trimEnds));
-            wireframe.addAll(this.traceEdge("HIGH", "W -> MIN", trimEnds));
-            wireframe.addAll(this.traceEdge("LOW", "MAX -> E", trimEnds));
-            wireframe.addAll(this.traceEdge("LOW", "MAX -> W", trimEnds));
-            wireframe.addAll(this.traceEdge("LOW", "E -> MIN", trimEnds));
-            wireframe.addAll(this.traceEdge("LOW", "W -> MIN", trimEnds));
-            wireframe.addAll(this.traceColumn("MAX", trimEnds));
-            wireframe.addAll(this.traceColumn("E", trimEnds));
-            wireframe.addAll(this.traceColumn("W", trimEnds));
-            wireframe.addAll(this.traceColumn("MIN", trimEnds));
-
-            return wireframe;
-        } else return null;
+        return wireframe;
     }
 
-    public List<Location> traceEdge(String yPlane, String line, boolean trimEnds) {
-        List<Location> edge = new ArrayList<>();
-        double y = yPlane.equals("HIGH") ? maxY + 1 : minY;
-        double dx = 0;
-        double dz = 0;
-
-        double trim = trimEnds ? 1 : 0;
-
-        switch (line) {
-            case "MAX -> E":
-                // MAX = (maxX, ---, maxZ)
-                // E = (minX, ---, maxZ)
-                while (minX + trim + dx <= maxX + 1 - trim) {
-                    edge.add(new Location(world, minX + dx, y, maxZ + 1));
-                    dx += 0.25;
-                }
-                return edge;
-            case "MAX -> W":
-                // MAX = (maxX, ---, maxZ)
-                // W = (maxX, ---, minZ)
-                while (minZ + trim + dz <= maxZ + 1 - trim) {
-                    edge.add(new Location(world, maxX + 1, y, minZ + dz));
-                    dz += 0.25;
-                }
-                return edge;
-            case "E -> MIN":
-                // E = (minX, ---, maxZ)
-                // MIN = (minX, ---, minZ)
-                while (minZ + trim + dz <= maxZ + 1 - trim) {
-                    edge.add(new Location(world, minX, y, minZ + dz));
-                    dz += 0.25;
-                }
-                return edge;
-            case "W -> MIN":
-                // W = (maxX, ---, minZ)
-                // MIN = (minX, ---, minZ)
-                while (minX + trim + dx <= maxX + 1 - trim) {
-                    edge.add(new Location(world, minX + dx, y, minZ));
-                    dx += 0.25;
-                }
-                return edge;
-            default:
-                return null;
-        }
-    }
-
-    public List<Location> traceColumn(String vertex, boolean trimEnds) {
-        List<Location> column = new ArrayList<>();
-        double x = 0;
-        double z = 0;
-
-        double trim = trimEnds ? 1 : 0;
-
-        switch (vertex) {
-            case "MAX":
-                x = maxX + 1;
-                z = maxZ + 1;
-                break;
-            case "W":
-                x = maxX + 1;
-                z = minZ;
-                break;
-            case "E":
-                x = minX;
-                z = maxZ + 1;
-                break;
-            case "MIN":
-                x = minX;
-                z = minZ;
-                break;
-            default:
-                return null;
-        }
-        for (double dy = trim; minY + dy <= maxY + 1 - trim; dy += 0.25) {
-            column.add(new Location(world, x, minY + dy, z));
-        }
-        return column;
+    public List<Location> getWireframe() {
+        return this.wireframe;
     }
 
     public boolean intersectsChunk(ChunkAnchor anchor) {
@@ -231,5 +181,22 @@ public class CuboidSelection {
             }
         }
         return false;
+    }
+
+    public boolean containsPosition(double x, double y, double z) {
+        if (this.hasPos1() && this.hasPos2()) {
+            return (x >= minX && x <= maxX) && (y >= minY && y <= maxY) && (z >= minZ && z <= maxZ);
+        } else return false;
+    }
+
+    public int getShortestChunkDistanceTo(ChunkAnchor anchor) {
+        int minDistance = 99;
+        for (ChunkAnchor chunk : chunks) {
+            int manhattanDistance = Math.abs(chunk.getX() - anchor.getX()) + Math.abs(chunk.getZ() - anchor.getZ());
+            if (manhattanDistance < minDistance) {
+                minDistance = manhattanDistance;
+            }
+        }
+        return minDistance;
     }
 }

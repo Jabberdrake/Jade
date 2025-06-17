@@ -5,6 +5,7 @@ import dev.jabberdrake.jade.database.DatabaseManager;
 import dev.jabberdrake.jade.realms.settings.BlockProtectionSetting;
 import dev.jabberdrake.jade.utils.ItemUtils;
 import dev.jabberdrake.jade.utils.AbstractSetting;
+import dev.jabberdrake.jade.utils.JadeTextColor;
 import dev.jabberdrake.jade.utils.TextUtils;
 import dev.jabberdrake.jade.utils.message.SettlementStrategy;
 import io.papermc.paper.datacomponent.DataComponentTypes;
@@ -314,6 +315,14 @@ public class Settlement {
         return this.population.containsKey(uuid);
     }
 
+    public Component getMemberAsComponent(UUID uuid) {
+        if (this.containsPlayer(uuid)) {
+            return this.getRoleFromMember(uuid).getDisplayAsComponent()
+                    .append(Component.text(" " + Bukkit.getOfflinePlayer(uuid).getName(), LIGHT_ZORBA));
+        }
+        return null;
+    }
+
     public Set<ChunkAnchor> getTerritory() {
         return this.territory;
     }
@@ -351,6 +360,14 @@ public class Settlement {
         }
     }
 
+    public UUID getLeaderUUID() {
+        for (UUID memberID : this.getPopulation().keySet()) {
+            SettlementRole role = this.getPopulation().get(memberID);
+            if (role.isLeader()) return memberID;
+        }
+        return null;
+    }
+
     public void addMember(UUID playerID, SettlementRole role) {
         this.population.put(playerID, role);
         DatabaseManager.addPlayerToSettlement(playerID, this, role);
@@ -359,6 +376,18 @@ public class Settlement {
     public void removeMember(UUID playerID) {
         if (this.containsPlayer(playerID)) {
             this.population.remove(playerID);
+
+            for (Area area : this.getAreaList()) {
+
+                if (area.isHolder(playerID)) {
+                    area.setHolder(getLeaderUUID());
+                }
+
+                if (area.isMember(playerID)) {
+                    area.removeMember(playerID);
+                }
+            }
+
             DatabaseManager.removePlayerFromSettlement(playerID, this);
         }
     }
@@ -532,21 +561,43 @@ public class Settlement {
         return null;
     }
 
-    // Used by DatabaseManager
-    public void setAreaList(List<Area> areaList) {
-        this.areas = areaList;
+    public boolean hasAreaInChunk(ChunkAnchor anchor) {
+        for (Area area : this.getAreaList()) {
+            if (area.intersectsChunk(anchor)) return true;
+        }
+        return false;
+    }
+
+    public Area getHighestPriorityAreaForLocation(Location location) {
+        Area result = null;
+        int lowestVolume = 999;
+        for (Area area : this.getAreaList()) {
+            if (area.containsPosition(location.getX(), location.getY(), location.getZ())) {
+                int thisVolume = area.getVolume();
+                if (thisVolume != -1 && thisVolume < lowestVolume) {
+                    result = area;
+                    lowestVolume = thisVolume;
+                }
+            }
+        }
+        return result;
+    }
+
+    // Used by RealmManager
+    public void registerArea(Area area) {
+        this.areas.add(area);
     }
 
     public void addArea(Area area) {
         this.areas.add(area);
-        //int areaID = DatabaseManager.createSettlementArea(area);
-        //area.setId(areaID);
+        int areaID = DatabaseManager.createArea(area);
+        area.setID(areaID);
     }
 
     public void removeArea(Area area) {
         if (this.areas.contains(area)) {
             this.areas.remove(area);
-            //DatabaseManager.deleteSettlementArea(area);
+            DatabaseManager.deleteArea(area.getId());
         }
     }
 
