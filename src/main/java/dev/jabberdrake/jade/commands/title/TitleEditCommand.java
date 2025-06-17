@@ -38,7 +38,7 @@ public class TitleEditCommand {
                                         .executes(TitleEditCommand::runCommandForName))
                         )
                         .then(Commands.literal("display")
-                                .then(Commands.argument("display", StringArgumentType.string())
+                                .then(Commands.argument("display", StringArgumentType.greedyString())
                                 .requires(sender -> sender.getExecutor() instanceof Player)
                                 .executes(TitleEditCommand::runCommandForDisplay))
                         )
@@ -73,7 +73,7 @@ public class TitleEditCommand {
             return Command.SINGLE_SUCCESS;
         }
 
-        String oldTitle = title.getDisplayName() + "<normal> <gray>(" + title.getName() + ")</gray>";
+        String oldTitle = title.asDisplayString();
         title.setName(nameArgument);
 
         for (UUID userID : title.getUserList()) {
@@ -82,10 +82,10 @@ public class TitleEditCommand {
             OfflinePlayer oUser = Bukkit.getOfflinePlayer(userID);
             if (oUser.isOnline()) {
                 Player user = (Player) oUser;
-                user.sendMessage(info("The title of " + title.getDisplayName() + "<normal> has been edited: <highlight>reference name</highlight> is now <gray><bold>" + title.getName()));
+                user.sendMessage(info("The title of <highlight>" + title.getDisplayName() + "<normal> has been edited: <highlight>reference name</highlight> is now <gray><bold>" + title.getName()));
             }
         }
-        player.sendMessage(success("Changed the <highlight>reference name</highlight> of the title " + oldTitle + " to <highlight>" + title.getName() + "<normal>!"));
+        player.sendMessage(success("Changed the <highlight>reference name</highlight> of the title <highlight>" + oldTitle + " to <highlight>" + title.getName() + "<normal>!"));
         return Command.SINGLE_SUCCESS;
     }
 
@@ -106,7 +106,7 @@ public class TitleEditCommand {
             return Command.SINGLE_SUCCESS;
         }
 
-        String oldTitle = title.getDisplayName() + "<normal> <gray>(" + title.getName() + ")</gray>";
+        String oldTitle = title.asDisplayString();
         title.setDisplayName(display);
 
         for (UUID userID : title.getUserList()) {
@@ -115,10 +115,10 @@ public class TitleEditCommand {
             OfflinePlayer oUser = Bukkit.getOfflinePlayer(userID);
             if (oUser.isOnline()) {
                 Player user = (Player) oUser;
-                user.sendMessage(info("The title of " + title.getDisplayName() + "<normal> has been edited: <highlight>display name</highlight> is now " + title.getDisplayName()));
+                user.sendMessage(info("The title of <highlight>" + title.getDisplayName() + "<normal> has been edited: <highlight>display name</highlight> is now " + title.getDisplayName()));
             }
         }
-        player.sendMessage(success("Changed the <highlight>display name</highlight> of the title " + oldTitle + " to <highlight>" + title.getDisplayName() + "<normal>!"));
+        player.sendMessage(success("Changed the <highlight>display name</highlight> of the title <highlight>" + oldTitle + " to <highlight>" + title.getDisplayName() + "<normal>!"));
         return Command.SINGLE_SUCCESS;
     }
 
@@ -169,10 +169,10 @@ public class TitleEditCommand {
             OfflinePlayer oUser = Bukkit.getOfflinePlayer(userID);
             if (oUser.isOnline()) {
                 Player user = (Player) oUser;
-                user.sendMessage(info("The title of " + title.getDisplayName() + "<normal> has been edited: <highlight>icon</highlight> is now <highlight>" + title.getIconAsString()));
+                user.sendMessage(info("The title of <highlight>" + title.getDisplayName() + "<normal> has been edited: <highlight>icon</highlight> is now <highlight>" + title.getIconAsString()));
             }
         }
-        player.sendMessage(success("Changed the <highlight>icon</highlight> of the title " + title.asDisplayString() + " to <highlight>" + title.getIconAsString() + "<normal>!"));
+        player.sendMessage(success("Changed the <highlight>icon</highlight> of the title <highlight>" + title.asDisplayString() + " to <highlight>" + title.getIconAsString() + "<normal>!"));
         return Command.SINGLE_SUCCESS;
     }
 }

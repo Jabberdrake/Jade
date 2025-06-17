@@ -10,10 +10,9 @@ import dev.jabberdrake.jade.players.PlayerManager;
 import dev.jabberdrake.jade.realms.ChunkAnchor;
 import dev.jabberdrake.jade.realms.RealmManager;
 import dev.jabberdrake.jade.realms.Settlement;
-import dev.jabberdrake.jade.utils.TextUtils;
+import dev.jabberdrake.jade.realms.Area;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
-import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
@@ -50,7 +49,7 @@ public class SettlementViewCommand {
                 if (!player.isOnline() || player.isDead()) { task.cancel(); }
 
                 drawClaimBorders(player, new ChunkAnchor(player.getChunk()));
-            }, 0, 60);
+            }, 0, 30);
         } else {
             ongoingViewTasks.remove(player.getUniqueId()).cancel();
             player.sendMessage(info("You are no longer viewing settlement borders!"));
@@ -59,19 +58,24 @@ public class SettlementViewCommand {
         return Command.SINGLE_SUCCESS;
     }
 
-    public static ParticleBuilder buildParticle(TextColor mapColor, Player player) {
+    public static ParticleBuilder buildClaimParticle(TextColor mapColor, Player player) {
         Particle.DustOptions claimBorderOptions = new Particle.DustOptions(
                 Color.fromRGB(mapColor.red(), mapColor.green(), mapColor.blue()
                 ), 10F);
-        ParticleBuilder claimParticle = new ParticleBuilder(Particle.DUST)
-                .data(claimBorderOptions).count(10).clone().receivers(player);
 
-        return claimParticle;
+        return new ParticleBuilder(Particle.DUST)
+                .data(claimBorderOptions).count(5).clone().receivers(player);
+    }
+
+    public static ParticleBuilder buildAreaParticle(Player player) {
+        return new ParticleBuilder(Particle.FLAME).count(0).clone().receivers(player);
     }
 
     public static void drawClaimBorders(Player player, ChunkAnchor anchor) {
         World world = player.getWorld();
         double y = player.getY();
+
+        Set<Area> areas = new HashSet<>();
 
         Set<ChunkAnchor> processed = new LinkedHashSet<>();
         Queue<ChunkAnchor> queue = new LinkedList<>();
@@ -95,25 +99,30 @@ public class SettlementViewCommand {
                 enqueueIfValid(processed, queue, anchor, east);
                 continue;
             }
+            owner.getAreaList().forEach(area -> {
+                if (area.intersectsChunk(head)) {
+                    areas.add(area);
+                }
+            });
 
             Settlement northOwner = RealmManager.getChunkOwner(north);
             Settlement southOwner = RealmManager.getChunkOwner(south);
             Settlement westOwner = RealmManager.getChunkOwner(west);
             Settlement eastOwner = RealmManager.getChunkOwner(east);
             if (northOwner == null || !northOwner.equals(owner)) {
-                drawNorthEdge(buildParticle(owner.getMapColor(), player), world, head, y);
+                drawNorthEdge(buildClaimParticle(owner.getMapColor(), player), world, head, y);
             }
 
             if (southOwner == null || !southOwner.equals(owner)) {
-                drawSouthEdge(buildParticle(owner.getMapColor(), player), world, head, y);
+                drawSouthEdge(buildClaimParticle(owner.getMapColor(), player), world, head, y);
             }
 
             if (westOwner == null || !westOwner.equals(owner)) {
-                drawWestEdge(buildParticle(owner.getMapColor(), player), world, head, y);
+                drawWestEdge(buildClaimParticle(owner.getMapColor(), player), world, head, y);
             }
 
             if (eastOwner == null || !eastOwner.equals(owner)) {
-                drawEastEdge(buildParticle(owner.getMapColor(), player), world, head, y);
+                drawEastEdge(buildClaimParticle(owner.getMapColor(), player), world, head, y);
             }
 
             processed.add(head);
@@ -121,7 +130,16 @@ public class SettlementViewCommand {
             enqueueIfValid(processed, queue, anchor, south);
             enqueueIfValid(processed, queue, anchor, west);
             enqueueIfValid(processed, queue, anchor, east);
+        }
 
+        if (!areas.isEmpty()) {
+            ParticleBuilder areaParticle = buildAreaParticle(player);
+            areas.forEach(area -> {
+                for (Location point : area.getWireframe(false)) {
+                    areaParticle.location(point);
+                    areaParticle.spawn();
+                }
+            });
         }
     }
 

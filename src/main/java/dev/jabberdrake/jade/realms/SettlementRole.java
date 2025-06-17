@@ -164,7 +164,10 @@ public class SettlementRole implements Comparable<SettlementRole> {
         };
     }
 
-    public void setIcon(NamespacedKey icon) { this.icon = icon; }
+    public void setIcon(NamespacedKey icon) {
+        this.icon = icon;
+        DatabaseManager.saveSettlementRole(this);
+    }
 
     public String getIconAsString() {
         return this.icon.asString();

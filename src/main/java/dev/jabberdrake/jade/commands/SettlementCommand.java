@@ -23,6 +23,7 @@ public class SettlementCommand {
                 .then(SettlementKickCommand.buildCommand("kick"))
                 .then(SettlementJoinCommand.buildCommand("join"))
                 .then(SettlementLeaveCommand.buildCommand("leave"))
+                .then(SettlementAreasCommand.buildCommand("areas"))
                 .then(SettlementClaimCommand.buildCommand("claim"))
                 .then(SettlementUnclaimCommand.buildCommand("unclaim"))
                 .then(SettlementManageCommand.buildCommand("manage"))

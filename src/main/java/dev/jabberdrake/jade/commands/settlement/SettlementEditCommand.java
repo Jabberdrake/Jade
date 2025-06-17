@@ -88,6 +88,7 @@ public class SettlementEditCommand {
         if (!validateUserPermissions(player, focus)) { return Command.SINGLE_SUCCESS; }
 
         String displayArgument = StringArgumentType.getString(context, "display_name");
+
         focus.setDisplayName(displayArgument);
         focus.broadcast("Changed <highlight>display name</highlight> to " + focus.getDisplayName() + "<normal>!");
 

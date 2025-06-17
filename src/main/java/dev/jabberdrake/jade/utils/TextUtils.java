@@ -4,10 +4,14 @@ import dev.jabberdrake.jade.realms.Settlement;
 import dev.jabberdrake.jade.utils.message.ErrorStrategy;
 import dev.jabberdrake.jade.utils.message.InfoStrategy;
 import dev.jabberdrake.jade.utils.message.SuccessStrategy;
+import io.papermc.paper.datacomponent.item.ItemLore;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+
+import java.util.List;
 
 public class TextUtils {
 
@@ -153,6 +157,12 @@ public class TextUtils {
 
     public static Component deserialize(String text) {
         return MiniMessage.miniMessage().deserialize(text, JadeTextColor.asAdventureTags());
+    }
+
+    public static void lore(ItemLore.Builder loreBuilder, List<Component> loreLines) {
+        for (Component line : loreLines) {
+            loreBuilder.addLine(line.decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE));
+        }
     }
 
 }

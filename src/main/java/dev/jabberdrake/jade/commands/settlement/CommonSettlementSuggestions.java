@@ -4,6 +4,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import dev.jabberdrake.jade.players.PlayerManager;
+import dev.jabberdrake.jade.realms.Area;
 import dev.jabberdrake.jade.realms.RealmManager;
 import dev.jabberdrake.jade.realms.Settlement;
 import dev.jabberdrake.jade.realms.SettlementRole;
@@ -76,6 +77,22 @@ public class CommonSettlementSuggestions {
         Set<String> roleNames = focus.getRoles().stream().map(SettlementRole::getName).collect(Collectors.toSet());
         roleNames.stream()
                 .filter(roleName -> roleName.toLowerCase().startsWith(builder.getRemainingLowerCase()))
+                .forEach(builder::suggest);
+
+        return builder.buildFuture();
+    }
+
+    public static CompletableFuture<Suggestions> suggestAllAreasInSettlement(final CommandContext<CommandSourceStack> context, final SuggestionsBuilder builder) {
+        Player player = (Player) context.getSource().getSender();
+        Settlement focus = PlayerManager.asJadePlayer(player.getUniqueId()).getFocusSettlement();
+
+        if (focus == null || focus.getRoleFromMember(player.getUniqueId()) == null) {
+            return builder.buildFuture();
+        }
+
+        focus.getAreaList().stream()
+                .map(Area::getName)
+                .filter(entry -> entry.toLowerCase().startsWith(builder.getRemainingLowerCase()))
                 .forEach(builder::suggest);
 
         return builder.buildFuture();

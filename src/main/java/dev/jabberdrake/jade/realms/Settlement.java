@@ -14,10 +14,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
-import org.bukkit.Bukkit;
-import org.bukkit.NamespacedKey;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -37,7 +34,7 @@ public class Settlement {
     private static final TextColor DEFAULT_MAP_COLOR = ZORBA;
     private static final int DEFAULT_MAX_FOOD = 1000;
 
-    private final int id;
+    private int id;
     private String name;
     private String displayName;
     private String description;
@@ -51,6 +48,7 @@ public class Settlement {
     private List<SettlementRole> roles = new ArrayList<>();
     private Map<UUID, SettlementRole> population = new HashMap<>();
     private Set<ChunkAnchor> territory = new HashSet<>();
+    private List<Area> areas = new ArrayList<>();
     private final Map<Class<? extends AbstractSetting<?>>, AbstractSetting<?>> settings = new HashMap<>();
 
     private final SettlementStrategy broadcastFormatter = new SettlementStrategy(this);
@@ -205,6 +203,11 @@ public class Settlement {
     public void calculateFoodCapacity() {
         //TODO: make this not dumb as shit
         this.foodCapacity = DEFAULT_MAX_FOOD;
+
+        // sanity check
+        if (this.getFood() > this.getFoodCapacity()) {
+            this.setFood(this.getFoodCapacity());
+        }
     }
 
     public long getCreationTimeAsLong() { return this.creationTime; }
@@ -280,7 +283,16 @@ public class Settlement {
 
     public boolean isUniqueRoleName(String potentialRoleName) {
         for (SettlementRole role: this.getRoles()) {
-            if (role.getName().equals(potentialRoleName)) {
+            if (role.getName().equalsIgnoreCase(potentialRoleName)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public boolean isUniqueAreaName(String potentialAreaName) {
+        for (Area area: this.getAreaList()) {
+            if (area.getName().equalsIgnoreCase(potentialAreaName)) {
                 return false;
             }
         }
@@ -304,6 +316,15 @@ public class Settlement {
 
     public Set<ChunkAnchor> getTerritory() {
         return this.territory;
+    }
+
+    public boolean isInTerritory(double x, double y, double z) {
+        Location loc = new Location(this.getWorld(), x, y, z);
+        ChunkAnchor target = new ChunkAnchor(loc.getChunk());
+        for (ChunkAnchor chunk : this.getTerritory()) {
+            if (target.equals(chunk)) return true;
+        }
+        return false;
     }
 
     // Used by DatabaseManager
@@ -495,6 +516,37 @@ public class Settlement {
             return Component.text().content("Nation: ").color(TextUtils.LIGHT_BRASS)
                     .append(this.getNation().getDisplayNameAsComponent())
                     .build();
+        }
+    }
+
+    public List<Area> getAreaList() {
+        return this.areas;
+    }
+
+    public Area getAreaByName(String name) {
+        for (Area area : this.getAreaList()) {
+            if (area.getName().equalsIgnoreCase(name)) {
+                return area;
+            }
+        }
+        return null;
+    }
+
+    // Used by DatabaseManager
+    public void setAreaList(List<Area> areaList) {
+        this.areas = areaList;
+    }
+
+    public void addArea(Area area) {
+        this.areas.add(area);
+        //int areaID = DatabaseManager.createSettlementArea(area);
+        //area.setId(areaID);
+    }
+
+    public void removeArea(Area area) {
+        if (this.areas.contains(area)) {
+            this.areas.remove(area);
+            //DatabaseManager.deleteSettlementArea(area);
         }
     }
 

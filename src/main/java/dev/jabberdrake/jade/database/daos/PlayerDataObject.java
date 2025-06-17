@@ -6,6 +6,7 @@ import dev.jabberdrake.jade.database.DatabaseManager;
 import dev.jabberdrake.jade.database.DatabaseObject;
 import dev.jabberdrake.jade.players.JadePlayer;
 import dev.jabberdrake.jade.titles.JadeTitle;
+import dev.jabberdrake.jade.titles.TitleManager;
 import org.bukkit.entity.Player;
 
 import java.sql.SQLException;
@@ -41,7 +42,7 @@ public class PlayerDataObject implements DatabaseObject<JadePlayer, UUID> {
                     String roleplay_name = resultSet.getString("roleplay_name");
                     int title_id = resultSet.getInt("title_id");
 
-                    player[0] = new JadePlayer(id, roleplay_name, DatabaseManager.fetchTitleById(title_id));
+                    player[0] = new JadePlayer(id, roleplay_name, TitleManager.getTitle(title_id));
                 }
             });
         } catch (SQLException e) {

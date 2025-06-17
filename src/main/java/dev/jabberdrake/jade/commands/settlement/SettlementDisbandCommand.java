@@ -56,6 +56,11 @@ public class SettlementDisbandCommand {
             return Command.SINGLE_SUCCESS;
         }
 
+        if (settlement.isInNation() && settlement.getNation().getCapital().equals(settlement)) {
+            player.sendMessage(error("This settlement (<highlight>" + settlement.getName() + "</highlight>) is the capital of a nation, and cannot be disbanded!"));
+            return Command.SINGLE_SUCCESS;
+        }
+
         RealmManager.deleteSettlement(settlement);
 
         settlement.broadcast("A high official has <red>disbanded</red> the settlement. Goodbye...");
