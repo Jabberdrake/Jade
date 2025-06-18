@@ -40,6 +40,10 @@ public record ChunkAnchor(World world, int x, int z) {
         return this.world.getName() + ";" + this.x + ";" + this.z;
     }
 
+    public int getManhattanDistanceTo(ChunkAnchor other) {
+        return Math.abs(this.getX() - other.getX()) + Math.abs(this.getZ() - other.getZ());
+    }
+
     public static ChunkAnchor deserialize(String serializedAnchor) {
         String[] split = serializedAnchor.split(";");
         String world = split[0];

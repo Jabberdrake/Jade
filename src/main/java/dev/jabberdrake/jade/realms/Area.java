@@ -60,7 +60,6 @@ public class Area {
         this.icon = NamespacedKey.minecraft("oak_fence_gate");
         this.selection = new CuboidSelection(settlement.getWorld());
         this.holder = founder.getUniqueId();
-        this.members.add(founder.getUniqueId());
     }
 
     public int getId() {
@@ -243,7 +242,7 @@ public class Area {
     }
 
     private String serializeLocation(Location location) {
-        return location.getX() + ";" + location.getY() + ";" + location.getZ();
+        return ((int) location.getX()) + ";" + ((int) location.getY()) + ";" + ((int) location.getZ());
     }
 
     public String serializePos1() {
@@ -288,17 +287,30 @@ public class Area {
         );
         loreBuilder.addLine(Component.empty());
         loreBuilder.addLine(text("Holder: ", JadeTextColor.LIGHT_BRASS)
-                .append(getSettlement().getMemberAsComponent(holder)));
+                .append(getSettlement().getMemberAsComponent(holder))
+                .decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE));
+
+        loreBuilder.addLine(text("Members: ", JadeTextColor.LIGHT_BRASS)
+                .decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE));
+
+        if (this.getMemberList().size() == 1) {
+            loreBuilder.addLine(Component.text().content("— ").color(JadeTextColor.LIGHT_BRASS)
+                    .append(Component.text("None...", JadeTextColor.DARK_ZORBA))
+                    .decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE));
+        }
 
         this.getMemberList().stream().filter(id -> !id.equals(holder))
                 .limit(10)
                 .forEach(member -> {
                     loreBuilder.addLine(Component.text().content("— ").color(JadeTextColor.LIGHT_BRASS)
-                            .append(getSettlement().getMemberAsComponent(member)));
+                            .append(getSettlement().getMemberAsComponent(member))
+                            .decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE));
                 });
 
         if (this.getMemberList().size() > 10) {
-            loreBuilder.addLine(Component.text().content("— ").color(JadeTextColor.LIGHT_BRASS).append(Component.text("...", JadeTextColor.LIGHT_ZORBA)));
+            loreBuilder.addLine(Component.text().content("— ").color(JadeTextColor.LIGHT_BRASS)
+                    .append(Component.text("...", JadeTextColor.LIGHT_ZORBA))
+                    .decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE));
         }
 
         if (addon == null) {
@@ -322,8 +334,7 @@ public class Area {
 
     @Override
     public boolean equals(Object o) {
-        if (o instanceof Area) {
-            Area other = (Area) o;
+        if (o instanceof Area other) {
             return this.getId() == other.getId();
         } else return false;
     }

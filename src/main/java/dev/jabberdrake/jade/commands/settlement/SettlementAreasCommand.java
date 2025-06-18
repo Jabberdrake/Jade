@@ -344,6 +344,8 @@ public class SettlementAreasCommand {
         Player player = (Player) context.getSource().getSender();
         Settlement focus = PlayerManager.asJadePlayer(player.getUniqueId()).getFocusSettlement();
 
+        if (!SettlementCommand.validateFocusSettlement(player, focus)) { return Command.SINGLE_SUCCESS; }
+
         new AreasListMenu(focus).open(player);
         return Command.SINGLE_SUCCESS;
     }

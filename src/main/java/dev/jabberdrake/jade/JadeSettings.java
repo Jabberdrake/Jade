@@ -28,9 +28,9 @@ public class JadeSettings {
         JadeSettings.config = YamlConfiguration.loadConfiguration(file);
 
         // Load generics
-        gameworlds = config.getStringList("generic.gameworlds");
         database = config.getString("generic.database");
         chunkCost = config.getInt("generic.chunkCost");
+        gameworlds = config.getStringList("generic.gameworlds");
 
         // Load gamerules
         preventCoralFade = config.getBoolean("gamerules.preventCoralFade");

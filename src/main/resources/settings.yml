@@ -1,9 +1,7 @@
 generic:
   database: jade.db
+  chunkCost: 20
   gameworlds:
     - world
-  chunkCost: 20
-
 gamerules:
   preventCoralFading: true
-  realmProtectionLevel: CONTAINER

@@ -13,6 +13,7 @@ import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.checkerframework.checker.units.qual.C;
 
 import static dev.jabberdrake.jade.utils.TextUtils.*;
 
@@ -37,6 +38,9 @@ public class SettlementCreateCommand {
 
         if (!RealmManager.isUnclaimedChunk(anchor)) {
             player.sendMessage(error("Cannot create a settlement on a claimed chunk!"));
+            return Command.SINGLE_SUCCESS;
+        } else if (!SettlementClaimCommand.validateWorldspawnDistance(player, anchor)) {
+            player.sendMessage(error("Cannot create a settlement on chunk so close to the worldspawn!"));
             return Command.SINGLE_SUCCESS;
         }
 

@@ -13,9 +13,12 @@ import dev.jabberdrake.jade.realms.RealmManager;
 import dev.jabberdrake.jade.realms.Settlement;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Chunk;
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
+import org.checkerframework.checker.units.qual.C;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -49,8 +52,13 @@ public class SettlementClaimCommand {
         if (!validateGameworld(player, focus)) { return Command.SINGLE_SUCCESS; }
         if (!validateUserPermissions(player, focus)) { return Command.SINGLE_SUCCESS; }
 
+        if (!validateWorldspawnDistance(player, new ChunkAnchor(currentChunk))) {
+            player.sendMessage(error("This chunk is too close to the worldspawn!"));
+            return Command.SINGLE_SUCCESS;
+        }
+
         if (RealmManager.claimChunk(focus, currentChunk)) {
-            player.sendMessage(success("Claimed this chunk for " + focus.getDisplayName() + "!"));
+            player.sendMessage(success("Claimed this chunk for <highlight>" + focus.getDisplayName() + "<normal>!"));
         } else if (!RealmManager.isUnclaimedChunk(currentChunk)) {
             player.sendMessage(error("This chunk is already claimed by <highlight>" + RealmManager.getChunkOwner(currentChunk).getName() + "<normal>!"));
         } else if (focus.getFood() < JadeSettings.chunkCost) {
@@ -78,6 +86,8 @@ public class SettlementClaimCommand {
         int cX = currentChunk.getX();
         int cZ = currentChunk.getZ();
 
+        boolean worldspawnFlag = false;
+
         int value = IntegerArgumentType.getInteger(context, "value");
         Set<ChunkAnchor> chunksToClaim = new HashSet<>();
         for (int aX = -value; aX <= value; aX++) {
@@ -85,9 +95,28 @@ public class SettlementClaimCommand {
                 ChunkAnchor aux = new ChunkAnchor(cWorld, cX + aX, cZ + aZ);
                 Settlement auxOwner = RealmManager.getChunkOwner(aux);
 
-                if (auxOwner != null || focus.getFood() < JadeSettings.chunkCost) { continue; }
+                if (auxOwner != null) { continue; }
+                if (!validateWorldspawnDistance(player, aux)) {
+                    worldspawnFlag = true;
+                    continue;
+                }
                 chunksToClaim.add(aux);
             }
+        }
+
+        if (focus.getFood() < chunksToClaim.size() * JadeSettings.chunkCost) {
+            player.sendMessage(error("You do not have enough food to claim <highlight>" + chunksToClaim.size() + "</highlight> chunks!"));
+            player.sendMessage(info("Remember: each chunk costs <highlight>" + JadeSettings.chunkCost + "</highlight> to claim!"));
+            player.sendMessage(info("To check how much food you have stored, do <highlight>/settlement food</highlight> or <highlight>/settlement info</highlight>!"));
+            return Command.SINGLE_SUCCESS;
+        }
+
+        if (worldspawnFlag) {
+            player.sendMessage(error("Some of the chunks you tried to claim were far too close to the worldspawn!"));
+        }
+
+        for (ChunkAnchor chunkToClaim : chunksToClaim) {
+            RealmManager.claimChunk(focus, chunkToClaim);
         }
 
         player.sendMessage(success("Claimed <highlight>" + chunksToClaim.size() + "</highlight> chunks for " + focus.getDisplayName() + "<normal>!"));
@@ -107,7 +136,9 @@ public class SettlementClaimCommand {
 
         if (jadePlayer.isAutoclaiming()) {
             player.sendMessage(info("Toggled autoclaim <green><bold>ON</bold></green>! Keep walking to claim chunks for " + focus.getDisplayName() + "<normal>!"));
-            RealmManager.claimChunk(focus, player.getChunk());
+            if (validateWorldspawnDistance(player, new ChunkAnchor(player.getChunk()))) {
+                RealmManager.claimChunk(focus, player.getChunk());
+            }
 
         } else {
             player.sendMessage(info("Toggled autoclaim <red><bold>OFF</bold></red>!"));
@@ -159,5 +190,11 @@ public class SettlementClaimCommand {
             return false;
         }
         return true;
+    }
+
+    public static boolean validateWorldspawnDistance(Player player, ChunkAnchor anchor) {
+        if (player.isOp()) {
+            return true;
+        } else return anchor.getManhattanDistanceTo(new ChunkAnchor(player.getWorld().getSpawnLocation().getChunk())) > 3;
     }
 }

@@ -144,7 +144,7 @@ public class SettlementFoodCommand {
             if (!item.hasData(DataComponentTypes.FOOD)) continue;
 
             int itemFoodValue = (item.getData(DataComponentTypes.FOOD).nutrition() / 2) * item.getAmount();
-            if (!focus.canHandleFoodDeposit(itemFoodValue)) break;
+            if (!focus.canHandleFoodDeposit(totalFoodValue + itemFoodValue)) break;
 
             player.getInventory().setItem(slot, null);
             totalFoodValue += itemFoodValue;
@@ -170,7 +170,7 @@ public class SettlementFoodCommand {
             if (!item.hasData(DataComponentTypes.FOOD)) continue;
 
             int itemFoodValue = (item.getData(DataComponentTypes.FOOD).nutrition() / 2) * item.getAmount();
-            if (!focus.canHandleFoodDeposit(itemFoodValue)) break;
+            if (!focus.canHandleFoodDeposit(totalFoodValue + itemFoodValue)) break;
 
             player.getInventory().setItem(slot, null);
             totalFoodValue += itemFoodValue;

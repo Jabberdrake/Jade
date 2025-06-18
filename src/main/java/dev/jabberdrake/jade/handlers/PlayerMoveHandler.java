@@ -1,6 +1,7 @@
 package dev.jabberdrake.jade.handlers;
 
 import dev.jabberdrake.jade.JadeSettings;
+import dev.jabberdrake.jade.commands.settlement.SettlementClaimCommand;
 import dev.jabberdrake.jade.players.JadePlayer;
 import dev.jabberdrake.jade.players.PlayerManager;
 import dev.jabberdrake.jade.realms.ChunkAnchor;
@@ -43,11 +44,15 @@ public class PlayerMoveHandler implements Listener {
             // Handle autoclaiming
             JadePlayer jadePlayer = PlayerManager.asJadePlayer(player.getUniqueId());
             if (jadePlayer.isAutoclaiming()) {
-                if (RealmManager.claimChunk(jadePlayer.getFocusSettlement(), toAnchor)) {
-                    player.clearTitle();
-                    player.sendActionBar(success("Claimed this chunk for <highlight>" + jadePlayer.getFocusSettlement().getDisplayName() + "<normal>!"));
-                } else if (jadePlayer.getFocusSettlement().getFood() < JadeSettings.chunkCost) {
-                    player.sendActionBar(error("Not enough food!"));
+                if (!SettlementClaimCommand.validateWorldspawnDistance(player, toAnchor)) {
+                    player.sendActionBar(error("Too close to worldspawn!"));
+                } else {
+                    if (RealmManager.claimChunk(jadePlayer.getFocusSettlement(), toAnchor)) {
+                        player.clearTitle();
+                        player.sendActionBar(success("Claimed this chunk for <highlight>" + jadePlayer.getFocusSettlement().getDisplayName() + "<normal>!"));
+                    } else if (jadePlayer.getFocusSettlement().getFood() < JadeSettings.chunkCost) {
+                        player.sendActionBar(error("Not enough food!"));
+                    }
                 }
 
             } else {

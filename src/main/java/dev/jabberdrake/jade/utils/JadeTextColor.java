@@ -59,10 +59,14 @@ public class JadeTextColor implements TextColor {
     public static final JadeTextColor LIGHT_ROSEMETAL = new JadeTextColor("light_rosemetal", color(0xf5afaf), "minecraft:armadillo_scute");
     public static final JadeTextColor LIVINGMETAL = new JadeTextColor("livingmetal", color(0x5afc9f), "minecraft:music_disc_creator");
     public static final JadeTextColor MYTHIC_BLUE = new JadeTextColor("mythic_blue", color(0x30eeb4), "minecraft:light_blue_candle");
+    public static final JadeTextColor AUDALAD_CYAN = new JadeTextColor("audalad_cyan", color(0x53b5b5), "minecraft:tide_armor_trim_smithing_template");
     public static final JadeTextColor COPPER_RED = new JadeTextColor("copper_red", color(0xb4684d), "minecraft:copper_ingot");
     public static final JadeTextColor BEER_YELLOW = new JadeTextColor("beer_yellow", color(0xf4ac5e), "minecraft:wheat");
     public static final JadeTextColor WINE_RED = new JadeTextColor("wine_red", color(0x7b0323), "minecraft:sweet_berries");
     public static final JadeTextColor TYRIAN_PURPLE = new JadeTextColor("tyrian_purple", color(0x66023c), "minecraft:nautilus_shell");
+    public static final JadeTextColor CORAL = new JadeTextColor("coral", color(0xff7f50), "minecraft:fire_coral");
+    public static final JadeTextColor SALMON = new JadeTextColor("salmon", color(0xfa8072), "minecraft:salmon");
+    public static final JadeTextColor ORANGE = new JadeTextColor("orange", color(0xffa500), "minecraft:orange_dye");
 
     private static final List<JadeTextColor> VANILLA_VALUES = List.of(
             BLACK, BLUE, GREEN, CYAN, CARMINE, PURPLE, GOLD, LIGHT_GRAY, GRAY, LIGHT_BLUE, LIME, AQUA, RED, MAGENTA, YELLOW, WHITE
@@ -79,8 +83,9 @@ public class JadeTextColor implements TextColor {
             CHROME, LIGHT_CHROME,
             DARK_MANA, LIGHT_MANA,
             ROSEMETAL, LIGHT_ROSEMETAL,
-            LIVINGMETAL, MYTHIC_BLUE,
-            COPPER_RED, BEER_YELLOW, WINE_RED, TYRIAN_PURPLE
+            LIVINGMETAL, MYTHIC_BLUE, AUDALAD_CYAN,
+            COPPER_RED, BEER_YELLOW, WINE_RED, TYRIAN_PURPLE,
+            CORAL, SALMON, ORANGE
     );
 
     public static final List<String> NAMES = VALUES.stream().map(JadeTextColor::toString).toList();

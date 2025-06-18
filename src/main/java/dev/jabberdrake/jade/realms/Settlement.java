@@ -592,6 +592,7 @@ public class Settlement {
         this.areas.add(area);
         int areaID = DatabaseManager.createArea(area);
         area.setID(areaID);
+        area.addMember(area.getHolderUniqueID());
     }
 
     public void removeArea(Area area) {
