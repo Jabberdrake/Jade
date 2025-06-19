@@ -4,7 +4,7 @@ import org.bukkit.Material;
 
 public record Road(double speedModifier, Material topMaterial, Material middleMaterial, Material bottomMaterial) {
 
-    private static final double DEFAULT_SPEED_MODIFIER = 1.25;
+    private static final double DEFAULT_SPEED_MODIFIER = 5;
     private static final Material DEFAULT_TOP_MATERIAL = null;
 
     public Road(Material middleMaterial, Material bottomMaterial) {
