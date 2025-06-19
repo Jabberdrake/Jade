@@ -37,6 +37,12 @@ public class AdminGameruleCommand {
                                 .executes(AdminGameruleCommand::runCommandForPlayerGraves)
                         )
                 )
+                .then(Commands.literal("enableSpeedRoads")
+                        .then(Commands.argument("value", BoolArgumentType.bool())
+                                .requires(sender -> sender.getExecutor() instanceof Player)
+                                .executes(AdminGameruleCommand::runCommandForSpeedRoads)
+                        )
+                )
                 .build();
     }
 
@@ -70,6 +76,25 @@ public class AdminGameruleCommand {
                 Bukkit.broadcast(system("An operator has set gamerule <highlight>enablePlayerGraves</highlight> to <green>TRUE</green>!"));
             } else {
                 Bukkit.broadcast(system("An operator has set gamerule <highlight>enablePlayerGraves</highlight> to <red>FALSE</red>!"));
+            }
+        } else {
+            player.sendMessage(error("An error occurred while altering gamerules! Please report this to a developer!"));
+        }
+
+        return Command.SINGLE_SUCCESS;
+    }
+
+    public static int runCommandForSpeedRoads(CommandContext<CommandSourceStack> context) {
+        Player player = (Player) context.getSource().getSender();
+
+        boolean valueArg = BoolArgumentType.getBool(context, "value");
+
+        boolean result = JadeSettings.setGamerule("enableSpeedRoads", valueArg);
+        if (result == true) {
+            if (valueArg) {
+                Bukkit.broadcast(system("An operator has set gamerule <highlight>enableSpeedRoads</highlight> to <green>TRUE</green>!"));
+            } else {
+                Bukkit.broadcast(system("An operator has set gamerule <highlight>enableSpeedRoads</highlight> to <red>FALSE</red>!"));
             }
         } else {
             player.sendMessage(error("An error occurred while altering gamerules! Please report this to a developer!"));

@@ -24,6 +24,7 @@ public class JadeSettings {
     // GAMERULES
     public static boolean preventCoralFade = true;
     public static boolean enablePlayerGraves = true;
+    public static boolean enableSpeedRoads = true;
 
     // OTHER
     public static List<Road> roads = new ArrayList<>();
@@ -41,6 +42,7 @@ public class JadeSettings {
         // Load gamerules
         preventCoralFade = config.getBoolean("gamerules.preventCoralFade", true);
         enablePlayerGraves = config.getBoolean("gamerules.enablePlayerGraves", true);
+        enableSpeedRoads = config.getBoolean("gamerules.enableSpeedRoads", true);
 
         // Load roads
         List<String> roadEntries = config.getStringList("roads");
@@ -84,7 +86,7 @@ public class JadeSettings {
                 }
             }
 
-            jade.getLogger().info("[JadeSettings::load] Adding new road: " + newRoad.toString());
+            jade.getLogger().info("[JadeSettings::load] Adding new road: " + newRoad);
             roads.add(newRoad);
         }
     }
@@ -99,6 +101,11 @@ public class JadeSettings {
             case "enablePlayerGraves":
                 enablePlayerGraves = value;
                 config.set("gamerules.enablePlayerGraves", value);
+                JadeSettings.save();
+                return true;
+            case "enableSpeedRoads":
+                enableSpeedRoads = value;
+                config.set("gamerules.enableSpeedRoads", value);
                 JadeSettings.save();
                 return true;
             default:

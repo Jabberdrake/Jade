@@ -24,6 +24,7 @@ public class PlayerRoadHandler implements Listener {
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent event) {
         if (!event.hasChangedPosition()) return;
+        if (!JadeSettings.enableSpeedRoads) return;
 
         Location from = event.getFrom();
         Location to = event.getTo();
