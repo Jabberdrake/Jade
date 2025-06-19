@@ -39,11 +39,11 @@ public class RealmManager {
             area.getSettlement().registerArea(area);
         }
 
-        logger.info("[RealmManager::initialize] Successfully loaded " + settlements.size() + " settlements and " + nations.size() + " nations!");
+        logger.info("[RealmManager::initialize] Loaded " + settlements.size() + " settlements and " + nations.size() + " nations!");
 
 
         RealmManager.territoryMap = DatabaseManager.fetchTerritoryMap(settlements);
-        logger.info("[RealmManager::initialize] Successfully loaded the territory map!");
+        logger.info("[RealmManager::initialize] Loaded the territory map!");
     }
 
     public static void shutdown() {

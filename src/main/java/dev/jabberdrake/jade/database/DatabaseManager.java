@@ -3,6 +3,7 @@ package dev.jabberdrake.jade.database;
 import dev.jabberdrake.jade.Jade;
 import dev.jabberdrake.jade.JadeSettings;
 import dev.jabberdrake.jade.database.daos.*;
+import dev.jabberdrake.jade.players.Grave;
 import dev.jabberdrake.jade.players.JadePlayer;
 import dev.jabberdrake.jade.realms.*;
 import dev.jabberdrake.jade.titles.JadeTitle;
@@ -53,6 +54,7 @@ public class DatabaseManager {
         dataObjectRegistry.put(Settlement.class, new SettlementDataObject(plugin, database));
         dataObjectRegistry.put(Nation.class, new NationDataObject(plugin, database));
         dataObjectRegistry.put(Area.class, new AreaDataObject(plugin, database));
+        dataObjectRegistry.put(Grave.class, new GraveDataObject(plugin, database));
 
         plugin.getLogger().info("[DatabaseManager::initialize] Finished database initialization!");
     }
@@ -76,6 +78,10 @@ public class DatabaseManager {
 
     public static AreaDataObject getAreaDao() {
         return (AreaDataObject) dataObjectRegistry.get(Area.class);
+    }
+
+    public static GraveDataObject getGraveDao() {
+        return (GraveDataObject) dataObjectRegistry.get(Grave.class);
     }
 
     // PLAYER METHODS
@@ -265,6 +271,27 @@ public class DatabaseManager {
 
     public static void removeMemberFromArea(UUID memberID, Area area) {
         getAreaDao().removeMemberFromArea(memberID, area);
+    }
+
+    // GRAVE METHODS
+    public static void createGrave(Grave grave) {
+        getGraveDao().create(grave);
+    }
+
+    public static Grave fetchGraveByID(String id) {
+        return getGraveDao().fetch(id);
+    }
+
+    public static List<Grave> fetchAllGraves() {
+        return getGraveDao().fetchAll();
+    }
+
+    public static void saveGrave(Grave grave) {
+        getGraveDao().save(grave);
+    }
+
+    public static void deleteGrave(String id) {
+        getGraveDao().delete(id);
     }
 
     public static void shutdown() {

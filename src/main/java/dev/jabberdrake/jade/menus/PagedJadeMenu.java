@@ -6,6 +6,7 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
+import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
@@ -18,6 +19,30 @@ public abstract class PagedJadeMenu extends SimpleJadeMenu {
     public PagedJadeMenu(String title, Rows rows) {
         super(title, rows);
         setNavigation();
+    }
+
+    protected int getCurrentPage() {
+        return currentPage;
+    }
+
+    protected int getMaxPage() {
+        return maxPage;
+    }
+
+    protected List<ItemStack> getItemStacksInSafeArea() {
+        return this.getItems().entrySet()
+                .stream()
+                .filter(pair -> isSafeSlot(getPagedSlot(pair.getKey())))
+                .map(pair -> pair.getValue().getItemStack())
+                .toList();
+    }
+
+    protected int getPagedSlot(int slot) {
+        return slot < getInventory().getSize() - 9 ? (currentPage * getInventory().getSize()) + slot : slot;
+    }
+
+    protected boolean isSafeSlot(int slot) {
+        return slot < getInventory().getSize() - 9;
     }
 
     protected void setNavigation() {
@@ -61,7 +86,7 @@ public abstract class PagedJadeMenu extends SimpleJadeMenu {
     }
 
     @Override
-    public void click(Player player, int slot, ClickType clickType) {
+    public void click(Player player, int slot, ClickType clickType, InventoryAction inventoryAction) {
         final int mapIndex = slot < getInventory().getSize() - 9 ? (currentPage * getInventory().getSize()) + slot : slot;
 
         final MenuItem clickedItem = this.getItems().get(mapIndex);

@@ -1,5 +1,6 @@
 package dev.jabberdrake.jade.utils;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 
@@ -7,6 +8,33 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PositionUtils {
+
+    public static Location fromString(String serialized, World world) {
+        if (serialized.equalsIgnoreCase("NONE")) return null;
+        String[] parts = serialized.split(",");
+        if (world == null) {
+            return new Location(Bukkit.getWorld(parts[0]), Double.parseDouble(parts[1]), Double.parseDouble(parts[2]), Double.parseDouble(parts[3]));
+        } else {
+            return new Location(world, Double.parseDouble(parts[0]), Double.parseDouble(parts[1]), Double.parseDouble(parts[2]));
+        }
+    }
+
+    public static Location fromString(String serialized) {
+        if (serialized.equalsIgnoreCase("NONE")) return null;
+
+        String[] parts = serialized.split(",");
+        return new Location(Bukkit.getWorld(parts[0]), Double.parseDouble(parts[1]), Double.parseDouble(parts[2]), Double.parseDouble(parts[3]));
+    }
+
+    public static String asString(Location location, boolean includeWorld) {
+        if (location == null) return "NONE";
+
+        if (includeWorld) {
+            return location.getWorld().getName() + "," + ((int) location.getX()) + "," + ((int) location.getY()) + "," + ((int) location.getZ());
+        } else {
+            return ((int) location.getX()) + "," + ((int) location.getY()) + "," + ((int) location.getZ());
+        }
+    }
 
     public static List<Location> traceNorthEdge(World world, double fromX, double toX, double blockY, double blockZ, double increment, boolean nudgeY) {
         double y = nudgeY ? blockY + 1 : blockY;

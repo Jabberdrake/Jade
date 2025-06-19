@@ -4,6 +4,7 @@ import dev.jabberdrake.jade.realms.Settlement;
 import dev.jabberdrake.jade.utils.message.ErrorStrategy;
 import dev.jabberdrake.jade.utils.message.InfoStrategy;
 import dev.jabberdrake.jade.utils.message.SuccessStrategy;
+import dev.jabberdrake.jade.utils.message.SystemStrategy;
 import io.papermc.paper.datacomponent.item.ItemLore;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -15,9 +16,10 @@ import java.util.List;
 
 public class TextUtils {
 
-    public static final InfoStrategy INFO_STRATEGY = new InfoStrategy();
-    public static final ErrorStrategy ERROR_STRATEGY = new ErrorStrategy();
-    public static final SuccessStrategy SUCCESS_STRATEGY = new SuccessStrategy();
+    private static final InfoStrategy INFO_STRATEGY = new InfoStrategy();
+    private static final ErrorStrategy ERROR_STRATEGY = new ErrorStrategy();
+    private static final SuccessStrategy SUCCESS_STRATEGY = new SuccessStrategy();
+    private static final SystemStrategy SYSTEM_STRATEGY = new SystemStrategy();
 
     public static final TextColor DARK_ZORBA = TextColor.color(0x4b4047);
     public static final TextColor ZORBA = TextColor.color(0x9f918d);
@@ -153,6 +155,10 @@ public class TextUtils {
 
     public static Component success(String message) {
         return SUCCESS_STRATEGY.process(message);
+    }
+
+    public static Component system(String message) {
+        return SYSTEM_STRATEGY.process(message);
     }
 
     public static Component deserialize(String text) {

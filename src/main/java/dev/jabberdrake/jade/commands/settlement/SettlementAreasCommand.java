@@ -7,7 +7,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import dev.jabberdrake.jade.commands.CommonArgumentSuggestions;
 import dev.jabberdrake.jade.commands.SettlementCommand;
-import dev.jabberdrake.jade.menus.implementations.AreasListMenu;
+import dev.jabberdrake.jade.menus.implementations.AreaListMenu;
 import dev.jabberdrake.jade.players.JadePlayer;
 import dev.jabberdrake.jade.players.PlayerManager;
 import dev.jabberdrake.jade.realms.Area;
@@ -346,7 +346,7 @@ public class SettlementAreasCommand {
 
         if (!SettlementCommand.validateFocusSettlement(player, focus)) { return Command.SINGLE_SUCCESS; }
 
-        new AreasListMenu(focus).open(player);
+        new AreaListMenu(focus).open(player);
         return Command.SINGLE_SUCCESS;
     }
 

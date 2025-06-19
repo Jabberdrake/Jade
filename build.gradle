@@ -52,7 +52,6 @@ tasks {
     runServer {
         downloadPlugins {
             hangar("bluemap", "5.7")
-            hangar("gravebox", "2.0")
         }
         minecraftVersion("1.21.5")
     }

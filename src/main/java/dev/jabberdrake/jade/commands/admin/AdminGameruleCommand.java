@@ -18,6 +18,9 @@ import org.w3c.dom.Text;
 
 import java.util.concurrent.CompletableFuture;
 
+import static dev.jabberdrake.jade.utils.TextUtils.error;
+import static dev.jabberdrake.jade.utils.TextUtils.system;
+
 public class AdminGameruleCommand {
 
     public static LiteralCommandNode<CommandSourceStack> buildCommand(final String label) {
@@ -28,23 +31,48 @@ public class AdminGameruleCommand {
                                 .executes(AdminGameruleCommand::runCommandForCoralFading)
                         )
                 )
+                .then(Commands.literal("enablePlayerGraves")
+                        .then(Commands.argument("value", BoolArgumentType.bool())
+                                .requires(sender -> sender.getExecutor() instanceof Player)
+                                .executes(AdminGameruleCommand::runCommandForPlayerGraves)
+                        )
+                )
                 .build();
     }
 
     public static int runCommandForCoralFading(CommandContext<CommandSourceStack> context) {
         Player player = (Player) context.getSource().getSender();
 
-        Boolean valueArg = BoolArgumentType.getBool(context, "value");
+        boolean valueArg = BoolArgumentType.getBool(context, "value");
 
         boolean result = JadeSettings.setGamerule("preventCoralFading", valueArg);
         if (result == true) {
-            Bukkit.broadcast(TextUtils.composeSimpleOperatorMessage("An administrator has set gamerule ")
-                    .append(TextUtils.composeOperatorHighlight("preventCoralFading"))
-                    .append(TextUtils.composeOperatorText(" to "))
-                    .append(TextUtils.composeSuccessHighlight(valueArg.toString().toUpperCase()).decorate(TextDecoration.ITALIC))
-            );
+            if (valueArg) {
+                Bukkit.broadcast(system("An operator has set gamerule <highlight>preventCoralFading</highlight> to <green>TRUE</green>!"));
+            } else {
+                Bukkit.broadcast(system("An operator has set gamerule <highlight>preventCoralFading</highlight> to <red>FALSE</red>!"));
+            }
         } else {
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("An error occurred while altering gamerules! Please report this to a developer!"));
+            player.sendMessage(error("An error occurred while altering gamerules! Please report this to a developer!"));
+        }
+
+        return Command.SINGLE_SUCCESS;
+    }
+
+    public static int runCommandForPlayerGraves(CommandContext<CommandSourceStack> context) {
+        Player player = (Player) context.getSource().getSender();
+
+        boolean valueArg = BoolArgumentType.getBool(context, "value");
+
+        boolean result = JadeSettings.setGamerule("enablePlayerGraves", valueArg);
+        if (result == true) {
+            if (valueArg) {
+                Bukkit.broadcast(system("An operator has set gamerule <highlight>enablePlayerGraves</highlight> to <green>TRUE</green>!"));
+            } else {
+                Bukkit.broadcast(system("An operator has set gamerule <highlight>enablePlayerGraves</highlight> to <red>FALSE</red>!"));
+            }
+        } else {
+            player.sendMessage(error("An error occurred while altering gamerules! Please report this to a developer!"));
         }
 
         return Command.SINGLE_SUCCESS;

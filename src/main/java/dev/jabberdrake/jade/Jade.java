@@ -87,6 +87,7 @@ public final class Jade extends JavaPlugin {
             commands.registrar().register(NationCommand.buildCommand("nation"), "Manages nation interactions!");
             commands.registrar().register(TitleCommand.buildCommand("title"), "Manages vanity titles!");
             commands.registrar().register(ProfileCommand.buildCommand("profile"), "Manage profile interactions!");
+            commands.registrar().register(GraveCommand.buildCommand("grave"), "Manage existing deathchests!");
             commands.registrar().register(ToggleRoleplayCommand.buildCommand("toggleroleplay"), "Toggle roleplay mode!");
         });
     }
@@ -99,6 +100,9 @@ public final class Jade extends JavaPlugin {
         this.getServer().getPluginManager().registerEvents(new PlayerChatHandler(), this);
 
         this.getServer().getPluginManager().registerEvents(new BlockFadeHandler(), this);
+        this.getServer().getPluginManager().registerEvents(new PlayerGraveHandler(), this);
+        this.getServer().getPluginManager().registerEvents(new PlayerRoadHandler(), this);
+
         this.getServer().getPluginManager().registerEvents(new RealmProtectionHandler(), this);
     }
 

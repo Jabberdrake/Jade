@@ -26,8 +26,10 @@ public class JadeCommand {
         return Commands.literal(label)
                     .executes(HelpCommand::runCommand)
                 .then(AdminCommand.buildCommand("admin"))
-                .then(SettlementCommand.buildCommand("settlement"))
                 .then(HelpCommand.buildCommand("help"))
+                .then(SettlementCommand.buildCommand("settlement"))
+                .then(NationCommand.buildCommand("nation"))
+                .then(GraveCommand.buildCommand("grave"))
                 .build();
     }
 }

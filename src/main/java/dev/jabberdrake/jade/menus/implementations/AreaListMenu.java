@@ -9,11 +9,11 @@ import dev.jabberdrake.jade.realms.Settlement;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AreasListMenu extends PagedJadeMenu {
+public class AreaListMenu extends PagedJadeMenu {
 
     private final Settlement settlement;
 
-    public AreasListMenu(Settlement settlement) {
+    public AreaListMenu(Settlement settlement) {
         super("Areas in " + settlement.getName(), SimpleJadeMenu.Rows.SIX);
         this.settlement = settlement;
     }

@@ -4,6 +4,7 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
+import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -26,7 +27,12 @@ public abstract class SimpleJadeMenu implements JadeMenu {
     }
 
     @Override
-    public void click(Player player, int slot, ClickType clickType) {
+    public boolean canClick(Player player, int slot, ClickType clickType, InventoryAction inventoryAction) {
+        return false;
+    }
+
+    @Override
+    public void click(Player player, int slot, ClickType clickType, InventoryAction inventoryAction) {
 
         final MenuItem clickedItem = this.getItems().get(slot);
         if (clickedItem != null) {
@@ -35,6 +41,11 @@ public abstract class SimpleJadeMenu implements JadeMenu {
                 action.accept(player);
             }
         }
+    }
+
+    @Override
+    public void close(Player player) {
+        // Nothing
     }
 
     @Override

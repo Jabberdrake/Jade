@@ -17,8 +17,6 @@ public class JadeTextColor implements TextColor {
     // A massive thank you to the developers of the Adventure API for the basis of this code!
     // (Source: https://github.com/KyoriPowered/adventure/blob/main/4/api/src/main/java/net/kyori/adventure/text/format/NamedTextColor.java)
 
-    private static final int ZORBA_VALUE = 0x000000;
-
     // STANDARD MINECRAFT COLORS
     public static final JadeTextColor BLACK = new JadeTextColor("black", NamedTextColor.BLACK.value(), "minecraft:black_dye");
     public static final JadeTextColor BLUE = new JadeTextColor("blue", NamedTextColor.DARK_BLUE.value(), "minecraft:blue_dye");
