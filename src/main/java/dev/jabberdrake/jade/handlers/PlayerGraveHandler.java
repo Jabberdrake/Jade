@@ -16,6 +16,7 @@ import org.bukkit.block.Skull;
 import org.bukkit.damage.DamageType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
@@ -31,7 +32,7 @@ import static dev.jabberdrake.jade.utils.TextUtils.info;
 
 public class PlayerGraveHandler implements Listener {
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onGraveInteract(PlayerInteractEvent event) {
         Block block = event.getClickedBlock();
         if (block == null || block.getType() == Material.AIR) {

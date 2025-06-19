@@ -22,7 +22,7 @@ import static dev.jabberdrake.jade.utils.TextUtils.error;
 
 public class RealmProtectionHandler implements Listener {
 
-    @EventHandler(priority = EventPriority.LOWEST)
+    @EventHandler(priority = EventPriority.LOW)
     public void onBlockPlace(BlockPlaceEvent event) {
         Player player = event.getPlayer();
         Chunk chunk = event.getBlockPlaced().getChunk();
@@ -47,7 +47,7 @@ public class RealmProtectionHandler implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.LOWEST)
+    @EventHandler(priority = EventPriority.LOW)
     public void onBlockBreak(BlockBreakEvent event) {
         Player player = event.getPlayer();
         Chunk chunk = event.getBlock().getChunk();
@@ -72,7 +72,7 @@ public class RealmProtectionHandler implements Listener {
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOW)
     public void onBlockInteract(PlayerInteractEvent event) {
         Block block = event.getClickedBlock();
         if (block == null || block.getType() == Material.AIR) {

@@ -11,6 +11,7 @@ import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
 
@@ -21,7 +22,7 @@ public class PlayerRoadHandler implements Listener {
     private static final AttributeModifier.Operation ROAD_MODIFIER_OP = AttributeModifier.Operation.ADD_SCALAR;
     private static final double ROAD_MODIFIER_TRANSITION = 0.25D;
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerMove(PlayerMoveEvent event) {
         if (!event.hasChangedPosition()) return;
         if (!JadeSettings.enableSpeedRoads) return;
