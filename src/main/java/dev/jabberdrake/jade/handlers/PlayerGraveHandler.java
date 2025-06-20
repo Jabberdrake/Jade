@@ -64,6 +64,7 @@ public class PlayerGraveHandler implements Listener {
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent event) {
         if (!JadeSettings.enablePlayerGraves) return;
+        if (event.getKeepInventory()) return;
 
         Player player = event.getPlayer();
         Location deathLocation = player.getLocation().getBlock().getLocation();
