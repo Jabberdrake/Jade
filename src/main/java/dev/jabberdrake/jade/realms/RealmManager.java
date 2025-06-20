@@ -12,8 +12,8 @@ import java.util.logging.Logger;
 
 public class RealmManager {
 
-    private static final Jade plugin = Jade.getPlugin(Jade.class);
-    private static final Logger logger = plugin.getLogger();
+    private static Jade plugin;
+    private static Logger logger;
 
     private static Map<Integer, Settlement> settlementCache = new HashMap<>();
     private static Map<UUID, Settlement> activeSettlementInvites = new HashMap<>(); // <invited player UUID, Settlement>
@@ -24,6 +24,9 @@ public class RealmManager {
     private static Map<ChunkAnchor, Settlement> territoryMap = new HashMap<>();
 
     public static void initialize() {
+        plugin = Jade.getInstance();
+        logger = plugin.getLogger();
+
         List<Settlement> settlements = DatabaseManager.fetchAllSettlements();
         for (Settlement settlement : settlements) {
             settlementCache.put(settlement.getId(), settlement);

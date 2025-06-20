@@ -11,8 +11,11 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import org.bukkit.Bukkit;
 
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class TextUtils {
 
@@ -162,7 +165,27 @@ public class TextUtils {
     }
 
     public static Component deserialize(String text) {
-        return MiniMessage.miniMessage().deserialize(text, JadeTextColor.asAdventureTags());
+        return MiniMessage.miniMessage().deserialize(preprocess(text), JadeTextColor.asAdventureTags());
+    }
+
+    public static String translateGradients(String raw) {
+        Pattern pattern = Pattern.compile("<gradient:([a-z_]+):([a-z_]+)>");
+        Matcher matcher = pattern.matcher(raw);
+        StringBuffer result = new StringBuffer();
+
+        while (matcher.find()) {
+            String replacement = "<gradient:" + JadeTextColor.matchName(matcher.group(1)).asHexString() + ":" + JadeTextColor.matchName(matcher.group(2)).asHexString() + ">";
+            matcher.appendReplacement(result, Matcher.quoteReplacement(replacement));
+        }
+        matcher.appendTail(result);
+
+        return result.toString();
+    }
+
+    public static String preprocess(String raw) {
+        String result = translateGradients(raw);
+        // other steps...
+        return result;
     }
 
     public static void lore(ItemLore.Builder loreBuilder, List<Component> loreLines) {

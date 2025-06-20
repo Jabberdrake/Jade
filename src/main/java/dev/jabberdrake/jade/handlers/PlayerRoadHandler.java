@@ -1,5 +1,6 @@
 package dev.jabberdrake.jade.handlers;
 
+import dev.jabberdrake.jade.Jade;
 import dev.jabberdrake.jade.JadeSettings;
 import dev.jabberdrake.jade.utils.Road;
 import org.bukkit.Location;
@@ -15,10 +16,8 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
 
-import static dev.jabberdrake.jade.utils.TextUtils.info;
-
 public class PlayerRoadHandler implements Listener {
-    private static final NamespacedKey ROAD_MODIFIER_KEY = new NamespacedKey("jade", "road_speed_modifier");
+    private static final NamespacedKey ROAD_MODIFIER_KEY = Jade.key("road_speed_modifier");
     private static final AttributeModifier.Operation ROAD_MODIFIER_OP = AttributeModifier.Operation.ADD_SCALAR;
     private static final double ROAD_MODIFIER_TRANSITION = 0.25D;
 

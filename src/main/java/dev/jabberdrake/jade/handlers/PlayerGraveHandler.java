@@ -4,12 +4,7 @@ import dev.jabberdrake.jade.JadeSettings;
 import dev.jabberdrake.jade.menus.implementations.GraveOpenMenu;
 import dev.jabberdrake.jade.players.Grave;
 import dev.jabberdrake.jade.players.PlayerManager;
-import dev.jabberdrake.jade.realms.Area;
-import dev.jabberdrake.jade.realms.RealmManager;
-import dev.jabberdrake.jade.realms.Settlement;
-import dev.jabberdrake.jade.realms.settings.BlockProtectionSetting;
 import dev.jabberdrake.jade.utils.PositionUtils;
-import net.kyori.adventure.text.Component;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.Skull;
@@ -27,7 +22,6 @@ import org.bukkit.inventory.ItemStack;
 import java.util.ArrayList;
 import java.util.List;
 
-import static dev.jabberdrake.jade.utils.TextUtils.error;
 import static dev.jabberdrake.jade.utils.TextUtils.info;
 
 public class PlayerGraveHandler implements Listener {

@@ -9,7 +9,9 @@ import de.bluecolored.bluemap.api.markers.MarkerSet;
 import de.bluecolored.bluemap.api.markers.ShapeMarker;
 import de.bluecolored.bluemap.api.math.Color;
 import de.bluecolored.bluemap.api.math.Shape;
+import dev.jabberdrake.jade.chat.ChatManager;
 import dev.jabberdrake.jade.commands.*;
+import dev.jabberdrake.jade.crafting.CraftingManager;
 import dev.jabberdrake.jade.database.DatabaseManager;
 import dev.jabberdrake.jade.handlers.*;
 import dev.jabberdrake.jade.players.PlayerManager;
@@ -19,6 +21,7 @@ import dev.jabberdrake.jade.realms.Settlement;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
+import org.bukkit.NamespacedKey;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Collection;
@@ -28,16 +31,16 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 public final class Jade extends JavaPlugin {
-    private Jade instance;
+    private static Jade instance;
     private final Logger logger = this.getLogger();
 
-    public Jade getInstance() {
-        return this.instance;
+    public static Jade getInstance() {
+        return instance;
     }
 
     @Override
     public void onEnable() {
-        this.instance = this;
+        Jade.instance = this;
         logger.info("Preparing to take over the world!");
 
         if (!getDataFolder().exists()) {
@@ -55,10 +58,12 @@ public final class Jade extends JavaPlugin {
         registerCommands();
         registerHandlers();
 
-        DatabaseManager.initialize(this);
+        DatabaseManager.initialize();
         RealmManager.initialize();
         TitleManager.initialize();
         PlayerManager.initialize();
+        ChatManager.initialize();
+        CraftingManager.initialize();
 
         logger.info("[Jade::onEnable] Looking for dependencies...");
         BlueMapAPI.onEnable(api -> {
@@ -170,6 +175,9 @@ public final class Jade extends JavaPlugin {
                 map.getMarkerSets().put("settlements", settlementSet);
             }
         }
+    }
 
+    public static NamespacedKey key(String value) {
+        return new NamespacedKey(getInstance(), value);
     }
 }

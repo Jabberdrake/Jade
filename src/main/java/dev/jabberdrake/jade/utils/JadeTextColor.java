@@ -125,8 +125,19 @@ public class JadeTextColor implements TextColor {
         return VALUES;
     }
 
+    public static JadeTextColor matchName(String name) {
+        for (JadeTextColor color : getAllColors()) {
+            if (color.name.equalsIgnoreCase(name)) return color;
+        }
+
+        return JadeTextColor.WHITE; //default
+    }
+
     public static TagResolver asAdventureTags() {
-        List<TagResolver> stylings = VALUES.stream().map(color -> Placeholder.styling(color.name, color(color.value))).collect(Collectors.toUnmodifiableList());
+        List<TagResolver> stylings = VALUES.stream().map(color -> Placeholder.styling(color.name, color(color.value))).collect(Collectors.toList());
+
+        stylings.add(Placeholder.unparsed("tag_open", "<"));
+        stylings.add(Placeholder.unparsed("tag_close", ">"));
         return TagResolver.resolver(stylings);
     }
 

@@ -22,8 +22,8 @@ public class DatabaseManager {
     private static Database database = null;
     private static Map<Class<?>, DatabaseObject<?, ?>> dataObjectRegistry = new HashMap<>();
 
-    public static void initialize(Jade plugin) {
-        DatabaseManager.plugin = plugin;
+    public static void initialize() {
+        DatabaseManager.plugin = Jade.getInstance();
         DatabaseManager.source = new SQLiteDataSource();
 
         File dataFolder = plugin.getDataFolder();
