@@ -5,7 +5,6 @@ import dev.jabberdrake.jade.database.DatabaseManager;
 import dev.jabberdrake.jade.realms.settings.BlockProtectionSetting;
 import dev.jabberdrake.jade.utils.ItemUtils;
 import dev.jabberdrake.jade.utils.AbstractSetting;
-import dev.jabberdrake.jade.utils.JadeTextColor;
 import dev.jabberdrake.jade.utils.TextUtils;
 import dev.jabberdrake.jade.utils.message.SettlementStrategy;
 import io.papermc.paper.datacomponent.DataComponentTypes;
@@ -162,7 +161,7 @@ public class Settlement {
     }
 
     public ItemStack getIconAsItem() {
-        return ItemUtils.asDisplayItem(this.icon);
+        return ItemUtils.asDisplayItemBase(this.icon);
     }
 
     public void setIcon(NamespacedKey icon) {

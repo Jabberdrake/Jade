@@ -10,7 +10,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
@@ -126,7 +125,7 @@ public class Nation {
 
     public String getIconAsString() { return this.icon.asString(); }
 
-    public ItemStack getIconAsItem() { return ItemUtils.asDisplayItem(this.icon); }
+    public ItemStack getIconAsItem() { return ItemUtils.asDisplayItemBase(this.icon); }
 
     public void setIcon(NamespacedKey icon) {
         this.icon = icon;

@@ -1,7 +1,6 @@
 package dev.jabberdrake.jade.titles;
 
 import dev.jabberdrake.jade.database.DatabaseManager;
-import dev.jabberdrake.jade.realms.SettlementRole;
 import dev.jabberdrake.jade.utils.ItemUtils;
 import dev.jabberdrake.jade.utils.JadeTextColor;
 import dev.jabberdrake.jade.utils.TextUtils;
@@ -126,7 +125,7 @@ public class JadeTitle {
     }
 
     public ItemStack getIconAsItem() {
-        return ItemUtils.asDisplayItem(this.icon);
+        return ItemUtils.asDisplayItemBase(this.icon);
     }
 
     public void setIcon(NamespacedKey icon) {

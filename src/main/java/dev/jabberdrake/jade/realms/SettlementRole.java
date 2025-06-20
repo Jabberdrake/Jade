@@ -2,10 +2,8 @@ package dev.jabberdrake.jade.realms;
 
 import dev.jabberdrake.jade.database.DatabaseManager;
 import dev.jabberdrake.jade.utils.ItemUtils;
-import io.papermc.paper.datacomponent.DataComponentTypes;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
-import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -174,7 +172,7 @@ public class SettlementRole implements Comparable<SettlementRole> {
     }
 
     public ItemStack getIconAsItem() {
-        return ItemUtils.asDisplayItem(this.icon);
+        return ItemUtils.asDisplayItemBase(this.icon);
     }
 
     public boolean isLeader() { return this.type == Type.LEADER; }

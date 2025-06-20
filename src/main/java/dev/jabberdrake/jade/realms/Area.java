@@ -15,7 +15,6 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import javax.xml.crypto.Data;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -117,7 +116,7 @@ public class Area {
     }
 
     public ItemStack getIconAsItem() {
-        return ItemUtils.asDisplayItem(this.icon);
+        return ItemUtils.asDisplayItemBase(this.icon);
     }
 
     public int getVolume() {

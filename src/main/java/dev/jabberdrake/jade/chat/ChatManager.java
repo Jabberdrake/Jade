@@ -1,7 +1,6 @@
 package dev.jabberdrake.jade.chat;
 
 import dev.jabberdrake.jade.Jade;
-import dev.jabberdrake.jade.crafting.recipes.FurnaceRecipes;
 import org.bukkit.Server;
 
 import java.util.logging.Logger;

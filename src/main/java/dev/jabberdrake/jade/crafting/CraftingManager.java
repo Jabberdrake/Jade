@@ -1,7 +1,7 @@
 package dev.jabberdrake.jade.crafting;
 
 import dev.jabberdrake.jade.Jade;
-import dev.jabberdrake.jade.crafting.recipes.FurnaceRecipes;
+import dev.jabberdrake.jade.crafting.recipes.CookingRecipes;
 import dev.jabberdrake.jade.crafting.recipes.StonecutterRecipes;
 import org.bukkit.Server;
 import org.bukkit.inventory.Recipe;
@@ -18,10 +18,10 @@ public class CraftingManager {
         logger = Jade.getInstance().getLogger();
 
         // add all custom furnace recipes
-        for (Recipe recipe : FurnaceRecipes.getAllRecipes().values()) {
+        for (Recipe recipe : CookingRecipes.getAllRecipes().values()) {
             server.addRecipe(recipe);
         }
-        logger.info("[CraftingManager::initialize] Added " + FurnaceRecipes.getAllRecipes().size() + " furnace recipes!");
+        logger.info("[CraftingManager::initialize] Added " + CookingRecipes.getAllRecipes().size() + " cooking recipes!");
 
         // add all custom stonecutter recipes
         for (Recipe recipe : StonecutterRecipes.getAllRecipes().values()) {

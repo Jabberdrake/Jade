@@ -1,9 +1,7 @@
 package dev.jabberdrake.jade.utils;
 
-import io.papermc.paper.datacomponent.DataComponentTypes;
 import io.papermc.paper.datacomponent.item.ItemLore;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
 
@@ -27,7 +25,7 @@ public abstract class AbstractSetting<T> {
     public abstract boolean isValidValue(T value);
     public abstract T cycleValue();
 
-    public ItemStack getIconAsItem() { return ItemUtils.asDisplayItem(iconKey()); }
+    public ItemStack getIconAsItem() { return ItemUtils.asDisplayItemBase(iconKey()); }
     public T getValue() { return this.value; };
 
     @SuppressWarnings("unchecked")

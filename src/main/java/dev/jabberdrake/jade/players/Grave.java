@@ -165,7 +165,7 @@ public class Grave {
     }
 
     public ItemStack asDisplayItem(String addon) {
-        ItemStack item = ItemUtils.asDisplayItem(NamespacedKey.minecraft(this.isVirtual() ? "cyan_candle" : "red_candle"));
+        ItemStack item = ItemUtils.asDisplayItemBase(NamespacedKey.minecraft(this.isVirtual() ? "cyan_candle" : "red_candle"));
         item.setData(DataComponentTypes.CUSTOM_NAME, text()
                 .content(this.getID()).color(JadeTextColor.ZORBA)
                 .decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE)

@@ -21,7 +21,7 @@ public class ItemUtils {
         return new NamespacedKey(namespace, key);
     }
 
-    public static ItemStack asDisplayItem(NamespacedKey itemKey) {
+    public static ItemStack asDisplayItemBase(NamespacedKey itemKey) {
         switch (itemKey.getNamespace()) {
             case "minecraft":
                 // Check if the provided key matches a valid Minecraft item
@@ -46,4 +46,6 @@ public class ItemUtils {
                 return ItemStack.of(Material.BARRIER);
         }
     }
+
+
 }
