@@ -59,6 +59,20 @@ public class StonecutterRecipes {
         registerRecipe("DARK_OAK_planks_to_stairs", ItemStack.of(Material.DARK_OAK_STAIRS), Material.DARK_OAK_PLANKS);
         registerRecipe("DARK_OAK_planks_to_slabs", ItemStack.of(Material.DARK_OAK_SLAB, 2), Material.DARK_OAK_PLANKS);
         registerRecipe("DARK_OAK_planks_to_trapdoors", ItemStack.of(Material.DARK_OAK_TRAPDOOR, 2), Material.DARK_OAK_PLANKS);
+        
+        // CRIMSON
+        registerRecipe("CRIMSON_stem_to_strippedStem", ItemStack.of(Material.STRIPPED_CRIMSON_STEM), Material.CRIMSON_STEM);
+        registerRecipe("CRIMSON_hyphae_to_strippedHyphae", ItemStack.of(Material.STRIPPED_CRIMSON_HYPHAE), Material.CRIMSON_HYPHAE);
+        registerRecipe("CRIMSON_planks_to_stairs", ItemStack.of(Material.CRIMSON_STAIRS), Material.CRIMSON_PLANKS);
+        registerRecipe("CRIMSON_planks_to_slabs", ItemStack.of(Material.CRIMSON_SLAB, 2), Material.CRIMSON_PLANKS);
+        registerRecipe("CRIMSON_planks_to_trapdoors", ItemStack.of(Material.CRIMSON_TRAPDOOR, 2), Material.CRIMSON_PLANKS);
+        
+        // WARPED
+        registerRecipe("WARPED_stem_to_strippedStem", ItemStack.of(Material.STRIPPED_WARPED_STEM), Material.WARPED_STEM);
+        registerRecipe("WARPED_hyphae_to_strippedHyphae", ItemStack.of(Material.STRIPPED_WARPED_HYPHAE), Material.WARPED_HYPHAE);
+        registerRecipe("WARPED_planks_to_stairs", ItemStack.of(Material.WARPED_STAIRS), Material.WARPED_PLANKS);
+        registerRecipe("WARPED_planks_to_slabs", ItemStack.of(Material.WARPED_SLAB, 2), Material.WARPED_PLANKS);
+        registerRecipe("WARPED_planks_to_trapdoors", ItemStack.of(Material.WARPED_TRAPDOOR, 2), Material.WARPED_PLANKS);
 
         // MANGROVE
         registerRecipe("MANGROVE_log_to_strippedLog", ItemStack.of(Material.STRIPPED_MANGROVE_LOG), Material.MANGROVE_LOG);
