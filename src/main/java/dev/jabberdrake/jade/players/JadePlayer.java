@@ -132,7 +132,7 @@ public class JadePlayer {
         String taskKey = getViewTaskKey("all");
         OfflinePlayer offlinePlayer = this.asOfflinePlayer();
         if (this.borderview) {
-            Bukkit.getScheduler().runTaskTimer(Jade.getPlugin(Jade.class), task -> {
+            Bukkit.getScheduler().runTaskTimer(Jade.getInstance(), task -> {
                 ongoingViewTasks.put(taskKey, task);
                 if (!offlinePlayer.isOnline() || ((Player) offlinePlayer).isDead()) { task.cancel(); }
 

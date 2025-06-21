@@ -84,7 +84,7 @@ public class PlayerGraveHandler implements Listener {
         if (items.isEmpty()) return;
 
         if (unrecoverable) {
-            PlayerManager.registerGrave(player, items);
+            PlayerManager.registerGrave(player, items, null);
             player.sendMessage(info("Since you died in an obstructed or otherwise unreachable location, your items were deposited in a <highlight>virtual grave</highlight>."));
             player.sendMessage(info("To see your virtual graves, do <highlight>/grave list"));
         } else {
@@ -103,6 +103,7 @@ public class PlayerGraveHandler implements Listener {
     }
 
     public boolean isObstructed(Location location) {
+        if (location.getY() < location.getWorld().getMinHeight() || location.getY() > location.getWorld().getMaxHeight()) return true;
         return !location.getBlock().getType().isAir() && !location.getBlock().isLiquid();
     }
 }

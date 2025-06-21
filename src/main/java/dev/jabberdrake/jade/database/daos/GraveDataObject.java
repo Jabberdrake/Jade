@@ -42,12 +42,14 @@ public class GraveDataObject implements DatabaseObject<Grave, String> {
                 if (resultSet.next()) {
                     String playerID = resultSet.getString("player_id");
                     String position = resultSet.getString("position");
+                    String cause = resultSet.getString("cause");
                     List<ItemStack> items = List.of(ItemStack.deserializeItemsFromBytes(resultSet.getBytes("items")));
+
                     Location location = PositionUtils.fromString(position);
                     if (location == null) {
-                        result[0] = new Grave(UUID.fromString(playerID), items);
+                        result[0] = new Grave(id, UUID.fromString(playerID), items, cause, null);
                     } else {
-                        result[0] = new Grave(UUID.fromString(playerID), items, location);
+                        result[0] = new Grave(id, UUID.fromString(playerID), items, cause, location);
                     }
                 }
             });
@@ -62,16 +64,18 @@ public class GraveDataObject implements DatabaseObject<Grave, String> {
     @Override
     public List<Grave> fetchAll() {
         List<Grave> graves = new ArrayList<>();
-        String sql = "SELECT id, player_id, position, items FROM graves;";
+        String sql = "SELECT id, player_id, position, cause, items FROM graves;";
         try {
             database.query(sql, resultSet -> {
                 while (resultSet.next()) {
                     String id = resultSet.getString("id");
                     String playerID = resultSet.getString("player_id");
                     String position = resultSet.getString("position");
+                    String cause = resultSet.getString("cause");
                     List<ItemStack> items = List.of(ItemStack.deserializeItemsFromBytes(resultSet.getBytes("items")));
+
                     Location location = PositionUtils.fromString(position);
-                    Grave grave = new Grave(id, UUID.fromString(playerID), items, location);
+                    Grave grave = new Grave(id, UUID.fromString(playerID), items, cause, location);
 
                     graves.add(grave);
                 }
@@ -100,7 +104,7 @@ public class GraveDataObject implements DatabaseObject<Grave, String> {
 
     @Override
     public String create(Grave grave) {
-        String sql = "INSERT INTO graves (id, player_id, position, items) VALUES (?, ?, ?, ?);";
+        String sql = "INSERT INTO graves (id, player_id, position, cause, items) VALUES (?, ?, ?, ?, ?);";
         try {
             database.create(sql, stmt -> {
                 stmt.setString(1, grave.getID());
@@ -110,7 +114,8 @@ public class GraveDataObject implements DatabaseObject<Grave, String> {
                 } else {
                     stmt.setString(3, PositionUtils.asString(grave.getChestLocation(), true));
                 }
-                stmt.setBytes(4, ItemStack.serializeItemsAsBytes(grave.getItems()));
+                stmt.setString(4, grave.getCause());
+                stmt.setBytes(5, ItemStack.serializeItemsAsBytes(grave.getItems()));
             });
         } catch (SQLException e) {
             plugin.getLogger().warning("[GraveDataObject::create] Caught SQLException while creating grave object for " + grave.getID() + ": ");
@@ -140,6 +145,7 @@ public class GraveDataObject implements DatabaseObject<Grave, String> {
                   id STRING PRIMARY KEY,
                   player_id TEXT(36) NOT NULL,
                   position TEXT NOT NULL,
+                  cause TEXT NOT NULL,
                   items BLOB NOT NULL
                 );
                 """;

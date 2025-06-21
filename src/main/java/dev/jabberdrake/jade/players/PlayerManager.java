@@ -8,6 +8,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
@@ -89,14 +90,8 @@ public class PlayerManager {
         return null;
     }
 
-    public static void registerGrave(Player player, List<ItemStack> items) {
-        Grave grave = new Grave(player.getUniqueId(), items);
-        graveCache.put(grave.getID(), grave);
-        DatabaseManager.createGrave(grave);
-    }
-
     public static void registerGrave(Player player, List<ItemStack> items, Location deathLocation) {
-        Grave grave = new Grave(player.getUniqueId(), items, deathLocation);
+        Grave grave = new Grave(player, items, deathLocation);
         graveCache.put(grave.getID(), grave);
         DatabaseManager.createGrave(grave);
     }
