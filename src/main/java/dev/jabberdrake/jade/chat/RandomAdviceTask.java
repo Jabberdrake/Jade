@@ -1,6 +1,6 @@
 package dev.jabberdrake.jade.chat;
 
-import dev.jabberdrake.jade.JadeSettings;
+import dev.jabberdrake.jade.JadeConfig;
 import dev.jabberdrake.jade.players.JadePlayer;
 import dev.jabberdrake.jade.players.PlayerManager;
 import dev.jabberdrake.jade.players.PlayerSettings;
@@ -15,7 +15,7 @@ public class RandomAdviceTask extends BukkitRunnable {
     private static int lastAdviceIndex = 0;
     private static final String PREFIX = "<highlight>Did you know?</highlight> ";
     private static final String[] ADVICE = {
-            "<livingmetal>Food</livingmetal> is used as a currency to claim chunks for settlements, at a rate of <highlight>" + JadeSettings.chunkCost + "</highlight> food per chunk!",
+            "<livingmetal>Food</livingmetal> is used as a currency to claim chunks for settlements, at a rate of <highlight>" + JadeConfig.chunkCost + "</highlight> food per chunk!",
             "There is absolutely no upkeep on realms! <livingmetal>Food</livingmetal> is only used to purchase new claims, not to upkeep already claimed ones!",
             "There is no limit on <dark_mana>settlement</dark_mana> and <dark_brass>nation</dark_brass> membership! You can be part of as many settlements and nations as you'd like!",
             "Elements like <dark_mana>settlements</dark_mana>, <dark_brass>nations</dark_brass> and <highlight>titles</highlight> have two types of names: <highlight>reference names</highlight> and <gradient:red:blue>display names</gradient>!",
@@ -36,7 +36,7 @@ public class RandomAdviceTask extends BukkitRunnable {
 
     @Override
     public void run() {
-        if (!JadeSettings.sayRandomAdvice) return;
+        if (!JadeConfig.sayRandomAdvice) return;
 
         int newIndex = generateNewIndex();
         String advice = ADVICE[newIndex];

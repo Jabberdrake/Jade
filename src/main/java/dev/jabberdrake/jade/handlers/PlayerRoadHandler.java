@@ -1,7 +1,7 @@
 package dev.jabberdrake.jade.handlers;
 
 import dev.jabberdrake.jade.Jade;
-import dev.jabberdrake.jade.JadeSettings;
+import dev.jabberdrake.jade.JadeConfig;
 import dev.jabberdrake.jade.utils.Road;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -24,7 +24,7 @@ public class PlayerRoadHandler implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerMove(PlayerMoveEvent event) {
         if (!event.hasChangedPosition()) return;
-        if (!JadeSettings.enableSpeedRoads) return;
+        if (!JadeConfig.enableSpeedRoads) return;
 
         Location from = event.getFrom();
         Location to = event.getTo();
@@ -40,7 +40,7 @@ public class PlayerRoadHandler implements Listener {
         Block bot = mid.getRelative(0, -1, 0);
 
         double speedModifier = 0;
-        for (Road road : JadeSettings.roads) {
+        for (Road road : JadeConfig.roads) {
             if (road.match(top.getType(), mid.getType(), bot.getType())) {
                 speedModifier = road.speedModifier();
             }

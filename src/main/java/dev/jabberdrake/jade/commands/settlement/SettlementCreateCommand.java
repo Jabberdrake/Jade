@@ -4,7 +4,7 @@ import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.LiteralCommandNode;
-import dev.jabberdrake.jade.JadeSettings;
+import dev.jabberdrake.jade.JadeConfig;
 import dev.jabberdrake.jade.players.PlayerManager;
 import dev.jabberdrake.jade.realms.ChunkAnchor;
 import dev.jabberdrake.jade.realms.RealmManager;
@@ -13,7 +13,6 @@ import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.checkerframework.checker.units.qual.C;
 
 import static dev.jabberdrake.jade.utils.TextUtils.*;
 
@@ -31,7 +30,7 @@ public class SettlementCreateCommand {
         Player player = (Player) context.getSource().getSender();
         ChunkAnchor anchor = new ChunkAnchor(player.getChunk());
 
-        if (!JadeSettings.gameworlds.contains(player.getWorld().getName())) {
+        if (!JadeConfig.gameworlds.contains(player.getWorld().getName())) {
             player.sendMessage(error("Cannot create a settlement in this world (<highlight>" + player.getWorld().getName() + "</highlight>)! If you believe this is in error, please contact an administrator!"));
             return Command.SINGLE_SUCCESS;
         }

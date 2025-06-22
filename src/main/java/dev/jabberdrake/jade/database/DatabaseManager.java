@@ -1,13 +1,12 @@
 package dev.jabberdrake.jade.database;
 
 import dev.jabberdrake.jade.Jade;
-import dev.jabberdrake.jade.JadeSettings;
+import dev.jabberdrake.jade.JadeConfig;
 import dev.jabberdrake.jade.database.daos.*;
 import dev.jabberdrake.jade.players.Grave;
 import dev.jabberdrake.jade.players.JadePlayer;
 import dev.jabberdrake.jade.realms.*;
 import dev.jabberdrake.jade.titles.JadeTitle;
-import net.kyori.adventure.text.format.TextColor;
 import org.sqlite.SQLiteDataSource;
 
 import java.io.File;
@@ -31,7 +30,7 @@ public class DatabaseManager {
             dataFolder.mkdirs();
         }
 
-        File dataFile = new File(dataFolder, JadeSettings.database);
+        File dataFile = new File(dataFolder, JadeConfig.database);
         if (!dataFile.exists()) {
             try {
                 dataFile.createNewFile();
@@ -43,7 +42,7 @@ public class DatabaseManager {
         DatabaseManager.source.setUrl("jdbc:sqlite:" + dataFile);
         try {
             database = new Database(source.getConnection());
-            plugin.getLogger().info("[DatabaseManager::initialize] Connected to database at " + JadeSettings.database + "!");
+            plugin.getLogger().info("[DatabaseManager::initialize] Connected to database at " + JadeConfig.database + "!");
         } catch (SQLException e) {
             plugin.getLogger().severe("[DatabaseManager::initialize] Severe error occured during database initialization:\n\t" + e.getMessage());
             e.printStackTrace();

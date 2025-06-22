@@ -6,5 +6,7 @@ generic:
 gamerules:
   preventCoralFading: true
   enablePlayerGraves: true
+  enableSpeedRoads: true
+  sayRandomAdvice: true
 roads:
   - ANY;PACKED_MUD;GRAVEL;2

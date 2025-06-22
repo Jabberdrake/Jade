@@ -4,7 +4,7 @@ import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.LiteralCommandNode;
-import dev.jabberdrake.jade.JadeSettings;
+import dev.jabberdrake.jade.JadeConfig;
 import dev.jabberdrake.jade.commands.SettlementCommand;
 import dev.jabberdrake.jade.players.JadePlayer;
 import dev.jabberdrake.jade.players.PlayerManager;
@@ -13,12 +13,9 @@ import dev.jabberdrake.jade.realms.RealmManager;
 import dev.jabberdrake.jade.realms.Settlement;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
-import net.kyori.adventure.text.Component;
 import org.bukkit.Chunk;
-import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
-import org.checkerframework.checker.units.qual.C;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -61,9 +58,9 @@ public class SettlementClaimCommand {
             player.sendMessage(success("Claimed this chunk for <highlight>" + focus.getDisplayName() + "<normal>!"));
         } else if (!RealmManager.isUnclaimedChunk(currentChunk)) {
             player.sendMessage(error("This chunk is already claimed by <highlight>" + RealmManager.getChunkOwner(currentChunk).getName() + "<normal>!"));
-        } else if (focus.getFood() < JadeSettings.chunkCost) {
+        } else if (focus.getFood() < JadeConfig.chunkCost) {
             player.sendMessage(error("Not enough food!"));
-            player.sendMessage(info("Remember: each chunk costs <highlight>" + JadeSettings.chunkCost + "</highlight> to claim!"));
+            player.sendMessage(info("Remember: each chunk costs <highlight>" + JadeConfig.chunkCost + "</highlight> to claim!"));
             player.sendMessage(info("To check how much food you have stored, do <highlight>/settlement food</highlight> or <highlight>/settlement info</highlight>!"));
         } else {
             player.sendMessage(error("oepsie woepsie! de plugin is stukkie wukkie!!!"));
@@ -104,9 +101,9 @@ public class SettlementClaimCommand {
             }
         }
 
-        if (focus.getFood() < chunksToClaim.size() * JadeSettings.chunkCost) {
+        if (focus.getFood() < chunksToClaim.size() * JadeConfig.chunkCost) {
             player.sendMessage(error("You do not have enough food to claim <highlight>" + chunksToClaim.size() + "</highlight> chunks!"));
-            player.sendMessage(info("Remember: each chunk costs <highlight>" + JadeSettings.chunkCost + "</highlight> to claim!"));
+            player.sendMessage(info("Remember: each chunk costs <highlight>" + JadeConfig.chunkCost + "</highlight> to claim!"));
             player.sendMessage(info("To check how much food you have stored, do <highlight>/settlement food</highlight> or <highlight>/settlement info</highlight>!"));
             return Command.SINGLE_SUCCESS;
         }
@@ -159,9 +156,9 @@ public class SettlementClaimCommand {
         if (chunksToClaim == null) {
             player.sendMessage(error("Too many chunks to claim at once! Are you sure the border is closed?"));
             return Command.SINGLE_SUCCESS;
-        } else if (chunksToClaim.size() * JadeSettings.chunkCost > focus.getFood()) {
+        } else if (chunksToClaim.size() * JadeConfig.chunkCost > focus.getFood()) {
             player.sendMessage(error("You do not have enough food to claim <highlight>" + chunksToClaim.size() + "</highlight> chunks!"));
-            player.sendMessage(info("Remember: each chunk costs <highlight>" + JadeSettings.chunkCost + "</highlight> to claim!"));
+            player.sendMessage(info("Remember: each chunk costs <highlight>" + JadeConfig.chunkCost + "</highlight> to claim!"));
             player.sendMessage(info("To check how much food you have stored, do <highlight>/settlement food</highlight> or <highlight>/settlement info</highlight>!"));
             return Command.SINGLE_SUCCESS;
         }

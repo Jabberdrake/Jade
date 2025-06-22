@@ -11,12 +11,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
-public class JadeSettings {
+public class JadeConfig {
     private static Jade jade;
     private static Logger logger;
     private static File file;
     private static FileConfiguration config;
-    public static final String FILENAME = "settings.yml";
+    public static final String FILENAME = "config.yml";
 
     // GENERIC
     public static String database = "jade.db";
@@ -24,7 +24,7 @@ public class JadeSettings {
     public static int chunkCost = 20;
 
     // GAMERULES
-    public static boolean preventCoralFade = true;
+    public static boolean preventCoralFading = true;
     public static boolean enablePlayerGraves = true;
     public static boolean enableSpeedRoads = true;
     public static boolean sayRandomAdvice = true;
@@ -33,9 +33,9 @@ public class JadeSettings {
     public static List<Road> roads = new ArrayList<>();
 
     public static void load(Jade jade) {
-        JadeSettings.logger = Jade.getInstance().getLogger();
-        JadeSettings.file = new File(jade.getDataFolder(), "settings.yml");
-        JadeSettings.config = YamlConfiguration.loadConfiguration(file);
+        JadeConfig.logger = Jade.getInstance().getLogger();
+        JadeConfig.file = new File(jade.getDataFolder(), FILENAME);
+        JadeConfig.config = YamlConfiguration.loadConfiguration(file);
 
         // Load generics
         database = config.getString("generic.database", "jade.db");
@@ -43,7 +43,7 @@ public class JadeSettings {
         gameworlds = config.getStringList("generic.gameworlds");
 
         // Load gamerules
-        preventCoralFade = config.getBoolean("gamerules.preventCoralFade", true);
+        preventCoralFading = config.getBoolean("gamerules.preventCoralFading", true);
         enablePlayerGraves = config.getBoolean("gamerules.enablePlayerGraves", true);
         enableSpeedRoads = config.getBoolean("gamerules.enableSpeedRoads", true);
         sayRandomAdvice = config.getBoolean("gamerules.sayRandomAdvice", true);
@@ -53,7 +53,7 @@ public class JadeSettings {
         outer: for (String entry : roadEntries) {
             String[] parts = entry.split(";");
             if (parts.length != 3 && parts.length != 4) {
-                logger.info("[JadeSettings::load] Invalid format for road entry in \"" + entry + "\". Skipping...");
+                logger.info("[JadeConfig::load] Invalid format for road entry in \"" + entry + "\". Skipping...");
                 continue;
             }
 
@@ -62,7 +62,7 @@ public class JadeSettings {
             Material bottom = parseRoadMaterial(parts[2]);
 
             if (top == null && middle == null && bottom == null) {
-                logger.info("[JadeSettings::load] Invalid content for road entry in \"" + entry + "\". Skipping...");
+                logger.info("[JadeConfig::load] Invalid content for road entry in \"" + entry + "\". Skipping...");
                 continue;
             }
 
@@ -72,11 +72,11 @@ public class JadeSettings {
                 try {
                     speed = Double.parseDouble(parts[3]);
                     if (speed <= 0.0) {
-                        logger.info("[JadeSettings::load] Found illegal argument while parsing explicit road speed modifier in \"" + entry + "\". Skipping...");
+                        logger.info("[JadeConfig::load] Found illegal argument while parsing explicit road speed modifier in \"" + entry + "\". Skipping...");
                         break;
                     }
                 } catch (NumberFormatException e) {
-                    logger.info("[JadeSettings::load] Caught NumberFormatException while parsing explicit road speed modifier in \"" + entry + "\". Defaulting to 1...");
+                    logger.info("[JadeConfig::load] Caught NumberFormatException while parsing explicit road speed modifier in \"" + entry + "\". Defaulting to 1...");
                     speed = 1.0;
                 }
                 newRoad = new Road(speed, top, middle, bottom);
@@ -85,37 +85,37 @@ public class JadeSettings {
             }
             for (Road road : roads) {
                 if (road.equals(newRoad)) {
-                    logger.info("[JadeSettings::load] Found duplicate road entry in \"" + entry + "\". Skipping...");
+                    logger.info("[JadeConfig::load] Found duplicate road entry in \"" + entry + "\". Skipping...");
                     continue outer;
                 }
             }
 
-            logger.info("[JadeSettings::load] Adding new road: " + newRoad);
+            logger.info("[JadeConfig::load] Adding new road: " + newRoad);
             roads.add(newRoad);
         }
     }
 
     public static boolean setGamerule(String gamerule, boolean value) {
         switch (gamerule) {
-            case "preventCoralFade":
-                preventCoralFade = value;
-                config.set("gamerules.preventCoralFade", value);
-                JadeSettings.save();
+            case "preventCoralFading":
+                preventCoralFading = value;
+                config.set("gamerules.preventCoralFading", value);
+                JadeConfig.save();
                 return true;
             case "enablePlayerGraves":
                 enablePlayerGraves = value;
                 config.set("gamerules.enablePlayerGraves", value);
-                JadeSettings.save();
+                JadeConfig.save();
                 return true;
             case "enableSpeedRoads":
                 enableSpeedRoads = value;
                 config.set("gamerules.enableSpeedRoads", value);
-                JadeSettings.save();
+                JadeConfig.save();
                 return true;
             case "sayRandomAdvice":
                 sayRandomAdvice = value;
                 config.set("gamerules.sayRandomAdvice", value);
-                JadeSettings.save();
+                JadeConfig.save();
                 return true;
             default:
                 return false;
@@ -124,11 +124,11 @@ public class JadeSettings {
 
     public static void save() {
         try {
-            JadeSettings.config.save(JadeSettings.file);
+            JadeConfig.config.save(JadeConfig.file);
 
-            logger.info("[JadeSettings::save] Successfully saved plugin settings!");
+            logger.info("[JadeConfig::save] Successfully saved plugin settings!");
         } catch (IOException e) {
-            logger.info("[JadeSettings::save] Caught IOException while attempting to save plugin settings! Continuing...");
+            logger.info("[JadeConfig::save] Caught IOException while attempting to save plugin settings! Continuing...");
             e.printStackTrace();
         }
     }
@@ -140,7 +140,7 @@ public class JadeSettings {
 
         Material aux = Material.matchMaterial(entry);
         if (aux == null) {
-            logger.info("[JadeSettings::parseRoadMaterial] Found unknown road material in settings: \"" + entry + "\". Defaulting to ANY...");
+            logger.info("[JadeConfig::parseRoadMaterial] Found unknown road material in settings: \"" + entry + "\". Defaulting to ANY...");
             return null;
         }
 

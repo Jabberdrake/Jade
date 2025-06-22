@@ -49,10 +49,9 @@ public final class Jade extends JavaPlugin {
         }
 
 
-
-        saveResource(JadeSettings.FILENAME, false);
+        saveResource(JadeConfig.FILENAME, false);
         logger.info("[Jade::onEnable] Loading settings...");
-        JadeSettings.load(this);
+        JadeConfig.load(this);
 
 
         registerCommands();
@@ -119,7 +118,7 @@ public final class Jade extends JavaPlugin {
             blueMapWorlds.put(worldName, world);
         }
 
-        for (String gameworldName : JadeSettings.gameworlds) {
+        for (String gameworldName : JadeConfig.gameworlds) {
             BlueMapWorld gameworld = blueMapWorlds.get(gameworldName);
             Collection<BlueMapMap> blueMapMaps = gameworld.getMaps();
 

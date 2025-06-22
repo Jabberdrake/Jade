@@ -1,6 +1,6 @@
 package dev.jabberdrake.jade.handlers;
 
-import dev.jabberdrake.jade.JadeSettings;
+import dev.jabberdrake.jade.JadeConfig;
 import dev.jabberdrake.jade.commands.settlement.SettlementClaimCommand;
 import dev.jabberdrake.jade.players.JadePlayer;
 import dev.jabberdrake.jade.players.PlayerManager;
@@ -51,7 +51,7 @@ public class PlayerMoveHandler implements Listener {
                     if (RealmManager.claimChunk(jadePlayer.getFocusSettlement(), toAnchor)) {
                         player.clearTitle();
                         player.sendActionBar(success("Claimed this chunk for <highlight>" + jadePlayer.getFocusSettlement().getDisplayName() + "<normal>!"));
-                    } else if (jadePlayer.getFocusSettlement().getFood() < JadeSettings.chunkCost) {
+                    } else if (jadePlayer.getFocusSettlement().getFood() < JadeConfig.chunkCost) {
                         player.sendActionBar(error("Not enough food!"));
                     }
                 }

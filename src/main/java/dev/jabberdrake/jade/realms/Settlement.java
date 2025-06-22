@@ -1,6 +1,6 @@
 package dev.jabberdrake.jade.realms;
 
-import dev.jabberdrake.jade.JadeSettings;
+import dev.jabberdrake.jade.JadeConfig;
 import dev.jabberdrake.jade.database.DatabaseManager;
 import dev.jabberdrake.jade.realms.settings.BlockProtectionSetting;
 import dev.jabberdrake.jade.utils.ItemUtils;
@@ -395,7 +395,7 @@ public class Settlement {
     public void addChunk(ChunkAnchor anchor) {
         this.territory.add(anchor);
 
-        this.food -= JadeSettings.chunkCost;
+        this.food -= JadeConfig.chunkCost;
 
         DatabaseManager.addChunkToSettlement(anchor, this);
     }

@@ -2,21 +2,13 @@ package dev.jabberdrake.jade.commands.admin;
 
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.BoolArgumentType;
-import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
-import com.mojang.brigadier.suggestion.Suggestions;
-import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import com.mojang.brigadier.tree.LiteralCommandNode;
-import dev.jabberdrake.jade.JadeSettings;
-import dev.jabberdrake.jade.utils.TextUtils;
+import dev.jabberdrake.jade.JadeConfig;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
-import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.w3c.dom.Text;
-
-import java.util.concurrent.CompletableFuture;
 
 import static dev.jabberdrake.jade.utils.TextUtils.error;
 import static dev.jabberdrake.jade.utils.TextUtils.system;
@@ -61,7 +53,7 @@ public class AdminGameruleCommand {
 
         boolean valueArg = BoolArgumentType.getBool(context, "value");
 
-        boolean result = JadeSettings.setGamerule("preventCoralFading", valueArg);
+        boolean result = JadeConfig.setGamerule("preventCoralFading", valueArg);
         if (result == true) {
             if (valueArg) {
                 Bukkit.broadcast(system("An operator has set gamerule <highlight>preventCoralFading</highlight> to <green>TRUE</green>!"));
@@ -80,7 +72,7 @@ public class AdminGameruleCommand {
 
         boolean valueArg = BoolArgumentType.getBool(context, "value");
 
-        boolean result = JadeSettings.setGamerule("enablePlayerGraves", valueArg);
+        boolean result = JadeConfig.setGamerule("enablePlayerGraves", valueArg);
         if (result == true) {
             if (valueArg) {
                 Bukkit.broadcast(system("An operator has set gamerule <highlight>enablePlayerGraves</highlight> to <green>TRUE</green>!"));
@@ -99,7 +91,7 @@ public class AdminGameruleCommand {
 
         boolean valueArg = BoolArgumentType.getBool(context, "value");
 
-        boolean result = JadeSettings.setGamerule("enableSpeedRoads", valueArg);
+        boolean result = JadeConfig.setGamerule("enableSpeedRoads", valueArg);
         if (result == true) {
             if (valueArg) {
                 Bukkit.broadcast(system("An operator has set gamerule <highlight>enableSpeedRoads</highlight> to <green>TRUE</green>!"));
@@ -118,7 +110,7 @@ public class AdminGameruleCommand {
 
         boolean valueArg = BoolArgumentType.getBool(context, "value");
 
-        boolean result = JadeSettings.setGamerule("sayRandomAdvice", valueArg);
+        boolean result = JadeConfig.setGamerule("sayRandomAdvice", valueArg);
         if (result == true) {
             if (valueArg) {
                 Bukkit.broadcast(system("An operator has set gamerule <highlight>sayRandomAdvice</highlight> to <green>TRUE</green>!"));
