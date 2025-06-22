@@ -11,12 +11,14 @@ import io.papermc.paper.command.brigadier.Commands;
 import org.bukkit.entity.Player;
 
 import static dev.jabberdrake.jade.utils.TextUtils.error;
+import static dev.jabberdrake.jade.utils.TextUtils.info;
 
 public class TitleCommand {
 
     public static LiteralCommandNode<CommandSourceStack> buildCommand(final String label) {
         return Commands.literal(label)
-                .executes(TitleCommand::runCommand)
+                    .requires(sender -> sender.getExecutor() instanceof Player)
+                    .executes(TitleCommand::runCommand)
                 .then(TitleCreateCommand.buildCommand("create"))
                 .then(TitleDeleteCommand.buildCommand("delete"))
                 .then(TitleEditCommand.buildCommand("edit"))
@@ -28,7 +30,9 @@ public class TitleCommand {
     }
 
     public static int runCommand(CommandContext<CommandSourceStack> context) {
-        context.getSource().getSender().sendPlainMessage("debi is a homo");
+        Player player = (Player) context.getSource().getSender();
+
+        player.sendMessage(info("The help menu for this command is still under development, sorry! In the meantime, if you have any questions, please ask the developer!"));
         return Command.SINGLE_SUCCESS;
     }
 }

@@ -10,11 +10,13 @@ import io.papermc.paper.command.brigadier.Commands;
 import org.bukkit.entity.Player;
 
 import static dev.jabberdrake.jade.utils.TextUtils.error;
+import static dev.jabberdrake.jade.utils.TextUtils.info;
 
 public class SettlementCommand {
 
     public static LiteralCommandNode<CommandSourceStack> buildCommand(final String label) {
         return Commands.literal(label)
+                    .requires(sender -> sender.getExecutor() instanceof Player)
                     .executes(SettlementCommand::runCommand)
                 .then(SettlementListCommand.buildCommand("list"))
                 .then(SettlementInfoCommand.buildCommand("info"))
@@ -41,7 +43,9 @@ public class SettlementCommand {
     }
 
     public static int runCommand(CommandContext<CommandSourceStack> context) {
-        context.getSource().getSender().sendPlainMessage("dotto is a homo");
+        Player player = (Player) context.getSource().getSender();
+
+        player.sendMessage(info("The help menu for this command is still under development, sorry! In the meantime, if you have any questions, please ask the developer!"));
         return Command.SINGLE_SUCCESS;
     }
 

@@ -21,7 +21,6 @@ import java.util.stream.Stream;
 public class JadePlayer {
     private static final int VIEW_RANGE = 2;
 
-
     private UUID uuid;
 
     // For general stuff
@@ -35,11 +34,13 @@ public class JadePlayer {
     private boolean autoclaim = false;
     private boolean borderview = false;
 
-    private static Map<String, BukkitTask> ongoingViewTasks = new HashMap<>();
+    private final Map<AbstractSetting<?>, Object> settings = new HashMap<>();
+
+    private static final Map<String, BukkitTask> ongoingViewTasks = new HashMap<>();
 
     public JadePlayer(UUID uuid) {
         this.uuid = uuid;
-        this.roleplayName = Bukkit.getPlayer(uuid).getName();
+        this.roleplayName = Bukkit.getOfflinePlayer(uuid).getName();
         this.titleInUse = DefaultJadeTitle.PEASANT;
     }
 
@@ -56,7 +57,17 @@ public class JadePlayer {
     public OfflinePlayer asOfflinePlayer() {
         return Bukkit.getOfflinePlayer(this.getUniqueID());
     }
-    public String getRoleplayName() { return this.roleplayName; }
+
+    public Player asPlayer() {
+        OfflinePlayer player = this.asOfflinePlayer();
+        if (player.isOnline()) {
+            return (Player) player;
+        } else return null;
+    }
+
+    public String getRoleplayName() {
+        return this.roleplayName;
+    }
 
     public void setRoleplayName(String roleplayName) {
         this.roleplayName = roleplayName;
@@ -94,6 +105,18 @@ public class JadePlayer {
 
     public boolean canUseTitle(JadeTitle title) {
         return this.getAvailableTitles().contains(title);
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T> T getSetting(AbstractSetting<T> setting) {
+        return (T) this.settings.get(setting);
+    }
+
+    public <T> void setSetting(AbstractSetting<T> setting, T value) {
+        if (this.settings.containsKey(setting)) {
+            this.settings.remove(setting);
+        }
+        this.settings.put(setting, value);
     }
 
     public boolean isInRoleplay() {

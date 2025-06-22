@@ -1,10 +1,16 @@
 package dev.jabberdrake.jade.handlers;
 
 import dev.jabberdrake.jade.JadeSettings;
+import dev.jabberdrake.jade.database.DatabaseManager;
 import dev.jabberdrake.jade.menus.implementations.GraveOpenMenu;
 import dev.jabberdrake.jade.players.Grave;
 import dev.jabberdrake.jade.players.PlayerManager;
+import dev.jabberdrake.jade.utils.JadeTextColor;
 import dev.jabberdrake.jade.utils.PositionUtils;
+import io.papermc.paper.datacomponent.DataComponentType;
+import io.papermc.paper.datacomponent.DataComponentTypes;
+import io.papermc.paper.datacomponent.item.ResolvableProfile;
+import net.kyori.adventure.text.Component;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.Skull;
@@ -79,6 +85,12 @@ public class PlayerGraveHandler implements Listener {
         }
 
         List<ItemStack> items = new ArrayList<>(event.getDrops());
+        if (player.getKiller() != null) {
+            ItemStack head = ItemStack.of(Material.PLAYER_HEAD);
+            head.setData(DataComponentTypes.CUSTOM_NAME, Component.text(player.getName() + "'s Head", JadeTextColor.YELLOW));
+            head.setData(DataComponentTypes.PROFILE, ResolvableProfile.resolvableProfile().uuid(player.getUniqueId()).build());
+            items.add(head);
+        }
         items.removeIf(itemstack -> itemstack == null || itemstack.getType().isAir() || itemstack.getAmount() <= 0);
 
         if (items.isEmpty()) return;

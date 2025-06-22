@@ -24,6 +24,7 @@ public class ProfileEditCommand {
                 .then(Commands.argument("attribute", StringArgumentType.word())
                         .suggests(ProfileEditCommand::buildProfileFieldSuggestions)
                         .then(Commands.argument("value", StringArgumentType.greedyString())
+                                .requires(sender -> sender.getExecutor() instanceof Player)
                                 .executes(ProfileEditCommand::runCommand)
                         )
                 )
@@ -31,15 +32,10 @@ public class ProfileEditCommand {
     }
 
     public static int runCommand(CommandContext<CommandSourceStack> context) {
-        CommandSender sender = context.getSource().getSender();
-        if (!(sender instanceof Player)) {
-            Jade.getPlugin(Jade.class).getLogger().warning("[ProfileEditCommand::runCommand] Only players can run this command!");
-        }
+        Player player = (Player) context.getSource().getSender();
 
-        Player player = (Player) sender;
         String attr = StringArgumentType.getString(context, "attribute");
         String value = StringArgumentType.getString(context, "value");
-
         switch (attr) {
             case "roleplayName":
                 PlayerManager.asJadePlayer(player.getUniqueId()).setRoleplayName(value);

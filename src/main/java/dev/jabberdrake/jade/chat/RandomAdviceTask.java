@@ -1,7 +1,11 @@
 package dev.jabberdrake.jade.chat;
 
 import dev.jabberdrake.jade.JadeSettings;
+import dev.jabberdrake.jade.players.JadePlayer;
+import dev.jabberdrake.jade.players.PlayerManager;
+import dev.jabberdrake.jade.players.PlayerSettings;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import static dev.jabberdrake.jade.utils.TextUtils.info;
@@ -19,7 +23,7 @@ public class RandomAdviceTask extends BukkitRunnable {
             "System messages displayed in <coral>this shade of orange</coral> usually do interesting things when you <hover:show_text:'<red>Boo!'><coral>hover</coral></hover> over them or <click:open_url:https://www.youtube.com/watch?v=dQw4w9WgXcQ><coral>click</coral></click> on them!",
             "There are four different options you can use when claiming chunks for your settlement: default, <coral><click:suggest_command:'/settlement claim square 1'><hover:show_text:'<zorba>Click to see the command!'>square</hover></click></coral>, <coral><click:suggest_command:'/settlement claim fill'><hover:show_text:'<zorba>Click to see the command!'>fill</hover></click></coral> and <coral><click:suggest_command:'/settlement claim auto'><hover:show_text:'<zorba>Click to see the command!'>auto</hover></click></coral>!",
             "<bold><livingmetal>Jade</livingmetal></bold> adds a bunch of <salmon>new</salmon> <rosemetal>custom</rosemetal> <tyrian_purple>colors</tyrian_purple>, which you can use in <highlight>display names</highlight> for many different game elements! You can even make <gradient:wine_red:audalad_cyan>gradients</gradient> with them!",
-            "Tired of having only <red>boring</red>, <blue>solid</blue> colors in your display text? Try <gradient:red:blue>gradients</gradients>! Gradients can be easily declared with a tag: the one you see in this message corresponds to the tag <chrome><tag_open>gradient:red:blue<tag_close></chrome>!",
+            "Tired of having only <red>boring</red>, <blue>solid</blue> colors in your display text? Try <gradient:red:blue>gradients</gradient>! Gradients can be easily declared with a tag: the one you see in this message corresponds to the tag <chrome><tag_open>gradient:red:blue<tag_close></chrome>!",
             "Got <i>way</i> too much <highlight>Rotten Flesh</highlight> collecting dust in your chests? Try treating it into <highlight>Leather</highlight> by shoving it all in a furnace!",
             "If you die over the void or in an obstructed location, the game will spawn a <highlight>virtual grave</highlight> for you, which can be opened via <coral><click:suggest_command:'/grave list'><hover:show_text:'<zorba>Click to see the command!'>this menu</click></hover></coral>!",
             "Graves are <red>NOT</red> protected against other players! If someone else kills you, they can loot your grave!",
@@ -36,7 +40,13 @@ public class RandomAdviceTask extends BukkitRunnable {
 
         int newIndex = generateNewIndex();
         String advice = ADVICE[newIndex];
-        Bukkit.broadcast(info(PREFIX + advice));
+
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            JadePlayer jadePlayer = PlayerManager.asJadePlayer(player.getUniqueId());
+            if (!jadePlayer.getSetting(PlayerSettings.MUTE_RANDOM_ADVICE)) {
+                player.sendMessage(info(PREFIX + advice));
+            }
+        }
         lastAdviceIndex = newIndex;
     }
 

@@ -4,15 +4,18 @@ import dev.jabberdrake.jade.Jade;
 import dev.jabberdrake.jade.database.DatabaseManager;
 import dev.jabberdrake.jade.titles.DefaultJadeTitle;
 import dev.jabberdrake.jade.titles.JadeTitle;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
 
 import java.util.*;
 import java.util.logging.Logger;
+
+import static dev.jabberdrake.jade.utils.TextUtils.info;
 
 public class PlayerManager {
 
@@ -50,6 +53,22 @@ public class PlayerManager {
             DatabaseManager.createPlayer(player);
         }
 
+        // Fetch all settings
+        PersistentDataContainer pdc = player.asPlayer().getPersistentDataContainer();
+        for (AbstractSetting<?> setting : PlayerSettings.getAllSettings()) {
+            boolean useDefaults = !pdc.has(setting.getKey());
+
+            Bukkit.broadcast(info("useDefaults: " + useDefaults));
+
+            if (setting instanceof BooleanSetting) {
+                BooleanSetting booleanSetting = (BooleanSetting) setting;
+                boolean booleanValue = useDefaults ? booleanSetting.getDefaultValue() : pdc.get(setting.getKey(), PersistentDataType.BOOLEAN);
+                Bukkit.broadcast(info("guy is big " + booleanValue));
+                player.setSetting(booleanSetting, booleanValue);
+            }
+            // add more setting types
+        }
+
         playerCache.put(uuid, player);
 
         logger.info("[PlayerManager::handleLogin] Successfully composed internal data structures for player " + plugin.getServer().getPlayer(uuid).getName() + "!");
@@ -59,6 +78,9 @@ public class PlayerManager {
         playerCache.get(uuid).clearViewTasks();
         playerCache.remove(uuid);
 
+        // was originally gonna save all edited settings to player PDCs here but those aren't accessible during PlayerQuitEvent so oh well
+
+        // Save all graves
         for (Grave grave : getAllGravesForPlayer(uuid)) {
             DatabaseManager.saveGrave(grave);
         }
@@ -103,6 +125,18 @@ public class PlayerManager {
 
         graveCache.remove(grave.getID());
         DatabaseManager.deleteGrave(grave.getID());
+    }
+
+    public static void registerSettingChange(Player player, AbstractSetting<?> setting) {
+        JadePlayer jadePlayer = PlayerManager.asJadePlayer(player.getUniqueId());
+
+        PersistentDataContainer pdc = player.getPersistentDataContainer();
+        if (setting instanceof BooleanSetting) {
+            BooleanSetting booleanSetting = (BooleanSetting) setting;
+            pdc.set(setting.getKey(), PersistentDataType.BOOLEAN, jadePlayer.getSetting(booleanSetting));
+        }
+        // add more setting types
+
     }
 
     public static List<Grave> getAllGravesForPlayer(UUID playerID) {

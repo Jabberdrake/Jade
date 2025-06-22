@@ -5,6 +5,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import dev.jabberdrake.jade.Jade;
 import dev.jabberdrake.jade.commands.profile.ProfileEditCommand;
+import dev.jabberdrake.jade.commands.profile.ProfileSettingsCommand;
 import dev.jabberdrake.jade.players.PlayerManager;
 import dev.jabberdrake.jade.utils.TextUtils;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
@@ -19,9 +20,10 @@ public class ProfileCommand {
 
     public static LiteralCommandNode<CommandSourceStack> buildCommand(final String label) {
         return Commands.literal(label)
-                .requires(sender -> sender.getExecutor() instanceof Player)
-                .executes(ProfileCommand::runCommand)
+                    .requires(sender -> sender.getExecutor() instanceof Player)
+                    .executes(ProfileCommand::runCommand)
                 .then(ProfileEditCommand.buildCommand("edit"))
+                .then(ProfileSettingsCommand.buildCommand("settings"))
                 .build();
     }
 
