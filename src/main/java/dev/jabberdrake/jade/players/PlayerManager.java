@@ -58,12 +58,9 @@ public class PlayerManager {
         for (AbstractSetting<?> setting : PlayerSettings.getAllSettings()) {
             boolean useDefaults = !pdc.has(setting.getKey());
 
-            Bukkit.broadcast(info("useDefaults: " + useDefaults));
-
             if (setting instanceof BooleanSetting) {
                 BooleanSetting booleanSetting = (BooleanSetting) setting;
                 boolean booleanValue = useDefaults ? booleanSetting.getDefaultValue() : pdc.get(setting.getKey(), PersistentDataType.BOOLEAN);
-                Bukkit.broadcast(info("guy is big " + booleanValue));
                 player.setSetting(booleanSetting, booleanValue);
             }
             // add more setting types
