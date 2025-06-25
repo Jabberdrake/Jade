@@ -2,9 +2,9 @@ package dev.jabberdrake.jade.players;
 
 import dev.jabberdrake.jade.Jade;
 import dev.jabberdrake.jade.database.DatabaseManager;
+import dev.jabberdrake.jade.menus.implementations.GraveOpenMenu;
 import dev.jabberdrake.jade.titles.DefaultJadeTitle;
 import dev.jabberdrake.jade.titles.JadeTitle;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -15,8 +15,6 @@ import org.bukkit.persistence.PersistentDataType;
 import java.util.*;
 import java.util.logging.Logger;
 
-import static dev.jabberdrake.jade.utils.TextUtils.info;
-
 public class PlayerManager {
 
     private static final Jade plugin = Jade.getPlugin(Jade.class);
@@ -24,6 +22,8 @@ public class PlayerManager {
 
     private static Map<UUID, JadePlayer> playerCache = new HashMap<>();
     private static Map<String, Grave> graveCache = new HashMap<>();
+
+    public static final Map<UUID, String> openGraves = new HashMap<>();
 
     public static void initialize() {
         List<Grave> graves = DatabaseManager.fetchAllGraves();
@@ -142,5 +142,22 @@ public class PlayerManager {
 
     public static List<Grave> getAllGraves() {
         return graveCache.values().stream().toList();
+    }
+
+    public static void openGraveMenu(Player player, Grave grave) {
+        openGraves.put(player.getUniqueId(), grave.getID());
+        new GraveOpenMenu(grave).open(player);
+    }
+
+    public static void closeGraveMenu(Player player, boolean force) {
+        openGraves.remove(player.getUniqueId());
+        if (force) player.closeInventory();
+    }
+
+    public static UUID getGraveViewer(Grave grave) {
+        for (UUID viewerID : PlayerManager.openGraves.keySet()) {
+            if (openGraves.get(viewerID).equalsIgnoreCase(grave.getID())) return viewerID;
+        }
+        return null;
     }
 }

@@ -1,5 +1,6 @@
 package dev.jabberdrake.jade.handlers;
 
+import com.destroystokyo.paper.event.block.BlockDestroyEvent;
 import dev.jabberdrake.jade.JadeConfig;
 import dev.jabberdrake.jade.menus.implementations.GraveOpenMenu;
 import dev.jabberdrake.jade.players.Grave;
@@ -18,14 +19,15 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockExplodeEvent;
+import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
+import static dev.jabberdrake.jade.utils.TextUtils.error;
 import static dev.jabberdrake.jade.utils.TextUtils.info;
 
 public class PlayerGraveHandler implements Listener {
@@ -41,9 +43,24 @@ public class PlayerGraveHandler implements Listener {
         Grave grave = PlayerManager.getGraveAt(block.getLocation());
         if (grave == null) return;
 
+        Player player = event.getPlayer();
+        UUID viewerUUID = PlayerManager.getGraveViewer(grave);
+        if (viewerUUID != null) {
+            if (viewerUUID.equals(player.getUniqueId())) {
+                // weird shit, ignore
+            } else if (grave.getPlayerID().equals(viewerUUID)) {
+                player.sendMessage(error("Cannot open someone's grave while its rightful owner already has it open!"));
+                return;
+            } else if (grave.getPlayerID().equals(player.getUniqueId())) {
+                Player viewerPlayer = Bukkit.getPlayer(viewerUUID);
+                if (viewerPlayer != null) {
+                    viewerPlayer.closeInventory();
+                }
+            }
+        }
+
         event.setCancelled(true);
 
-        Player player = event.getPlayer();
         if (!grave.getPlayerID().equals(player.getUniqueId())) {
             player.sendMessage(info("This grave does not belong to you... The rightful owner has been notified."));
             OfflinePlayer owner = Bukkit.getOfflinePlayer(grave.getPlayerID());
@@ -52,7 +69,24 @@ public class PlayerGraveHandler implements Listener {
             }
         }
 
-        new GraveOpenMenu(grave).open(player);
+        PlayerManager.openGraveMenu(player, grave);
+        Bukkit.broadcast(Component.text("added " + grave.getID() + " for " + player.getName()));
+    }
+
+    @EventHandler
+    public void onBlockDestroy(BlockDestroyEvent event) {
+        Grave grave = PlayerManager.getGraveAt(event.getBlock().getLocation());
+        if (grave != null) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onBlockFromTo(BlockFromToEvent event) {
+        Grave grave = PlayerManager.getGraveAt(event.getToBlock().getLocation());
+        if (grave != null) {
+            event.setCancelled(true);
+        }
     }
 
     @EventHandler

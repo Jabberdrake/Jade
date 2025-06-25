@@ -5,6 +5,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import dev.jabberdrake.jade.commands.admin.AdminDumpCommand;
 import dev.jabberdrake.jade.commands.admin.AdminGameruleCommand;
+import dev.jabberdrake.jade.commands.admin.AdminMakeVirtualCommand;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import org.bukkit.entity.Player;
@@ -20,6 +21,7 @@ public class AdminCommand {
                     .executes(AdminCommand::runCommand)
                 .then(AdminGameruleCommand.buildCommand("gamerule"))
                 .then(AdminDumpCommand.buildCommand("dump"))
+                .then(AdminMakeVirtualCommand.buildCommand("makevirtual"))
                 .build();
     }
 

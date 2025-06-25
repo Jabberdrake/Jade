@@ -3,6 +3,8 @@ package dev.jabberdrake.jade.commands;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
+import dev.jabberdrake.jade.players.Grave;
+import dev.jabberdrake.jade.players.PlayerManager;
 import dev.jabberdrake.jade.utils.JadeTextColor;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.registry.RegistryAccess;
@@ -40,6 +42,17 @@ public class CommonArgumentSuggestions {
         JadeTextColor.VANILLA_NAMES
                 .stream().filter(name -> name.toLowerCase().contains(builder.getRemainingLowerCase()) || name.equals(builder.getRemainingLowerCase()))
                 .forEach(builder::suggest);
+        return builder.buildFuture();
+    }
+
+    public static CompletableFuture<Suggestions> suggestExistingGravesForPlayer(final CommandContext<CommandSourceStack> context, final SuggestionsBuilder builder) {
+        Player player = (Player) context.getSource().getSender();
+        PlayerManager.getAllGravesForPlayer(player.getUniqueId()).stream().map(Grave::getID).forEach(builder::suggest);
+        return builder.buildFuture();
+    }
+
+    public static CompletableFuture<Suggestions> suggestAllGraves(final CommandContext<CommandSourceStack> context, final SuggestionsBuilder builder) {
+        PlayerManager.getAllGraves().stream().map(Grave::getID).forEach(builder::suggest);
         return builder.buildFuture();
     }
 }

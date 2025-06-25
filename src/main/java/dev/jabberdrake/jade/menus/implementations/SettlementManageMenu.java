@@ -95,7 +95,7 @@ public class SettlementManageMenu extends SimpleJadeMenu {
 
         if (role.isLeader()) {
             loreBuilder.addLine(Component.empty());
-            loreBuilder.addLine(text("Leader Role").color(TextUtils.LEGENDARY_ORANGE)
+            loreBuilder.addLine(text("Leader Role").color(NamedTextColor.GOLD)
                     .decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE));
             loreBuilder.addLine(text()
                     .content("Leaders have all permissions and").color(TextUtils.DARK_ZORBA)

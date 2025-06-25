@@ -11,6 +11,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -78,6 +79,7 @@ public class Grave {
     }
 
     public void makeVirtual() {
+        if (chestLocation.getBlock() != null && chestLocation.getBlock().getType() == Material.PLAYER_HEAD) { chestLocation.getBlock().setType(Material.AIR); }
         this.chestLocation = null;
     }
 

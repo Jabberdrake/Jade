@@ -95,6 +95,7 @@ public class CauldronCraftHandler implements Listener {
                 for (CauldronRecipe potentialRecipe : CauldronRecipes.getAllRecipes().values()) {
                     if (potentialRecipe.matchSource(source.getItemStack())) {
                         recipe[0] = potentialRecipe;
+                        break;
                     }
                 }
 

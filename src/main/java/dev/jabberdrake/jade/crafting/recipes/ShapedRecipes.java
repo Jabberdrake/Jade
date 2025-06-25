@@ -1,6 +1,7 @@
 package dev.jabberdrake.jade.crafting.recipes;
 
 import dev.jabberdrake.jade.Jade;
+import dev.jabberdrake.jade.items.JadeItemRegistry;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.*;
@@ -150,6 +151,8 @@ public class ShapedRecipes {
         registerRecipe("CANDLE_any_to_purple", ItemStack.of(Material.PURPLE_CANDLE, 8), "AAA;ABA;AAA", Ingredient.of(Material.PURPLE_DYE, 'B'), Ingredient.of(new RecipeChoice.MaterialChoice(ALL_CANDLE), 'A'));
         registerRecipe("CANDLE_any_to_magenta", ItemStack.of(Material.MAGENTA_CANDLE, 8), "AAA;ABA;AAA", Ingredient.of(Material.MAGENTA_DYE, 'B'), Ingredient.of(new RecipeChoice.MaterialChoice(ALL_CANDLE), 'A'));
         registerRecipe("CANDLE_any_to_pink", ItemStack.of(Material.PINK_CANDLE, 8), "AAA;ABA;AAA", Ingredient.of(Material.PINK_DYE, 'B'), Ingredient.of(new RecipeChoice.MaterialChoice(ALL_CANDLE), 'A'));
+
+        registerRecipe("phantom_item_frame", JadeItemRegistry.PHANTOM_ITEM_FRAME.getItem(8), "AAA;ABA;AAA", Ingredient.of(Material.PHANTOM_MEMBRANE, 'B'), Ingredient.of(Material.ITEM_FRAME, 'A'));
     }
 
     private static class Ingredient {

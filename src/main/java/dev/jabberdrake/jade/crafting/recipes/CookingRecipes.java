@@ -14,9 +14,9 @@ public class CookingRecipes {
 
     static {
         registerRecipe("rottenFlesh_to_leather", ItemStack.of(Material.LEATHER), Material.ROTTEN_FLESH, 0.2f, 200, CookingStations.FURNACE, CookingStations.SMOKER, CookingStations.CAMPFIRE);
-        registerRecipe("rawCopperBlock_to_copperBlock", ItemStack.of(Material.COPPER_BLOCK), Material.RAW_COPPER_BLOCK, 7f, 400, CookingStations.FURNACE, CookingStations.BLAST_FURNACE);
-        registerRecipe("rawIronBlock_to_ironBlock", ItemStack.of(Material.IRON_BLOCK), Material.RAW_IRON_BLOCK, 7f, 400, CookingStations.FURNACE, CookingStations.BLAST_FURNACE);
-        registerRecipe("rawGoldBlock_to_goldBlock", ItemStack.of(Material.GOLD_BLOCK), Material.RAW_GOLD_BLOCK, 10f, 400, CookingStations.FURNACE, CookingStations.BLAST_FURNACE);
+        registerRecipe("rawCopperBlock_to_copperBlock", ItemStack.of(Material.COPPER_BLOCK), Material.RAW_COPPER_BLOCK, 6.3f, 400, CookingStations.FURNACE, CookingStations.BLAST_FURNACE);
+        registerRecipe("rawIronBlock_to_ironBlock", ItemStack.of(Material.IRON_BLOCK), Material.RAW_IRON_BLOCK, 6.3f, 400, CookingStations.FURNACE, CookingStations.BLAST_FURNACE);
+        registerRecipe("rawGoldBlock_to_goldBlock", ItemStack.of(Material.GOLD_BLOCK), Material.RAW_GOLD_BLOCK, 9f, 400, CookingStations.FURNACE, CookingStations.BLAST_FURNACE);
     }
 
     private enum CookingStations {
