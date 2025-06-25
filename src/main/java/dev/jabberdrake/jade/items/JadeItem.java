@@ -12,15 +12,23 @@ import org.bukkit.persistence.PersistentDataType;
 public abstract class JadeItem {
     public static final NamespacedKey JADE_ITEM_KEY = Jade.key("item");
 
-    private final String name;
-    private final String key;
-    private final Rarity rarity;
-    private final ItemStack template;
-    private final Group group;
+    protected final String name;
+    protected final String key;
+    protected final Rarity rarity;
+    protected final ItemStack template;
+    protected final Group group;
 
     protected enum Group {
         VANILLA,
         GADGET;
+    }
+
+    protected JadeItem(String name, String key, Rarity rarity, Material material, Group group) {
+        this.name = name;
+        this.key = key;
+        this.rarity = rarity;
+        this.template = ItemStack.of(material);
+        this.group = group;
     }
 
     protected JadeItem(JadeItem.Builder builder) {
@@ -59,6 +67,24 @@ public abstract class JadeItem {
 
     public JadeItem.Group getItemGroup() {
         return this.group;
+    }
+
+    public void setCustomName() {
+        this.template.setData(DataComponentTypes.CUSTOM_NAME, Component.text(name, rarity.getColor()).decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE));
+    }
+
+    public void setModelData(String path) {
+        this.template.setData(DataComponentTypes.ITEM_MODEL, Jade.key(path));
+    }
+
+    public void setKeyData() {
+        this.template.editPersistentDataContainer(pdc -> {
+            pdc.set(JadeItem.JADE_ITEM_KEY, PersistentDataType.STRING, key);
+        });
+    }
+
+    public void setTooltipStyle() {
+        this.template.setData(DataComponentTypes.TOOLTIP_STYLE, rarity.getTooltipKey());
     }
 
     static abstract class Builder {
