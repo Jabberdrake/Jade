@@ -1,6 +1,5 @@
 package dev.jabberdrake.jade.utils;
 
-import dev.jabberdrake.jade.realms.Settlement;
 import dev.jabberdrake.jade.utils.message.ErrorStrategy;
 import dev.jabberdrake.jade.utils.message.InfoStrategy;
 import dev.jabberdrake.jade.utils.message.SuccessStrategy;
@@ -11,8 +10,8 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
-import org.bukkit.Bukkit;
 
+import java.text.DecimalFormat;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -23,6 +22,8 @@ public class TextUtils {
     private static final ErrorStrategy ERROR_STRATEGY = new ErrorStrategy();
     private static final SuccessStrategy SUCCESS_STRATEGY = new SuccessStrategy();
     private static final SystemStrategy SYSTEM_STRATEGY = new SystemStrategy();
+
+    public static final DecimalFormat DF = new DecimalFormat("#.#");
 
     public static final TextColor DARK_ZORBA = TextColor.color(0x4b4047);
     public static final TextColor ZORBA = TextColor.color(0x9f918d);
@@ -188,9 +189,13 @@ public class TextUtils {
         return result;
     }
 
-    public static void lore(ItemLore.Builder loreBuilder, List<Component> loreLines) {
-        for (Component line : loreLines) {
-            loreBuilder.addLine(line.decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE));
+    public static void lore(ItemLore.Builder loreBuilder, List<String> loreLines) {
+        for (String line : loreLines) {
+            if (line.equalsIgnoreCase("")) {
+                loreBuilder.addLine(Component.empty());
+                continue;
+            }
+            loreBuilder.addLine(deserialize(line).decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE));
         }
     }
 

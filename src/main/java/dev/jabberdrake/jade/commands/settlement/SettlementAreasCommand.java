@@ -418,7 +418,7 @@ public class SettlementAreasCommand {
 
         String targetArgument = StringArgumentType.getString(context, "player");
         OfflinePlayer target = Bukkit.getOfflinePlayer(targetArgument);
-        if (!target.hasPlayedBefore()) {
+        if (!target.isOnline() && !target.hasPlayedBefore()) {
             player.sendMessage(error("Could not find a player named <highlight>" + targetArgument + "</highlight>!"));
             return Command.SINGLE_SUCCESS;
         } else if (targetArgument.equals(player.getName())) {
@@ -457,7 +457,7 @@ public class SettlementAreasCommand {
 
         String targetArgument = StringArgumentType.getString(context, "player");
         OfflinePlayer target = Bukkit.getOfflinePlayer(targetArgument);
-        if (!target.hasPlayedBefore()) {
+        if (!target.isOnline() && !target.hasPlayedBefore()) {
             player.sendMessage(error("Could not find a player named <highlight>" + targetArgument + "</highlight>!"));
             return Command.SINGLE_SUCCESS;
         } else if (targetArgument.equals(player.getName())) {
@@ -523,7 +523,7 @@ public class SettlementAreasCommand {
 
         String targetArgument = StringArgumentType.getString(context, "player");
         OfflinePlayer target = Bukkit.getOfflinePlayer(targetArgument);
-        if (!target.hasPlayedBefore()) {
+        if (!target.isOnline() && !target.hasPlayedBefore()) {
             player.sendMessage(error("Could not find a player named <highlight>" + targetArgument + "</highlight>!"));
             return Command.SINGLE_SUCCESS;
         } else if (targetArgument.equals(player.getName())) {

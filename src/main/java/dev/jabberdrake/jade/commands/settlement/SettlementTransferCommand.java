@@ -36,7 +36,7 @@ public class SettlementTransferCommand {
 
         String targetArgument = StringArgumentType.getString(context, "player");
         OfflinePlayer target = Bukkit.getOfflinePlayer(targetArgument);
-        if (!player.hasPlayedBefore()) {
+        if (!player.isOnline() && !player.hasPlayedBefore()) {
             player.sendMessage(error("Could not find a player named <highlight>" + targetArgument + "</highlight>!"));
             return Command.SINGLE_SUCCESS;
         } else if (targetArgument.equals(player.getName())) {

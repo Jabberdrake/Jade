@@ -20,6 +20,7 @@ public class GadgetItem extends JadeItem {
 
         @Override
         public GadgetItem build() {
+            if (this.template == null) return null;
             setKeyData();
             setCustomName();
             setTooltipStyle();

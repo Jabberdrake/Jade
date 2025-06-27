@@ -70,7 +70,6 @@ public class PlayerGraveHandler implements Listener {
         }
 
         PlayerManager.openGraveMenu(player, grave);
-        Bukkit.broadcast(Component.text("added " + grave.getID() + " for " + player.getName()));
     }
 
     @EventHandler

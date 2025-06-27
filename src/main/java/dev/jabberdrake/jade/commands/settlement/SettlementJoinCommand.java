@@ -38,7 +38,7 @@ public class SettlementJoinCommand {
         RealmManager.clearInviteToSettlement(player);
 
         player.sendMessage(success("You have joined the settlement of " + inviter.getDisplayName() + "!"));
-        inviter.broadcast("<highlight>" + player.getName() + " has joined the settlement!");
+        inviter.broadcast("<highlight>" + player.getName() + "</highlight> has joined the settlement!");
         return Command.SINGLE_SUCCESS;
     }
 
