@@ -1,11 +1,53 @@
 package dev.jabberdrake.jade.utils;
 
+import dev.jabberdrake.jade.items.Rarity;
+import io.papermc.paper.datacomponent.item.attribute.AttributeModifierDisplay;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeModifier;
+import org.bukkit.inventory.EquipmentSlotGroup;
+import org.w3c.dom.Attr;
 
 public class AttributeUtils {
 
     public static final double BASE_ATTACK_DAMAGE = 1.0;
     public static final double BASE_ATTACK_SPEED = 4.0;
+
+    public static class ItemAttributeEntry {
+        private Attribute attribute;
+        private AttributeModifier modifier;
+        private EquipmentSlotGroup equipmentSlotGroup;
+        private AttributeModifierDisplay modifierDisplay;
+
+        public ItemAttributeEntry(Attribute attribute, AttributeModifier modifier, AttributeModifierDisplay modifierDisplay) {
+            this.attribute = attribute;
+            this.modifier = modifier;
+            this.equipmentSlotGroup = null;
+            this.modifierDisplay = modifierDisplay;
+        }
+
+        public ItemAttributeEntry(Attribute attribute, AttributeModifier modifier, EquipmentSlotGroup equipmentSlotGroup, AttributeModifierDisplay modifierDisplay) {
+            this.attribute = attribute;
+            this.modifier = modifier;
+            this.equipmentSlotGroup = equipmentSlotGroup;
+            this.modifierDisplay = modifierDisplay;
+        }
+
+        public Attribute getAttribute() {
+            return this.attribute;
+        }
+
+        public AttributeModifier getModifier() {
+            return this.modifier;
+        }
+
+        public EquipmentSlotGroup getSlotGroup() {
+            return this.equipmentSlotGroup;
+        }
+
+        public AttributeModifierDisplay getDisplay() {
+            return this.modifierDisplay;
+        }
+    }
 
     public enum BaseAttributes {
         ARMOR("minecraft:armor", 0.0),

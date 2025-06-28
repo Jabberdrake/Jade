@@ -1,18 +1,10 @@
 package dev.jabberdrake.jade.items;
 
-import dev.jabberdrake.jade.utils.AttributeUtils;
-import dev.jabberdrake.jade.utils.TextUtils;
+import dev.jabberdrake.jade.utils.ItemUtils;
 import io.papermc.paper.datacomponent.DataComponentTypes;
-import io.papermc.paper.datacomponent.item.ItemAttributeModifiers;
-import io.papermc.paper.datacomponent.item.ItemLore;
-import io.papermc.paper.datacomponent.item.TooltipDisplay;
-import io.papermc.paper.datacomponent.item.attribute.AttributeModifierDisplay;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
 
@@ -45,6 +37,20 @@ public class VanillaItem extends JadeItem {
 
         // Apply lore
         source.setData(DataComponentTypes.LORE, template.template.getData(DataComponentTypes.LORE));
+
+        // Hide attributes
+        ItemUtils.hideAttributes(source);
+    }
+
+    public static void update(ItemStack source) {
+        if (source == null || !source.getPersistentDataContainer().has(JADE_ITEM_KEY)) return;
+
+        String sourceKey = source.getType().getKey().getKey();
+        VanillaItem template = VanillaItemRegistry.getVanillaItem(sourceKey);
+        if (template == null) return;
+
+        // Re-apply lore
+        JadeItem.setLore(source, template.getLoreLines());
     }
 
     public static VanillaItem.Builder builder() {
@@ -53,19 +59,28 @@ public class VanillaItem extends JadeItem {
 
     public static class Builder extends JadeItem.Builder {
         public Builder data(String name, Material material, Rarity rarity) {
-            super.data(name, material.getKey().getKey(), rarity, Group.VANILLA);
+            super.data(name, material.getKey().getKey(), rarity, ItemGroup.VANILLA);
             super.item(material);
+            return this;
+        }
+
+        public Builder lore(List<String> loreLines) {
+            this.loreLines = loreLines;
             return this;
         }
 
         @Override
         public VanillaItem build() {
             if (this.template == null) return null;
-            setKeyData();
-            setCustomName();
-            setTooltipStyle();
-            setLore();
-            return new VanillaItem(this);
+
+            VanillaItem item = new VanillaItem(this);
+            item.setKeyData();
+            item.setCustomName();
+            item.setTooltipStyle();
+            item.hideAttributes();
+            item.setLore();
+
+            return item;
         }
     }
 

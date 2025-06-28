@@ -1,12 +1,22 @@
 package dev.jabberdrake.jade.utils;
 
+import io.papermc.paper.datacomponent.DataComponentType;
 import io.papermc.paper.datacomponent.DataComponentTypes;
+import io.papermc.paper.datacomponent.item.ItemAttributeModifiers;
+import io.papermc.paper.datacomponent.item.ItemEnchantments;
+import io.papermc.paper.datacomponent.item.TooltipDisplay;
+import io.papermc.paper.datacomponent.item.attribute.AttributeModifierDisplay;
 import io.papermc.paper.registry.RegistryAccess;
 import io.papermc.paper.registry.RegistryKey;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ItemType;
+import org.checkerframework.checker.units.qual.A;
+
+import javax.xml.crypto.Data;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ItemUtils {
 
@@ -44,6 +54,32 @@ public class ItemUtils {
                 return ItemStack.of(Material.STRUCTURE_VOID);
             default:
                 return ItemStack.of(Material.BARRIER);
+        }
+    }
+
+    public static void hideAttributes(ItemStack item) {
+        List<AttributeUtils.ItemAttributeEntry> entries = new ArrayList<>();
+
+        ItemAttributeModifiers modifiers = item.getData(DataComponentTypes.ATTRIBUTE_MODIFIERS);
+        for (ItemAttributeModifiers.Entry entry : modifiers.modifiers()) {
+            entries.add(new AttributeUtils.ItemAttributeEntry(entry.attribute(), entry.modifier(), entry.getGroup(), AttributeModifierDisplay.hidden()));
+        }
+
+        ItemAttributeModifiers.Builder hiddenAttrBuilder = ItemAttributeModifiers.itemAttributes();
+        for (AttributeUtils.ItemAttributeEntry hiddenEntry : entries) {
+            hiddenAttrBuilder.addModifier(hiddenEntry.getAttribute(), hiddenEntry.getModifier(), hiddenEntry.getSlotGroup(), hiddenEntry.getDisplay());
+        }
+        ItemAttributeModifiers hiddenAttrModifiers = hiddenAttrBuilder.build();
+
+        item.setData(DataComponentTypes.ATTRIBUTE_MODIFIERS, hiddenAttrModifiers);
+
+
+
+        // Hide enchantments
+        if (item.hasData(DataComponentTypes.ENCHANTMENTS)) {
+            item.setData(DataComponentTypes.TOOLTIP_DISPLAY, TooltipDisplay.tooltipDisplay()
+                    .addHiddenComponents(DataComponentTypes.ENCHANTMENTS)
+                    .build());
         }
     }
 

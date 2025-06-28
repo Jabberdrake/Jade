@@ -13,7 +13,7 @@ public class GadgetItem extends JadeItem {
     public static class Builder extends JadeItem.Builder {
 
         public Builder data(String name, String key, Rarity rarity) {
-            super.data(name, key, rarity, Group.GADGET);
+            super.data(name, key, rarity, ItemGroup.GADGET);
 
             return this;
         }
@@ -21,11 +21,16 @@ public class GadgetItem extends JadeItem {
         @Override
         public GadgetItem build() {
             if (this.template == null) return null;
-            setKeyData();
-            setCustomName();
-            setTooltipStyle();
-            setModelData(key);
-            return new GadgetItem(this);
+            GadgetItem item = new GadgetItem(this);
+
+            item.setKeyData();
+            item.setCustomName();
+            item.setTooltipStyle();
+            item.setModelData(this.key);
+            item.hideAttributes();
+            item.setLore();
+
+            return item;
         }
     }
 }

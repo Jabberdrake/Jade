@@ -31,7 +31,8 @@ public class RandomAdviceTask extends BukkitRunnable {
             "You can swap in and out of <light_rosemetal>Roleplay</light_rosemetal> chat by typing the <coral><click:suggest_command:'/toggleroleplay'><hover:show_text:'<zorba>Click to see the command!'>toggleroleplay</hover></click></coral> command!",
             "While in <light_rosemetal>Roleplay</light_rosemetal> chat, you can customize your character's action by adding an <highlight>asterisk</highlight> before your message, like so: \"<white>*waves: Good morning!</white>\"",
             "Walking on <highlight>roads</highlight> can boost your movement speed several times over!",
-            "Ever wanted to subdivide your towns and cities into neat districts and zones, each with their own set of <highlight>trusted members</highlight>? Try using <coral><click:suggest_command:'/settlement areas'><hover:show_text:'<zorba>Click to see the command!'>areas</hover></click></coral>!"
+            "Ever wanted to subdivide your towns and cities into neat districts and zones, each with their own set of <highlight>trusted members</highlight>? Try using <coral><click:suggest_command:'/settlement areas'><hover:show_text:'<zorba>Click to see the command!'>areas</hover></click></coral>!",
+            "Tired of seeing these messages? You can change whether or not to receive these tips, along with many other settings, via the <coral><click:suggest_command:'/profile settings'><hover:show_text:'<zorba>Click to see the command!'>profile settings</hover></click></coral> command! To mute these tip messages, do <highlight>/profile settings muteRandomAdvice true</highlight>!"
     };
 
     @Override

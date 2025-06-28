@@ -6,9 +6,11 @@ import dev.jabberdrake.jade.menus.JadeMenu;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.enchantment.EnchantItemEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
+import org.bukkit.event.inventory.PrepareItemCraftEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -49,8 +51,24 @@ public class VanillaItemHandler implements Listener {
         processVanillaItem(event.getCursor());
     }
 
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onItemEnchant(EnchantItemEvent event) {
+        processVanillaItem(event.getItem());
+    }
+
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onCraftingResult(PrepareItemCraftEvent event) {
+        if (event.getRecipe() == null) return;
+        processVanillaItem(event.getRecipe().getResult());
+    }
+
     public void processVanillaItem(ItemStack source) {
         if (source == null) return;
-        VanillaItem.convert(source);
+
+        if (source.getPersistentDataContainer().has(JadeItem.JADE_ITEM_KEY)) {
+            VanillaItem.update(source);
+        } else {
+            VanillaItem.convert(source);
+        }
     }
 }

@@ -12,7 +12,9 @@ import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 
 import java.text.DecimalFormat;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -24,6 +26,23 @@ public class TextUtils {
     private static final SystemStrategy SYSTEM_STRATEGY = new SystemStrategy();
 
     public static final DecimalFormat DF = new DecimalFormat("#.#");
+    private static final Map<String, Integer> ROMAN_CONVERSION_MAP = new HashMap<>();
+
+    static {
+        ROMAN_CONVERSION_MAP.put("M", 1000);
+        ROMAN_CONVERSION_MAP.put("CM", 900);
+        ROMAN_CONVERSION_MAP.put("D", 500);
+        ROMAN_CONVERSION_MAP.put("CD", 400);
+        ROMAN_CONVERSION_MAP.put("C", 100);
+        ROMAN_CONVERSION_MAP.put("XC", 90);
+        ROMAN_CONVERSION_MAP.put("L", 50);
+        ROMAN_CONVERSION_MAP.put("XL", 40);
+        ROMAN_CONVERSION_MAP.put("X", 10);
+        ROMAN_CONVERSION_MAP.put("IX", 9);
+        ROMAN_CONVERSION_MAP.put("V", 5);
+        ROMAN_CONVERSION_MAP.put("IV", 4);
+        ROMAN_CONVERSION_MAP.put("I", 1);
+    }
 
     public static final TextColor DARK_ZORBA = TextColor.color(0x4b4047);
     public static final TextColor ZORBA = TextColor.color(0x9f918d);
@@ -189,6 +208,15 @@ public class TextUtils {
         return result;
     }
 
+    public static void lore(ItemLore.Builder loreBuilder, List<Component> loreLines, String prefixString, TextColor prefixColor) {
+        for (Component line : loreLines) {
+            loreBuilder.addLine(Component.text().content(prefixString).color(prefixColor)
+                    .append(line)
+                    .decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE)
+                    .build());
+        }
+    }
+
     public static void lore(ItemLore.Builder loreBuilder, List<String> loreLines) {
         for (String line : loreLines) {
             if (line.equalsIgnoreCase("")) {
@@ -197,6 +225,18 @@ public class TextUtils {
             }
             loreBuilder.addLine(deserialize(line).decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE));
         }
+    }
+
+    public static String toRomanNumeral(int arabicInt) {
+        StringBuilder romanNumeral = new StringBuilder();
+        int remainder = arabicInt;
+        for (Map.Entry<String, Integer> numeralPair : ROMAN_CONVERSION_MAP.entrySet()) {
+            while (remainder >= numeralPair.getValue()) {
+                romanNumeral.append(numeralPair.getKey());
+                remainder -= numeralPair.getValue();
+            }
+        }
+        return romanNumeral.toString();
     }
 
 }

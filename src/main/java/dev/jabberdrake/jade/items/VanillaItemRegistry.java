@@ -3,11 +3,26 @@ package dev.jabberdrake.jade.items;
 import org.bukkit.Material;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class VanillaItemRegistry {
 
     private static final Map<String, VanillaItem> VANILLA_ITEMS = new HashMap<>();
+
+    // COMMON ITEMS
+    public static final VanillaItem CHAINMAIL_HELMET = registerItem(VanillaItem.builder()
+            .data("Chainmail Helmet", Material.CHAINMAIL_HELMET, Rarity.COMMON)
+            .build());
+    public static final VanillaItem CHAINMAIL_CHESTPLATE = registerItem(VanillaItem.builder()
+            .data("Chainmail Chestplate", Material.CHAINMAIL_CHESTPLATE, Rarity.COMMON)
+            .build());
+    public static final VanillaItem CHAINMAIL_LEGGINGS = registerItem(VanillaItem.builder()
+            .data("Chainmail Leggings", Material.CHAINMAIL_LEGGINGS, Rarity.COMMON)
+            .build());
+    public static final VanillaItem CHAINMAIL_BOOTS = registerItem(VanillaItem.builder()
+            .data("Chainmail Boots", Material.CHAINMAIL_BOOTS, Rarity.COMMON)
+            .build());
 
     // UNCOMMON ITEMS
     public static final VanillaItem NAUTILUS_SHELL = registerItem(VanillaItem.builder()
@@ -31,6 +46,7 @@ public class VanillaItemRegistry {
 
     public static final VanillaItem NETHERITE_SWORD = registerItem(VanillaItem.builder()
             .data("Netherite Sword", Material.NETHERITE_SWORD, Rarity.RARE)
+            .lore(List.of("<dark_zorba>so cool,,,"))
             .build());
     public static final VanillaItem NETHERITE_PICKAXE = registerItem(VanillaItem.builder()
             .data("Netherite Pickaxe", Material.NETHERITE_PICKAXE, Rarity.RARE)
