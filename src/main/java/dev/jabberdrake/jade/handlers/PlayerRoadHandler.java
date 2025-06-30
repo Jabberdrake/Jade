@@ -3,6 +3,8 @@ package dev.jabberdrake.jade.handlers;
 import dev.jabberdrake.jade.Jade;
 import dev.jabberdrake.jade.JadeConfig;
 import dev.jabberdrake.jade.utils.Road;
+import net.kyori.adventure.text.Component;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -15,11 +17,14 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.scoreboard.ScoreboardManager;
+
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class PlayerRoadHandler implements Listener {
     private static final NamespacedKey ROAD_MODIFIER_KEY = Jade.key("road_speed_modifier");
-    private static final AttributeModifier.Operation ROAD_MODIFIER_OP = AttributeModifier.Operation.ADD_SCALAR;
-    private static final double ROAD_MODIFIER_TRANSITION = 0.25D;
+    private static final AttributeModifier.Operation ROAD_MODIFIER_OP = AttributeModifier.Operation.ADD_NUMBER;
+    private static final double ROAD_MODIFIER_TRANSITION = 0.01D;
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerMove(PlayerMoveEvent event) {
@@ -47,21 +52,21 @@ public class PlayerRoadHandler implements Listener {
         }
 
         AttributeInstance movementSpeed = player.getAttribute(Attribute.MOVEMENT_SPEED);
-        double targetSpeed = movementSpeed.getBaseValue() * speedModifier;
-        double currentSpeed = movementSpeed.getValue();
-        if (currentSpeed == targetSpeed || currentSpeed == movementSpeed.getBaseValue()) return;
-
-        movementSpeed.removeModifier(ROAD_MODIFIER_KEY);
+        double targetSpeed = speedModifier == 0 ? 0 : (speedModifier * movementSpeed.getBaseValue()) - movementSpeed.getBaseValue();
+        double currentSpeed = movementSpeed.getModifier(ROAD_MODIFIER_KEY) != null ? movementSpeed.getModifier(ROAD_MODIFIER_KEY).getAmount() : movementSpeed.getBaseValue();
+        if (currentSpeed == targetSpeed) return;
 
         double finalSpeedModifier;
         // Gradually transition from current speed to target speed
         if (targetSpeed >= currentSpeed) {
             // Speed up until we've hit the target speed
-            finalSpeedModifier = Math.min(currentSpeed + ROAD_MODIFIER_TRANSITION, targetSpeed) - movementSpeed.getBaseValue();
+            finalSpeedModifier = Math.min(currentSpeed + ROAD_MODIFIER_TRANSITION, targetSpeed);
         } else {
             // Slow down until we get back to base speed
-            finalSpeedModifier = Math.max(currentSpeed - ROAD_MODIFIER_TRANSITION, movementSpeed.getBaseValue()) - movementSpeed.getBaseValue();
+            finalSpeedModifier = Math.max(currentSpeed - ROAD_MODIFIER_TRANSITION, 0);
         }
+
+        movementSpeed.removeModifier(ROAD_MODIFIER_KEY);
         movementSpeed.addModifier(new AttributeModifier(ROAD_MODIFIER_KEY, finalSpeedModifier, ROAD_MODIFIER_OP));
     }
 
