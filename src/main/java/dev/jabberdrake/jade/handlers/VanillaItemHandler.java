@@ -85,9 +85,9 @@ public class VanillaItemHandler implements Listener {
             VanillaItem template = VanillaItemRegistry.getVanillaItem(source.getType().getKey().getKey());
 
             if (newName.equalsIgnoreCase("")) {
-                JadeItem.setCustomName(source, template.getName(), template.getRarity(), false);
+                JadeItem.rename(source, template.getName(), false);
             } else {
-                JadeItem.setCustomName(source, newName, template.getRarity(), true);
+                JadeItem.rename(source, newName, true);
             }
         }
     }

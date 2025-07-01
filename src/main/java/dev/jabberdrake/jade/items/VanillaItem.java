@@ -1,5 +1,6 @@
 package dev.jabberdrake.jade.items;
 
+import dev.jabberdrake.jade.Jade;
 import dev.jabberdrake.jade.utils.ItemUtils;
 import io.papermc.paper.datacomponent.DataComponentTypes;
 import net.kyori.adventure.text.Component;
@@ -23,23 +24,22 @@ public class VanillaItem extends JadeItem {
         VanillaItem template = VanillaItemRegistry.getVanillaItem(sourceKey);
         if (template == null) return;
 
+        // Set name
+        source.getItemMeta().itemName(Component.text(template.getName(), template.getRarity().getColor()));
+
+        // Set tooltip style
+        source.setData(DataComponentTypes.TOOLTIP_STYLE, template.getRarity().getTooltipKey());
+
         // Apply key data
         source.editPersistentDataContainer(pdc -> {
             pdc.set(JadeItem.JADE_ITEM_KEY, PersistentDataType.STRING, template.getKey());
         });
 
-        // Apply custom name
-        source.setData(DataComponentTypes.CUSTOM_NAME, Component.text(template.getName(), template.getRarity().getColor())
-                .decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE));
-
-        // Apply custom tooltip
-        source.setData(DataComponentTypes.TOOLTIP_STYLE, template.getRarity().getTooltipKey());
+        // Hide vanilla attributes
+        ItemUtils.hideAttributes(source);
 
         // Apply lore
         source.setData(DataComponentTypes.LORE, template.template.getData(DataComponentTypes.LORE));
-
-        // Hide attributes
-        ItemUtils.hideAttributes(source);
     }
 
     public static void update(ItemStack source) {
@@ -50,7 +50,7 @@ public class VanillaItem extends JadeItem {
         if (template == null) return;
 
         // Re-apply lore
-        JadeItem.setLore(source, template.getLoreLines());
+        JadeItem.setLore(source, template.getLore());
     }
 
     public static VanillaItem.Builder builder() {
@@ -65,19 +65,19 @@ public class VanillaItem extends JadeItem {
         }
 
         public Builder lore(List<String> loreLines) {
-            this.loreLines = loreLines;
+            this.lore = loreLines;
             return this;
         }
 
         @Override
         public VanillaItem build() {
-            if (this.template == null) return null;
+            try {
+                mount();
+            } catch (IllegalStateException e) {
+                Jade.error("Could not finish building VanillaItem " + this.key + " due to: <red>" + e.getMessage());
+            }
 
             VanillaItem item = new VanillaItem(this);
-            item.setKeyData();
-            item.setCustomName();
-            item.setTooltipStyle();
-            item.hideAttributes();
             item.setLore();
 
             return item;

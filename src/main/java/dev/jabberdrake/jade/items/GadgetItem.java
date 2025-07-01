@@ -1,5 +1,7 @@
 package dev.jabberdrake.jade.items;
 
+import dev.jabberdrake.jade.Jade;
+
 public class GadgetItem extends JadeItem {
 
     public GadgetItem(Builder builder) {
@@ -20,17 +22,13 @@ public class GadgetItem extends JadeItem {
 
         @Override
         public GadgetItem build() {
-            if (this.template == null) return null;
-            GadgetItem item = new GadgetItem(this);
-
-            item.setKeyData();
-            item.setCustomName();
-            item.setTooltipStyle();
-            item.setModelData(this.key);
-            item.hideAttributes();
-            item.setLore();
-
-            return item;
+            try {
+                model();
+                mount();
+            } catch (IllegalStateException e) {
+                Jade.error("Could not finish building GadgetItem " + this.key + " due to: <red>" + e.getMessage());
+            }
+            return new GadgetItem(this);
         }
     }
 }

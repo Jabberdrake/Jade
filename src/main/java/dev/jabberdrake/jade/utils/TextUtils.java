@@ -13,6 +13,7 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 
 import java.text.DecimalFormat;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -26,7 +27,7 @@ public class TextUtils {
     private static final SystemStrategy SYSTEM_STRATEGY = new SystemStrategy();
 
     public static final DecimalFormat DF = new DecimalFormat("#.#");
-    private static final Map<String, Integer> ROMAN_CONVERSION_MAP = new HashMap<>();
+    private static final Map<String, Integer> ROMAN_CONVERSION_MAP = new LinkedHashMap<>();
 
     static {
         ROMAN_CONVERSION_MAP.put("M", 1000);

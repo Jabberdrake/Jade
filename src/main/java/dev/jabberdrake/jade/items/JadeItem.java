@@ -1,6 +1,7 @@
 package dev.jabberdrake.jade.items;
 
 import dev.jabberdrake.jade.Jade;
+import dev.jabberdrake.jade.items.decorators.JadeItemDecorator;
 import dev.jabberdrake.jade.utils.AttributeUtils;
 import dev.jabberdrake.jade.utils.ItemUtils;
 import dev.jabberdrake.jade.utils.TextUtils;
@@ -9,7 +10,9 @@ import io.papermc.paper.datacomponent.item.ItemAttributeModifiers;
 import io.papermc.paper.datacomponent.item.ItemLore;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import org.apache.maven.model.Build;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.attribute.Attribute;
@@ -17,7 +20,6 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -29,24 +31,18 @@ public abstract class JadeItem {
     protected final String key;
     protected final Rarity rarity;
     protected final ItemStack template;
+    protected List<String> lore;
     protected final ItemGroup group;
-    protected List<String> loreLines;
-
-    protected JadeItem(String name, String key, Rarity rarity, Material material, ItemGroup group) {
-        this.name = name;
-        this.key = key;
-        this.rarity = rarity;
-        this.template = ItemStack.of(material);
-        this.group = group;
-    }
+    protected final ItemTag[] tags;
 
     protected JadeItem(JadeItem.Builder builder) {
         this.name = builder.name;
         this.key = builder.key;
         this.rarity = builder.rarity;
         this.template = builder.template;
+        this.lore = builder.lore;
         this.group = builder.group;
-        this.loreLines = builder.loreLines;
+        this.tags = builder.tags;
     }
 
     public String getName() {
@@ -75,59 +71,50 @@ public abstract class JadeItem {
         return clone;
     }
 
+    public List<String> getLore() {
+        return this.lore;
+    }
+
     public ItemGroup getItemGroup() {
         return this.group;
     }
 
-    public List<String> getLoreLines() {
-        return this.loreLines;
+    public ItemTag[] getItemTags() {
+        return this.tags;
     }
 
-    public void setCustomName() {
-        if (this.template == null) return;
-        this.template.getItemMeta().itemName(Component.text(name, rarity.getColor()));
-        setCustomName(this.template, this.name, this.rarity, false);
-    }
+    public static void rename(ItemStack item, String name, boolean italic) {
+        TextColor nameColor = Rarity.COMMON.getColor();
+        if (item.hasData(DataComponentTypes.CUSTOM_NAME)) {
+            Component itemName = item.getData(DataComponentTypes.CUSTOM_NAME);
+            if (itemName.style().color() != null) {
+                nameColor = itemName.style().color();
+            }
 
-    public static void setCustomName(ItemStack item, String name, Rarity rarity, boolean italic) {
-        if (italic) {
-            item.setData(DataComponentTypes.CUSTOM_NAME, Component.text(name, rarity.getColor()));
-        } else {
-            item.setData(DataComponentTypes.CUSTOM_NAME, Component.text(name, rarity.getColor()).decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE));
         }
-    }
 
-    public void setModelData(String path) {
-        if (this.template == null) return;
-        this.template.setData(DataComponentTypes.ITEM_MODEL, Jade.key(path));
-    }
-
-    public void setKeyData() {
-        if (this.template == null) return;
-        this.template.editPersistentDataContainer(pdc -> {
-            pdc.set(JadeItem.JADE_ITEM_KEY, PersistentDataType.STRING, key);
-        });
-    }
-
-    public void setTooltipStyle() {
-        if (this.template == null) return;
-        this.template.setData(DataComponentTypes.TOOLTIP_STYLE, rarity.getTooltipKey());
-    }
-
-    public void hideAttributes() {
-        if (this.template == null) return;
-
-        ItemUtils.hideAttributes(this.template);
+        if (italic) {
+            item.setData(DataComponentTypes.CUSTOM_NAME, Component.text(name, nameColor));
+        } else {
+            item.setData(DataComponentTypes.CUSTOM_NAME, Component.text(name, nameColor).decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE));
+        }
     }
     
     public void setLore() {
-        JadeItem.setLore(this.template, this.loreLines);
+        JadeItem.setLore(this.template, this.lore);
     }
 
     public static void setLore(ItemStack item, List<String> flavorText) {
         if (item == null) return;
 
         ItemLore.Builder lore = ItemLore.lore();
+
+        // TEMP
+        if (item.getType().equals(Material.POTION)) {
+            TextUtils.lore(lore, JadeItemDecorator.parseEffects(item));
+            item.setData(DataComponentTypes.LORE, lore.build());
+            return;
+        }
 
         List<String> baseAttributeLore = new LinkedList<>();
         List<String> idenAttributeLore = new LinkedList<>();
@@ -190,14 +177,22 @@ public abstract class JadeItem {
         item.setData(DataComponentTypes.LORE, lore.build());
     }
 
-    static abstract class Builder {
-        protected JadeItem item;
+    public static class Builder {
         protected String name;
         protected String key;
         protected Rarity rarity;
         protected ItemStack template;
         protected ItemGroup group;
-        protected List<String> loreLines;
+        protected List<String> lore;
+        protected ItemTag[] tags;
+
+        public ItemStack getTemplate() {
+            return this.template;
+        }
+
+        public ItemTag[] getItemTags() {
+            return this.tags;
+        }
 
         protected Builder data(String name, String key, Rarity rarity, ItemGroup group) {
             this.name = name;
@@ -222,11 +217,41 @@ public abstract class JadeItem {
         }
 
         public Builder lore(List<String> loreLines) {
-            this.loreLines = loreLines;
+            this.lore = loreLines;
             return this;
         }
 
-        abstract JadeItem build();
+        public Builder model() throws IllegalStateException {
+            if (this.template == null) throw new IllegalStateException("Missing itemstack!");
+
+            this.template.setData(DataComponentTypes.ITEM_MODEL, Jade.key(this.key));
+            return this;
+        }
+
+        public Builder mount() throws IllegalStateException {
+            if (this.template == null) throw new IllegalStateException("Missing itemstack!");
+
+            // Set name
+            this.template.getItemMeta().itemName(Component.text(this.name, this.rarity.getColor()));
+
+            // Set tooltip style
+            this.template.setData(DataComponentTypes.TOOLTIP_STYLE, rarity.getTooltipKey());
+
+            // Add key to PDC
+            this.template.editPersistentDataContainer(pdc -> {
+                pdc.set(JadeItem.JADE_ITEM_KEY, PersistentDataType.STRING, this.key);
+            });
+
+            // Hide vanilla attribute display
+            ItemUtils.hideAttributes(this.template);
+
+            return this;
+        }
+
+        public JadeItem build() {
+            // This is dogshit
+            return null;
+        }
     }
 
 }

@@ -18,6 +18,7 @@ import dev.jabberdrake.jade.players.PlayerManager;
 import dev.jabberdrake.jade.titles.TitleManager;
 import dev.jabberdrake.jade.realms.RealmManager;
 import dev.jabberdrake.jade.realms.Settlement;
+import dev.jabberdrake.jade.utils.TextUtils;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
@@ -184,5 +185,9 @@ public final class Jade extends JavaPlugin {
 
     public static NamespacedKey key(String value) {
         return new NamespacedKey(getInstance(), value);
+    }
+
+    public static void error(String errorMessage) {
+        Bukkit.broadcast(TextUtils.system("<highlight>An error has occured!</highlight> " + errorMessage), "jade.admin");
     }
 }
