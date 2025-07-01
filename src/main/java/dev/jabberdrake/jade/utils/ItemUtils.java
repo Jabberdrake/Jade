@@ -1,5 +1,7 @@
 package dev.jabberdrake.jade.utils;
 
+import dev.jabberdrake.jade.items.JadeItem;
+import dev.jabberdrake.jade.items.JadeItemRegistry;
 import io.papermc.paper.datacomponent.DataComponentType;
 import io.papermc.paper.datacomponent.DataComponentTypes;
 import io.papermc.paper.datacomponent.item.ItemAttributeModifiers;
@@ -10,6 +12,7 @@ import io.papermc.paper.registry.RegistryAccess;
 import io.papermc.paper.registry.RegistryKey;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ItemType;
 import org.checkerframework.checker.units.qual.A;
@@ -32,6 +35,7 @@ public class ItemUtils {
     }
 
     public static ItemStack asDisplayItemBase(NamespacedKey itemKey) {
+        ItemStack iconItem;
         switch (itemKey.getNamespace()) {
             case "minecraft":
                 // Check if the provided key matches a valid Minecraft item
@@ -41,7 +45,7 @@ public class ItemUtils {
                 }
 
                 // Fetch the item material and return a matching itemstack
-                ItemStack iconItem = ItemStack.of(Material.matchMaterial(itemKey.asString()));
+                iconItem = ItemStack.of(Material.matchMaterial(itemKey.asString()));
                 if (iconItem.hasData(DataComponentTypes.ATTRIBUTE_MODIFIERS)) {
                     iconItem.unsetData(DataComponentTypes.ATTRIBUTE_MODIFIERS);
                 }
@@ -50,14 +54,24 @@ public class ItemUtils {
                 }
                 return iconItem;
             case "jade":
-                // TODO: IMPLEMENT ME
-                return ItemStack.of(Material.STRUCTURE_VOID);
+                iconItem = JadeItemRegistry.getJadeItem(itemKey.getKey()).getItem();
+                if (iconItem.hasData(DataComponentTypes.TOOLTIP_STYLE)) {
+                    iconItem.unsetData(DataComponentTypes.TOOLTIP_STYLE);
+                }
+                if (iconItem.hasData(DataComponentTypes.ATTRIBUTE_MODIFIERS)) {
+                    iconItem.unsetData(DataComponentTypes.ATTRIBUTE_MODIFIERS);
+                }
+                if (iconItem.hasData(DataComponentTypes.FOOD)) {
+                    iconItem.unsetData(DataComponentTypes.FOOD);
+                }
+                return iconItem;
             default:
                 return ItemStack.of(Material.BARRIER);
         }
     }
 
     public static void hideAttributes(ItemStack item) {
+        /*
         List<AttributeUtils.ItemAttributeEntry> entries = new ArrayList<>();
 
         ItemAttributeModifiers modifiers = item.getData(DataComponentTypes.ATTRIBUTE_MODIFIERS);
@@ -72,16 +86,12 @@ public class ItemUtils {
         ItemAttributeModifiers hiddenAttrModifiers = hiddenAttrBuilder.build();
 
         item.setData(DataComponentTypes.ATTRIBUTE_MODIFIERS, hiddenAttrModifiers);
+        */
 
-
-
-        // Hide enchantments
-        if (item.hasData(DataComponentTypes.ENCHANTMENTS)) {
-            item.setData(DataComponentTypes.TOOLTIP_DISPLAY, TooltipDisplay.tooltipDisplay()
-                    .addHiddenComponents(DataComponentTypes.ENCHANTMENTS)
-                    .build());
+        item.setData(DataComponentTypes.TOOLTIP_DISPLAY, TooltipDisplay.tooltipDisplay()
+                .addHiddenComponents(DataComponentTypes.ENCHANTMENTS, DataComponentTypes.ATTRIBUTE_MODIFIERS)
+                .build());
         }
-    }
 
 
 }

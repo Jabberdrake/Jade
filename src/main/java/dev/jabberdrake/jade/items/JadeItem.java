@@ -85,7 +85,16 @@ public abstract class JadeItem {
 
     public void setCustomName() {
         if (this.template == null) return;
-        this.template.setData(DataComponentTypes.CUSTOM_NAME, Component.text(name, rarity.getColor()).decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE));
+        this.template.getItemMeta().itemName(Component.text(name, rarity.getColor()));
+        setCustomName(this.template, this.name, this.rarity, false);
+    }
+
+    public static void setCustomName(ItemStack item, String name, Rarity rarity, boolean italic) {
+        if (italic) {
+            item.setData(DataComponentTypes.CUSTOM_NAME, Component.text(name, rarity.getColor()));
+        } else {
+            item.setData(DataComponentTypes.CUSTOM_NAME, Component.text(name, rarity.getColor()).decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE));
+        }
     }
 
     public void setModelData(String path) {

@@ -2,6 +2,7 @@ package dev.jabberdrake.jade.handlers;
 
 import com.destroystokyo.paper.event.block.BlockDestroyEvent;
 import dev.jabberdrake.jade.JadeConfig;
+import dev.jabberdrake.jade.items.Rarity;
 import dev.jabberdrake.jade.menus.implementations.GraveOpenMenu;
 import dev.jabberdrake.jade.players.Grave;
 import dev.jabberdrake.jade.players.PlayerManager;
@@ -10,6 +11,7 @@ import dev.jabberdrake.jade.utils.PositionUtils;
 import io.papermc.paper.datacomponent.DataComponentTypes;
 import io.papermc.paper.datacomponent.item.ResolvableProfile;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.Skull;
@@ -118,7 +120,9 @@ public class PlayerGraveHandler implements Listener {
         List<ItemStack> items = new ArrayList<>(event.getDrops());
         if (player.getKiller() != null) {
             ItemStack head = ItemStack.of(Material.PLAYER_HEAD);
-            head.setData(DataComponentTypes.CUSTOM_NAME, Component.text(player.getName() + "'s Head", JadeTextColor.YELLOW));
+            head.setData(DataComponentTypes.CUSTOM_NAME, Component.text(player.getName() + "'s Head", Rarity.UNCOMMON.getColor())
+                    .decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE));
+            head.setData(DataComponentTypes.TOOLTIP_STYLE, Rarity.UNCOMMON.getTooltipKey());
             head.setData(DataComponentTypes.PROFILE, ResolvableProfile.resolvableProfile().uuid(player.getUniqueId()).build());
             items.add(head);
         }

@@ -2,6 +2,7 @@ package dev.jabberdrake.jade.handlers;
 
 import dev.jabberdrake.jade.items.JadeItem;
 import dev.jabberdrake.jade.items.VanillaItem;
+import dev.jabberdrake.jade.items.VanillaItemRegistry;
 import dev.jabberdrake.jade.menus.JadeMenu;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -10,6 +11,7 @@ import org.bukkit.event.enchantment.EnchantItemEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
+import org.bukkit.event.inventory.PrepareAnvilEvent;
 import org.bukkit.event.inventory.PrepareItemCraftEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.Inventory;
@@ -62,6 +64,12 @@ public class VanillaItemHandler implements Listener {
         processVanillaItem(event.getRecipe().getResult());
     }
 
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onAnvilRename(PrepareAnvilEvent event) {
+        if (event.getResult() == null) return;
+        renameVanillaItem(event.getResult(), event.getView().getRenameText());
+    }
+
     public void processVanillaItem(ItemStack source) {
         if (source == null) return;
 
@@ -69,6 +77,18 @@ public class VanillaItemHandler implements Listener {
             VanillaItem.update(source);
         } else {
             VanillaItem.convert(source);
+        }
+    }
+
+    public void renameVanillaItem(ItemStack source, String newName) {
+        if (source.getPersistentDataContainer().has(JadeItem.JADE_ITEM_KEY)) {
+            VanillaItem template = VanillaItemRegistry.getVanillaItem(source.getType().getKey().getKey());
+
+            if (newName.equalsIgnoreCase("")) {
+                JadeItem.setCustomName(source, template.getName(), template.getRarity(), false);
+            } else {
+                JadeItem.setCustomName(source, newName, template.getRarity(), true);
+            }
         }
     }
 }
