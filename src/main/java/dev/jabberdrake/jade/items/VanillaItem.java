@@ -4,7 +4,6 @@ import dev.jabberdrake.jade.Jade;
 import dev.jabberdrake.jade.utils.ItemUtils;
 import io.papermc.paper.datacomponent.DataComponentTypes;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
@@ -25,7 +24,7 @@ public class VanillaItem extends JadeItem {
         if (template == null) return;
 
         // Set name
-        source.getItemMeta().itemName(Component.text(template.getName(), template.getRarity().getColor()));
+        source.setData(DataComponentTypes.ITEM_NAME, Component.text(template.getName(), template.getRarity().getColor()));
 
         // Set tooltip style
         source.setData(DataComponentTypes.TOOLTIP_STYLE, template.getRarity().getTooltipKey());
@@ -39,7 +38,7 @@ public class VanillaItem extends JadeItem {
         ItemUtils.hideAttributes(source);
 
         // Apply lore
-        source.setData(DataComponentTypes.LORE, template.template.getData(DataComponentTypes.LORE));
+        JadeItem.relore(source, template.getItemTags(), template.getLore());
     }
 
     public static void update(ItemStack source) {
@@ -50,7 +49,7 @@ public class VanillaItem extends JadeItem {
         if (template == null) return;
 
         // Re-apply lore
-        JadeItem.setLore(source, template.getLore());
+        JadeItem.relore(source, template.getItemTags(), template.getLore());
     }
 
     public static VanillaItem.Builder builder() {
@@ -65,7 +64,12 @@ public class VanillaItem extends JadeItem {
         }
 
         public Builder lore(List<String> loreLines) {
-            this.lore = loreLines;
+            super.lore(loreLines);
+            return this;
+        }
+
+        public Builder tags(ItemTag... tags) {
+            super.tags(tags);
             return this;
         }
 
@@ -76,11 +80,7 @@ public class VanillaItem extends JadeItem {
             } catch (IllegalStateException e) {
                 Jade.error("Could not finish building VanillaItem " + this.key + " due to: <red>" + e.getMessage());
             }
-
-            VanillaItem item = new VanillaItem(this);
-            item.setLore();
-
-            return item;
+            return new VanillaItem(this);
         }
     }
 

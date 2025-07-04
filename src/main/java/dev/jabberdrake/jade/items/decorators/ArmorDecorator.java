@@ -7,18 +7,16 @@ import io.papermc.paper.datacomponent.DataComponentTypes;
 import io.papermc.paper.datacomponent.item.ItemAttributeModifiers;
 import io.papermc.paper.datacomponent.item.ItemLore;
 import org.bukkit.attribute.Attribute;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
-public class WeaponDecorator extends JadeItemDecorator {
+public class ArmorDecorator extends JadeItemDecorator {
 
-    private static final WeaponDecorator INSTANCE = new WeaponDecorator();
+    private static final ArmorDecorator INSTANCE = new ArmorDecorator();
 
-    public static WeaponDecorator weaponDecorator() {
+    public static ArmorDecorator armorDecorator() {
         return INSTANCE;
     }
 
@@ -30,7 +28,7 @@ public class WeaponDecorator extends JadeItemDecorator {
     @Override
     public void decorate(ItemStack template, List<String> lore) {
         List<String> primaryAttrLore = parsePrimaryAttributes(template);
-        if (primaryAttrLore == null) throw new IllegalStateException("[WeaponDecorator] Invalid primary attributes in weapon item!");
+        if (primaryAttrLore == null) throw new IllegalStateException("[ArmorDecorator] Invalid primary attributes in armor item!");
 
         ItemLore.Builder loreBuilder = ItemLore.lore();
         TextUtils.lore(loreBuilder, primaryAttrLore);
@@ -55,42 +53,36 @@ public class WeaponDecorator extends JadeItemDecorator {
             return null;
         }
 
+        /*
         Map<Enchantment, Integer> enchantments = null;
         if (template.hasData(DataComponentTypes.ENCHANTMENTS)) {
             enchantments = template.getData(DataComponentTypes.ENCHANTMENTS).enchantments();
         }
+        */
 
-        String damageLore = "";
-        String atkSpeedLore = "";
+        String healthLore = "";
+        String defenseLore = "";
         List<ItemAttributeModifiers.Entry> modifiers = template.getData(DataComponentTypes.ATTRIBUTE_MODIFIERS).modifiers();
         for (ItemAttributeModifiers.Entry entry : modifiers) {
             Attribute entryAttr = entry.attribute();
             double amount = entry.modifier().getAmount();
             //if (amount == 0) continue;
-            if (entryAttr == Attribute.ATTACK_DAMAGE) {
-                StringBuilder damageLoreBuilder = new StringBuilder("<gold>\uD83D\uDDE1 Damage: " + TextUtils.DF.format(AttributeUtils.BASE_ATTACK_DAMAGE + amount));
-
-                if (enchantments != null) {
-                    for (Enchantment enchantment : enchantments.keySet()) {
-                        if (enchantment.getKey().getKey().equalsIgnoreCase("sharpness")) {
-                            int sharpnessVal = enchantments.get(enchantment);
-                            if (sharpnessVal <= 0) break;
-
-                            double sharpnessBuff = 0.5 + (sharpnessVal * 0.5);
-                            damageLoreBuilder.append(" <light_purple>(+").append(TextUtils.DF.format(sharpnessBuff)).append(")");
-                        }
-                    }
-                }
-                damageLore = damageLoreBuilder.toString();
+            if (entryAttr == Attribute.MAX_HEALTH) {
+                StringBuilder healthLoreBuilder = new StringBuilder("<dark_red>❤ Health: " + TextUtils.DF.format(AttributeUtils.BASE_ATTACK_DAMAGE + amount));
+                healthLore = healthLoreBuilder.toString();
             }
-            else if (entryAttr == Attribute.ATTACK_SPEED) {
-                StringBuilder speedLoreBuilder = new StringBuilder("<copper_red>⌛ Attack Speed: " + TextUtils.DF.format(AttributeUtils.BASE_ATTACK_SPEED + amount));
-                atkSpeedLore = speedLoreBuilder.toString();
+            else if (entryAttr == Attribute.ARMOR) {
+                StringBuilder defenseLoreBuilder = new StringBuilder("<cyan>⛨ Defense: " + TextUtils.DF.format(amount));
+                defenseLore = defenseLoreBuilder.toString();
             }
         }
 
-        if (damageLore.equalsIgnoreCase("") || atkSpeedLore.equalsIgnoreCase("")) return null;
-        return List.of(damageLore, atkSpeedLore);
+        if (defenseLore.equalsIgnoreCase("")) return null;
+        if (healthLore.equalsIgnoreCase("")) {
+            return List.of(defenseLore);
+        } else {
+            return List.of(healthLore, defenseLore);
+        }
     }
 
     @Override
@@ -106,8 +98,12 @@ public class WeaponDecorator extends JadeItemDecorator {
         for (ItemAttributeModifiers.Entry entry : modifiers) {
             Attribute entryAttr = entry.attribute();
             double amount = entry.modifier().getAmount();
-            if (entryAttr == Attribute.ARMOR) {
-                attrLore.add("<lime>+" + TextUtils.DF.format(amount) + " <zorba>Defense");
+            if (amount == 0) continue;
+            if (entryAttr == Attribute.ATTACK_DAMAGE) {
+                attrLore.add("<lime>+" + TextUtils.DF.format(amount) + " <zorba>Damage");
+            }
+            else if (entryAttr == Attribute.ATTACK_SPEED) {
+                attrLore.add("<lime>+" + TextUtils.DF.format(amount) + " <zorba>Attack Speed");
             }
             else if (entryAttr == Attribute.ARMOR_TOUGHNESS) {
                 attrLore.add("<lime>+" + TextUtils.DF.format(amount) + " <zorba>Armor Toughness");

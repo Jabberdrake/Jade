@@ -1,7 +1,7 @@
 package dev.jabberdrake.jade.items;
 
 import dev.jabberdrake.jade.Jade;
-import dev.jabberdrake.jade.items.decorators.JadeItemDecorator;
+import dev.jabberdrake.jade.items.decorators.*;
 import dev.jabberdrake.jade.utils.AttributeUtils;
 import dev.jabberdrake.jade.utils.ItemUtils;
 import dev.jabberdrake.jade.utils.TextUtils;
@@ -12,7 +12,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import org.apache.maven.model.Build;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.attribute.Attribute;
@@ -85,8 +84,8 @@ public abstract class JadeItem {
 
     public static void rename(ItemStack item, String name, boolean italic) {
         TextColor nameColor = Rarity.COMMON.getColor();
-        if (item.hasData(DataComponentTypes.CUSTOM_NAME)) {
-            Component itemName = item.getData(DataComponentTypes.CUSTOM_NAME);
+        if (item.hasData(DataComponentTypes.ITEM_NAME)) {
+            Component itemName = item.getData(DataComponentTypes.ITEM_NAME);
             if (itemName.style().color() != null) {
                 nameColor = itemName.style().color();
             }
@@ -99,82 +98,17 @@ public abstract class JadeItem {
             item.setData(DataComponentTypes.CUSTOM_NAME, Component.text(name, nameColor).decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE));
         }
     }
-    
-    public void setLore() {
-        JadeItem.setLore(this.template, this.lore);
-    }
 
-    public static void setLore(ItemStack item, List<String> flavorText) {
+    public static void relore(ItemStack item, ItemTag[] tags, List<String> flavorText) {
         if (item == null) return;
 
-        ItemLore.Builder lore = ItemLore.lore();
-
-        // TEMP
-        if (item.getType().equals(Material.POTION)) {
-            TextUtils.lore(lore, JadeItemDecorator.parseEffects(item));
-            item.setData(DataComponentTypes.LORE, lore.build());
-            return;
+        ItemTag tag = tags == null ? ItemTag.MATERIAL : tags[0];
+        switch (tag) {
+            case WEAPON,TOOL -> WeaponDecorator.weaponDecorator().decorate(item, flavorText);
+            case ARMOR -> ArmorDecorator.armorDecorator().decorate(item, flavorText);
+            case CONSUMABLE -> ConsumableDecorator.consumableDecorator().decorate(item, flavorText);
+            default -> MaterialDecorator.materialDecorator().decorate(item, flavorText);
         }
-
-        List<String> baseAttributeLore = new LinkedList<>();
-        List<String> idenAttributeLore = new LinkedList<>();
-        List<Component> enchantmentsLore = new LinkedList<>();
-
-        Map<Enchantment, Integer> enchantments = item.getData(DataComponentTypes.ENCHANTMENTS).enchantments();
-        List<ItemAttributeModifiers.Entry> modifiers = item.getData(DataComponentTypes.ATTRIBUTE_MODIFIERS).modifiers();
-        for (ItemAttributeModifiers.Entry entry : modifiers) {
-            Attribute entryAttr = entry.attribute();
-            double amount = entry.modifier().getAmount();
-            if (amount == 0) continue;
-            if (entryAttr == Attribute.ATTACK_DAMAGE) {
-                StringBuilder damageLoreStr = new StringBuilder("<gold>\uD83D\uDDE1 Damage: " + TextUtils.DF.format(AttributeUtils.BASE_ATTACK_DAMAGE + amount));
-
-                for (Enchantment enchantment : enchantments.keySet()) {
-                    if (enchantment.getKey().getKey().equalsIgnoreCase("sharpness")) {
-                        int sharpnessVal = enchantments.get(enchantment);
-                        if (sharpnessVal <= 0) break;
-
-                        double sharpnessBuff = 0.5 + (sharpnessVal * 0.5);
-                        damageLoreStr.append(" <light_purple>(+ ").append(TextUtils.DF.format(sharpnessBuff)).append(")");
-                    }
-                }
-
-                baseAttributeLore.add(damageLoreStr.toString());
-            }
-            else if (entryAttr == Attribute.ATTACK_SPEED) {
-                baseAttributeLore.add("<copper_red>⌛ Attack Speed: " + TextUtils.DF.format(AttributeUtils.BASE_ATTACK_SPEED + amount));
-            }
-            else if (entryAttr == Attribute.ARMOR) {
-                baseAttributeLore.add("<cyan>⛨ Defense: " + TextUtils.DF.format(amount));
-            }
-            else if (entryAttr == Attribute.ARMOR_TOUGHNESS) {
-                idenAttributeLore.add("<lime>+" + TextUtils.DF.format(amount) + " <zorba>Armor Toughness");
-            }
-            else if (entryAttr == Attribute.KNOCKBACK_RESISTANCE) {
-                idenAttributeLore.add("<lime>+" + TextUtils.DF.format(amount * 100) + "% <zorba>Knockback Resistance");
-            }
-        }
-
-        if (!idenAttributeLore.isEmpty()) idenAttributeLore.addFirst("");
-        if (!enchantments.isEmpty()) idenAttributeLore.add("");
-
-        for (Enchantment ench : enchantments.keySet()) {
-            int magnitude = enchantments.get(ench);
-            enchantmentsLore.add(ench.displayName(magnitude).color(NamedTextColor.LIGHT_PURPLE));
-        }
-
-        // Apply attribute lore
-        TextUtils.lore(lore, baseAttributeLore);
-        TextUtils.lore(lore, idenAttributeLore);
-        TextUtils.lore(lore, enchantmentsLore, "✧ ", NamedTextColor.LIGHT_PURPLE);
-
-        // Apply actual lore
-        if (flavorText != null) {
-            lore.addLine(Component.empty());
-            TextUtils.lore(lore, flavorText);
-        }
-
-        item.setData(DataComponentTypes.LORE, lore.build());
     }
 
     public static class Builder {
@@ -188,6 +122,10 @@ public abstract class JadeItem {
 
         public ItemStack getTemplate() {
             return this.template;
+        }
+
+        public List<String> getLore() {
+            return this.lore;
         }
 
         public ItemTag[] getItemTags() {
@@ -221,6 +159,11 @@ public abstract class JadeItem {
             return this;
         }
 
+        public Builder tags(ItemTag... tags) {
+            this.tags = tags;
+            return this;
+        }
+
         public Builder model() throws IllegalStateException {
             if (this.template == null) throw new IllegalStateException("Missing itemstack!");
 
@@ -232,7 +175,9 @@ public abstract class JadeItem {
             if (this.template == null) throw new IllegalStateException("Missing itemstack!");
 
             // Set name
-            this.template.getItemMeta().itemName(Component.text(this.name, this.rarity.getColor()));
+            this.template.setData(DataComponentTypes.ITEM_NAME, Component.text(this.name, this.rarity.getColor()));
+            //this.template.setData(DataComponentTypes.CUSTOM_NAME, Component.text(this.name, this.rarity.getColor())
+            //        .decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE));
 
             // Set tooltip style
             this.template.setData(DataComponentTypes.TOOLTIP_STYLE, rarity.getTooltipKey());
@@ -241,6 +186,15 @@ public abstract class JadeItem {
             this.template.editPersistentDataContainer(pdc -> {
                 pdc.set(JadeItem.JADE_ITEM_KEY, PersistentDataType.STRING, this.key);
             });
+
+            // Add lore
+            ItemTag tag = this.tags == null ? ItemTag.MATERIAL : this.tags[0];
+            switch (tag) {
+                case WEAPON,TOOL -> WeaponDecorator.weaponDecorator().decorate(this);
+                case ARMOR -> ArmorDecorator.armorDecorator().decorate(this);
+                case CONSUMABLE -> ConsumableDecorator.consumableDecorator().decorate(this);
+                default -> MaterialDecorator.materialDecorator().decorate(this);
+            }
 
             // Hide vanilla attribute display
             ItemUtils.hideAttributes(this.template);

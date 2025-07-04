@@ -9,10 +9,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.enchantment.EnchantItemEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryOpenEvent;
-import org.bukkit.event.inventory.PrepareAnvilEvent;
-import org.bukkit.event.inventory.PrepareItemCraftEvent;
+import org.bukkit.event.inventory.*;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -65,9 +62,16 @@ public class VanillaItemHandler implements Listener {
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
-    public void onAnvilRename(PrepareAnvilEvent event) {
+    public void onAnvilUse(PrepareAnvilEvent event) {
         if (event.getResult() == null) return;
         renameVanillaItem(event.getResult(), event.getView().getRenameText());
+    }
+
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onPotionBrew(BrewEvent event) {
+        for (ItemStack result : event.getResults()) {
+            processVanillaItem(result);
+        }
     }
 
     public void processVanillaItem(ItemStack source) {
@@ -83,6 +87,7 @@ public class VanillaItemHandler implements Listener {
     public void renameVanillaItem(ItemStack source, String newName) {
         if (source.getPersistentDataContainer().has(JadeItem.JADE_ITEM_KEY)) {
             VanillaItem template = VanillaItemRegistry.getVanillaItem(source.getType().getKey().getKey());
+            if (template == null) return;
 
             if (newName.equalsIgnoreCase("")) {
                 JadeItem.rename(source, template.getName(), false);

@@ -13,165 +13,216 @@ public class VanillaItemRegistry {
     // COMMON ITEMS
     public static final VanillaItem CHAINMAIL_HELMET = registerItem(VanillaItem.builder()
             .data("Chainmail Helmet", Material.CHAINMAIL_HELMET, Rarity.COMMON)
+            .tags(ItemTag.ARMOR)
             .build());
     public static final VanillaItem CHAINMAIL_CHESTPLATE = registerItem(VanillaItem.builder()
             .data("Chainmail Chestplate", Material.CHAINMAIL_CHESTPLATE, Rarity.COMMON)
+            .tags(ItemTag.ARMOR)
             .build());
     public static final VanillaItem CHAINMAIL_LEGGINGS = registerItem(VanillaItem.builder()
             .data("Chainmail Leggings", Material.CHAINMAIL_LEGGINGS, Rarity.COMMON)
+            .tags(ItemTag.ARMOR)
             .build());
     public static final VanillaItem CHAINMAIL_BOOTS = registerItem(VanillaItem.builder()
             .data("Chainmail Boots", Material.CHAINMAIL_BOOTS, Rarity.COMMON)
+            .tags(ItemTag.ARMOR)
             .build());
 
     public static final VanillaItem IRON_HELMET = registerItem(VanillaItem.builder()
             .data("Iron Helmet", Material.IRON_HELMET, Rarity.COMMON)
+            .tags(ItemTag.ARMOR)
             .build());
     public static final VanillaItem IRON_CHESTPLATE = registerItem(VanillaItem.builder()
             .data("Iron Chestplate", Material.IRON_CHESTPLATE, Rarity.COMMON)
+            .tags(ItemTag.ARMOR)
             .build());
     public static final VanillaItem IRON_LEGGINGS = registerItem(VanillaItem.builder()
             .data("Iron Leggings", Material.IRON_LEGGINGS, Rarity.COMMON)
+            .tags(ItemTag.ARMOR)
             .build());
     public static final VanillaItem IRON_BOOTS = registerItem(VanillaItem.builder()
             .data("Iron Boots", Material.IRON_BOOTS, Rarity.COMMON)
+            .tags(ItemTag.ARMOR)
             .build());
     public static final VanillaItem IRON_SWORD = registerItem(VanillaItem.builder()
             .data("Iron Sword", Material.IRON_SWORD, Rarity.COMMON)
+            .tags(ItemTag.WEAPON)
             .build());
     public static final VanillaItem IRON_PICKAXE = registerItem(VanillaItem.builder()
             .data("Iron Pickaxe", Material.IRON_PICKAXE, Rarity.COMMON)
+            .tags(ItemTag.TOOL)
             .build());
     public static final VanillaItem IRON_AXE = registerItem(VanillaItem.builder()
             .data("Iron Axe", Material.IRON_AXE, Rarity.COMMON)
+            .tags(ItemTag.TOOL)
             .build());
     public static final VanillaItem IRON_SHOVEL = registerItem(VanillaItem.builder()
             .data("Iron Shovel", Material.IRON_SHOVEL, Rarity.COMMON)
+            .tags(ItemTag.TOOL)
             .build());
     public static final VanillaItem IRON_HOE = registerItem(VanillaItem.builder()
             .data("Iron Hoe", Material.IRON_HOE, Rarity.COMMON)
+            .tags(ItemTag.TOOL)
             .build());
 
     public static final VanillaItem DIAMOND_HELMET = registerItem(VanillaItem.builder()
             .data("Diamond Helmet", Material.DIAMOND_HELMET, Rarity.COMMON)
+            .tags(ItemTag.ARMOR)
             .build());
     public static final VanillaItem DIAMOND_CHESTPLATE = registerItem(VanillaItem.builder()
             .data("Diamond Chestplate", Material.DIAMOND_CHESTPLATE, Rarity.COMMON)
+            .tags(ItemTag.ARMOR)
             .build());
     public static final VanillaItem DIAMOND_LEGGINGS = registerItem(VanillaItem.builder()
             .data("Diamond Leggings", Material.DIAMOND_LEGGINGS, Rarity.COMMON)
+            .tags(ItemTag.ARMOR)
             .build());
     public static final VanillaItem DIAMOND_BOOTS = registerItem(VanillaItem.builder()
             .data("Diamond Boots", Material.DIAMOND_BOOTS, Rarity.COMMON)
+            .tags(ItemTag.ARMOR)
             .build());
     public static final VanillaItem DIAMOND_SWORD = registerItem(VanillaItem.builder()
             .data("Diamond Sword", Material.DIAMOND_SWORD, Rarity.COMMON)
+            .tags(ItemTag.WEAPON)
             .build());
     public static final VanillaItem DIAMOND_PICKAXE = registerItem(VanillaItem.builder()
             .data("Diamond Pickaxe", Material.DIAMOND_PICKAXE, Rarity.COMMON)
+            .tags(ItemTag.TOOL)
             .build());
     public static final VanillaItem DIAMOND_AXE = registerItem(VanillaItem.builder()
             .data("Diamond Axe", Material.DIAMOND_AXE, Rarity.COMMON)
+            .tags(ItemTag.TOOL)
             .build());
     public static final VanillaItem DIAMOND_SHOVEL = registerItem(VanillaItem.builder()
             .data("Diamond Shovel", Material.DIAMOND_SHOVEL, Rarity.COMMON)
+            .tags(ItemTag.TOOL)
             .build());
     public static final VanillaItem DIAMOND_HOE = registerItem(VanillaItem.builder()
             .data("Diamond Hoe", Material.DIAMOND_HOE, Rarity.COMMON)
+            .tags(ItemTag.TOOL)
             .build());
 
     public static final VanillaItem LEATHER_HELMET = registerItem(VanillaItem.builder()
             .data("Leather Cap", Material.LEATHER_HELMET, Rarity.COMMON)
+            .tags(ItemTag.ARMOR)
             .build());
     public static final VanillaItem LEATHER_CHESTPLATE = registerItem(VanillaItem.builder()
             .data("Leather Tunic", Material.LEATHER_CHESTPLATE, Rarity.COMMON)
+            .tags(ItemTag.ARMOR)
             .build());
     public static final VanillaItem LEATHER_LEGGINGS = registerItem(VanillaItem.builder()
             .data("Leather Pants", Material.LEATHER_LEGGINGS, Rarity.COMMON)
+            .tags(ItemTag.ARMOR)
             .build());
     public static final VanillaItem LEATHER_BOOTS = registerItem(VanillaItem.builder()
             .data("Leather Boots", Material.LEATHER_BOOTS, Rarity.COMMON)
+            .tags(ItemTag.ARMOR)
             .build());
 
     public static final VanillaItem WOODEN_SWORD = registerItem(VanillaItem.builder()
             .data("Wooden Sword", Material.WOODEN_SWORD, Rarity.COMMON)
+            .tags(ItemTag.WEAPON)
             .build());
     public static final VanillaItem WOODEN_PICKAXE = registerItem(VanillaItem.builder()
             .data("Wooden Pickaxe", Material.WOODEN_PICKAXE, Rarity.COMMON)
+            .tags(ItemTag.TOOL)
             .build());
     public static final VanillaItem WOODEN_AXE = registerItem(VanillaItem.builder()
             .data("Wooden Axe", Material.WOODEN_AXE, Rarity.COMMON)
+            .tags(ItemTag.TOOL)
             .build());
     public static final VanillaItem WOODEN_SHOVEL = registerItem(VanillaItem.builder()
             .data("Wooden Shovel", Material.WOODEN_SHOVEL, Rarity.COMMON)
+            .tags(ItemTag.TOOL)
             .build());
     public static final VanillaItem WOODEN_HOE = registerItem(VanillaItem.builder()
             .data("Wooden Hoe", Material.WOODEN_HOE, Rarity.COMMON)
+            .tags(ItemTag.TOOL)
             .build());
 
     public static final VanillaItem STONE_SWORD = registerItem(VanillaItem.builder()
             .data("Stone Sword", Material.STONE_SWORD, Rarity.COMMON)
+            .tags(ItemTag.WEAPON)
             .build());
     public static final VanillaItem STONE_PICKAXE = registerItem(VanillaItem.builder()
             .data("Stone Pickaxe", Material.STONE_PICKAXE, Rarity.COMMON)
+            .tags(ItemTag.TOOL)
             .build());
     public static final VanillaItem STONE_AXE = registerItem(VanillaItem.builder()
             .data("Stone Axe", Material.STONE_AXE, Rarity.COMMON)
+            .tags(ItemTag.TOOL)
             .build());
     public static final VanillaItem STONE_SHOVEL = registerItem(VanillaItem.builder()
             .data("Stone Shovel", Material.STONE_SHOVEL, Rarity.COMMON)
+            .tags(ItemTag.TOOL)
             .build());
     public static final VanillaItem STONE_HOE = registerItem(VanillaItem.builder()
             .data("Stone Hoe", Material.STONE_HOE, Rarity.COMMON)
+            .tags(ItemTag.TOOL)
             .build());
 
     public static final VanillaItem TURTLE_HELMET = registerItem(VanillaItem.builder()
             .data("Turtle Shell", Material.TURTLE_HELMET, Rarity.COMMON)
+            .tags(ItemTag.ARMOR)
             .build());
 
     public static final VanillaItem LEATHER_HORSE_ARMOR = registerItem(VanillaItem.builder()
             .data("Leather Horse Armor", Material.LEATHER_HORSE_ARMOR, Rarity.COMMON)
+            .tags(ItemTag.ARMOR)
             .build());
     public static final VanillaItem IRON_HORSE_ARMOR = registerItem(VanillaItem.builder()
             .data("Iron Horse Armor", Material.IRON_HORSE_ARMOR, Rarity.COMMON)
+            .tags(ItemTag.ARMOR)
             .build());
     public static final VanillaItem GOLDEN_HORSE_ARMOR = registerItem(VanillaItem.builder()
             .data("Golden Horse Armor", Material.GOLDEN_HORSE_ARMOR, Rarity.COMMON)
+            .tags(ItemTag.ARMOR)
             .build());
     public static final VanillaItem DIAMOND_HORSE_ARMOR = registerItem(VanillaItem.builder()
             .data("Diamond Horse Armor", Material.DIAMOND_HORSE_ARMOR, Rarity.COMMON)
+            .tags(ItemTag.ARMOR)
             .build());
     public static final VanillaItem WOLF_ARMOR = registerItem(VanillaItem.builder()
             .data("Wolf Armor", Material.WOLF_ARMOR, Rarity.COMMON)
+            .tags(ItemTag.ARMOR)
             .build());
 
     public static final VanillaItem BOW = registerItem(VanillaItem.builder()
             .data("Bow", Material.BOW, Rarity.COMMON)
+            .tags(ItemTag.WEAPON)
             .build());
     public static final VanillaItem CROSSBOW = registerItem(VanillaItem.builder()
             .data("Crossbow", Material.CROSSBOW, Rarity.COMMON)
+            .tags(ItemTag.WEAPON)
             .build());
     public static final VanillaItem TIPPED_ARROW = registerItem(VanillaItem.builder()
             .data("Tipped Arrow", Material.TIPPED_ARROW, Rarity.COMMON)
+            .tags(ItemTag.CONSUMABLE)
             .build());
 
     public static final VanillaItem FISHING_ROD = registerItem(VanillaItem.builder()
             .data("Fishing Rod", Material.FISHING_ROD, Rarity.COMMON)
+            .tags(ItemTag.TOOL)
             .build());
     public static final VanillaItem SHEARS = registerItem(VanillaItem.builder()
             .data("Shears", Material.SHEARS, Rarity.COMMON)
+            .tags(ItemTag.TOOL)
             .build());
     public static final VanillaItem BRUSH = registerItem(VanillaItem.builder()
             .data("Brush", Material.BRUSH, Rarity.COMMON)
+            .tags(ItemTag.TOOL)
             .build());
     public static final VanillaItem POTION = registerItem(VanillaItem.builder()
             .data("Uncraftable Potion", Material.POTION, Rarity.COMMON)
+            .tags(ItemTag.CONSUMABLE)
             .build());
     public static final VanillaItem SPLASH_POTION = registerItem(VanillaItem.builder()
             .data("Splash Uncraftable Potion", Material.SPLASH_POTION, Rarity.COMMON)
+            .tags(ItemTag.CONSUMABLE)
             .build());
     public static final VanillaItem LINGERING_POTION = registerItem(VanillaItem.builder()
             .data("Lingering Uncraftable Potion", Material.LINGERING_POTION, Rarity.COMMON)
+            .tags(ItemTag.CONSUMABLE)
             .build());
 
     // UNCOMMON ITEMS
@@ -281,6 +332,7 @@ public class VanillaItemRegistry {
 
     public static final VanillaItem OMINOUS_BOTTLE = registerItem(VanillaItem.builder()
             .data("Ominous Bottle", Material.OMINOUS_BOTTLE, Rarity.UNCOMMON)
+            .tags(ItemTag.CONSUMABLE)
             .build());
     public static final VanillaItem NETHERITE_UPGRADE_SMITHING_TEMPLATE = registerItem(VanillaItem.builder()
             .data("Netherite Upgrade", Material.NETHERITE_UPGRADE_SMITHING_TEMPLATE, Rarity.UNCOMMON)
@@ -346,6 +398,7 @@ public class VanillaItemRegistry {
             .build());
     public static final VanillaItem TRIDENT = registerItem(VanillaItem.builder()
             .data("Trident", Material.TRIDENT, Rarity.UNCOMMON)
+            .tags(ItemTag.WEAPON)
             .build());
     public static final VanillaItem HEART_OF_THE_SEA = registerItem(VanillaItem.builder()
             .data("Heart of the Sea", Material.HEART_OF_THE_SEA, Rarity.UNCOMMON)
@@ -472,30 +525,39 @@ public class VanillaItemRegistry {
             .build());
     public static final VanillaItem NETHERITE_HELMET = registerItem(VanillaItem.builder()
             .data("Netherite Helmet", Material.NETHERITE_HELMET, Rarity.UNCOMMON)
+            .tags(ItemTag.ARMOR)
             .build());
     public static final VanillaItem NETHERITE_CHESTPLATE = registerItem(VanillaItem.builder()
             .data("Netherite Chestplate", Material.NETHERITE_CHESTPLATE, Rarity.UNCOMMON)
+            .tags(ItemTag.ARMOR)
             .build());
     public static final VanillaItem NETHERITE_LEGGINGS = registerItem(VanillaItem.builder()
             .data("Netherite Leggings", Material.NETHERITE_LEGGINGS, Rarity.UNCOMMON)
+            .tags(ItemTag.ARMOR)
             .build());
     public static final VanillaItem NETHERITE_BOOTS = registerItem(VanillaItem.builder()
             .data("Netherite Boots", Material.NETHERITE_BOOTS, Rarity.UNCOMMON)
+            .tags(ItemTag.ARMOR)
             .build());
     public static final VanillaItem NETHERITE_SWORD = registerItem(VanillaItem.builder()
             .data("Netherite Sword", Material.NETHERITE_SWORD, Rarity.UNCOMMON)
+            .tags(ItemTag.WEAPON)
             .build());
     public static final VanillaItem NETHERITE_PICKAXE = registerItem(VanillaItem.builder()
             .data("Netherite Pickaxe", Material.NETHERITE_PICKAXE, Rarity.UNCOMMON)
+            .tags(ItemTag.TOOL)
             .build());
     public static final VanillaItem NETHERITE_AXE = registerItem(VanillaItem.builder()
             .data("Netherite Axe", Material.NETHERITE_AXE, Rarity.UNCOMMON)
+            .tags(ItemTag.TOOL)
             .build());
     public static final VanillaItem NETHERITE_SHOVEL = registerItem(VanillaItem.builder()
             .data("Netherite Shovel", Material.NETHERITE_SHOVEL, Rarity.UNCOMMON)
+            .tags(ItemTag.TOOL)
             .build());
     public static final VanillaItem NETHERITE_HOE = registerItem(VanillaItem.builder()
             .data("Netherite Hoe", Material.NETHERITE_HOE, Rarity.UNCOMMON)
+            .tags(ItemTag.TOOL)
             .build());
 
 
