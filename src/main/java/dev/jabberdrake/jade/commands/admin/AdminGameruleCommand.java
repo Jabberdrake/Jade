@@ -45,6 +45,13 @@ public class AdminGameruleCommand {
                                 .executes(AdminGameruleCommand::runCommandForRandomAdvice)
                         )
                 )
+                .then(Commands.literal("doMobExplosion")
+                        .then(Commands.argument("value", BoolArgumentType.bool())
+                                .requires(sender -> sender.getExecutor() instanceof Player)
+                                .requires(sender -> sender.getSender().hasPermission("jade.admin") || sender.getSender().isOp())
+                                .executes(AdminGameruleCommand::runCommandForMobExplosion)
+                        )
+                )
                 .build();
     }
 
@@ -116,6 +123,25 @@ public class AdminGameruleCommand {
                 Bukkit.broadcast(system("An operator has set gamerule <highlight>sayRandomAdvice</highlight> to <green>TRUE</green>!"));
             } else {
                 Bukkit.broadcast(system("An operator has set gamerule <highlight>sayRandomAdvice</highlight> to <red>FALSE</red>!"));
+            }
+        } else {
+            player.sendMessage(error("An error occurred while altering gamerules! Please report this to a developer!"));
+        }
+
+        return Command.SINGLE_SUCCESS;
+    }
+
+    public static int runCommandForMobExplosion(CommandContext<CommandSourceStack> context) {
+        Player player = (Player) context.getSource().getSender();
+
+        boolean valueArg = BoolArgumentType.getBool(context, "value");
+
+        boolean result = JadeConfig.setGamerule("doMobExplosion", valueArg);
+        if (result == true) {
+            if (valueArg) {
+                Bukkit.broadcast(system("An operator has set gamerule <highlight>doMobExplosion</highlight> to <green>TRUE</green>!"));
+            } else {
+                Bukkit.broadcast(system("An operator has set gamerule <highlight>doMobExplosion</highlight> to <red>FALSE</red>!"));
             }
         } else {
             player.sendMessage(error("An error occurred while altering gamerules! Please report this to a developer!"));

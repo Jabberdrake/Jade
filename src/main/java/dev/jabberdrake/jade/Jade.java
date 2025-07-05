@@ -108,6 +108,7 @@ public final class Jade extends JavaPlugin {
         this.getServer().getPluginManager().registerEvents(new VanillaItemHandler(), this);
 
         this.getServer().getPluginManager().registerEvents(new BlockFadeHandler(), this);
+        this.getServer().getPluginManager().registerEvents(new MobExplodeHandler(), this);
         this.getServer().getPluginManager().registerEvents(new PlayerGraveHandler(), this);
         this.getServer().getPluginManager().registerEvents(new PlayerRoadHandler(), this);
         this.getServer().getPluginManager().registerEvents(new ExpBottleHandler(), this);
