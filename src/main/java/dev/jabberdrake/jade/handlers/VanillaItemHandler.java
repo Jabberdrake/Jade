@@ -4,10 +4,13 @@ import dev.jabberdrake.jade.items.JadeItem;
 import dev.jabberdrake.jade.items.VanillaItem;
 import dev.jabberdrake.jade.items.VanillaItemRegistry;
 import dev.jabberdrake.jade.menus.JadeMenu;
+import net.kyori.adventure.text.Component;
+import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.enchantment.EnchantItemEvent;
+import org.bukkit.event.enchantment.PrepareItemEnchantEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.inventory.*;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -52,19 +55,37 @@ public class VanillaItemHandler implements Listener {
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onItemEnchant(EnchantItemEvent event) {
-        processVanillaItem(event.getItem());
+        ItemStack result = event.getItem();
+        processVanillaItem(result);
+        event.setItem(result);
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
-    public void onCraftingResult(PrepareItemCraftEvent event) {
+    public void onCraftingPrepare(PrepareItemCraftEvent event) {
         if (event.getRecipe() == null) return;
         processVanillaItem(event.getRecipe().getResult());
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
-    public void onAnvilUse(PrepareAnvilEvent event) {
+    public void onAnvilPrepare(PrepareAnvilEvent event) {
         if (event.getResult() == null) return;
-        renameVanillaItem(event.getResult(), event.getView().getRenameText());
+        ItemStack result = event.getResult();
+        renameVanillaItem(result, event.getView().getRenameText());
+        event.setResult(result);
+    }
+
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onSmithingPrepare(PrepareSmithingEvent event) {
+        if (event.getResult() == null) return;
+        ItemStack result = event.getResult();
+        resetJadeData(result);
+        VanillaItem.convert(result);
+        event.setResult(result);
+    }
+
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onSmithingComplete(SmithItemEvent event) {
+        resetJadeData(event.getInventory().getResult());
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
@@ -84,6 +105,12 @@ public class VanillaItemHandler implements Listener {
         }
     }
 
+    public void resetJadeData(ItemStack source) {
+        if (source == null) return;
+
+        source.editPersistentDataContainer(pdc -> pdc.remove(JadeItem.JADE_ITEM_KEY));
+    }
+
     public void renameVanillaItem(ItemStack source, String newName) {
         if (source.getPersistentDataContainer().has(JadeItem.JADE_ITEM_KEY)) {
             VanillaItem template = VanillaItemRegistry.getVanillaItem(source.getType().getKey().getKey());
@@ -94,6 +121,7 @@ public class VanillaItemHandler implements Listener {
             } else {
                 JadeItem.rename(source, newName, true);
             }
+            VanillaItem.update(source);
         }
     }
 }

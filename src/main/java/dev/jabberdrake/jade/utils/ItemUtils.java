@@ -1,25 +1,14 @@
 package dev.jabberdrake.jade.utils;
 
-import dev.jabberdrake.jade.items.JadeItem;
 import dev.jabberdrake.jade.items.JadeItemRegistry;
-import io.papermc.paper.datacomponent.DataComponentType;
 import io.papermc.paper.datacomponent.DataComponentTypes;
-import io.papermc.paper.datacomponent.item.ItemAttributeModifiers;
-import io.papermc.paper.datacomponent.item.ItemEnchantments;
 import io.papermc.paper.datacomponent.item.TooltipDisplay;
-import io.papermc.paper.datacomponent.item.attribute.AttributeModifierDisplay;
 import io.papermc.paper.registry.RegistryAccess;
 import io.papermc.paper.registry.RegistryKey;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
-import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ItemType;
-import org.checkerframework.checker.units.qual.A;
-
-import javax.xml.crypto.Data;
-import java.util.ArrayList;
-import java.util.List;
 
 public class ItemUtils {
 
@@ -89,7 +78,12 @@ public class ItemUtils {
         */
 
         item.setData(DataComponentTypes.TOOLTIP_DISPLAY, TooltipDisplay.tooltipDisplay()
-                .addHiddenComponents(DataComponentTypes.ENCHANTMENTS, DataComponentTypes.ATTRIBUTE_MODIFIERS, DataComponentTypes.POTION_CONTENTS)
+                .addHiddenComponents(
+                        DataComponentTypes.ENCHANTMENTS,
+                        DataComponentTypes.ATTRIBUTE_MODIFIERS,
+                        DataComponentTypes.POTION_CONTENTS,
+                        DataComponentTypes.TRIM
+                )
                 .build());
         }
 

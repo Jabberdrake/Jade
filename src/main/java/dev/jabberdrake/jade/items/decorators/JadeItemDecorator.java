@@ -1,5 +1,6 @@
 package dev.jabberdrake.jade.items.decorators;
 
+import dev.jabberdrake.jade.items.ItemGroup;
 import dev.jabberdrake.jade.utils.TextUtils;
 import io.papermc.paper.datacomponent.DataComponentTypes;
 import io.papermc.paper.datacomponent.item.ItemLore;
@@ -11,6 +12,7 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.trim.ArmorTrim;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectTypeCategory;
 import org.bukkit.potion.PotionType;
@@ -22,7 +24,7 @@ import java.util.Map;
 public abstract class JadeItemDecorator {
 
     abstract void decorate(JadeItem.Builder builder);
-    abstract void decorate(ItemStack template, List<String> lore);
+    abstract void decorate(ItemStack template, List<String> lore, ItemGroup group);
 
     abstract List<String> parsePrimaryAttributes(ItemStack template);
     abstract List<String> parseSecondaryAttributes(ItemStack template);
@@ -71,6 +73,16 @@ public abstract class JadeItemDecorator {
         }
 
         return effectLore;
+    }
+
+    public static List<String> parseTrim(ItemStack template) {
+        List<String> trimLore = new ArrayList<>();
+        if (!template.hasData(DataComponentTypes.TRIM)) return trimLore;
+
+        trimLore.add("");
+        ArmorTrim trim = template.getData(DataComponentTypes.TRIM).armorTrim();
+        trimLore.add(TextUtils.getTrimAsString(trim));
+        return trimLore;
     }
 
     public static void applyLore(ItemLore.Builder loreBuilder, List<String> lore) {

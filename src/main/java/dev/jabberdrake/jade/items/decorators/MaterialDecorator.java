@@ -1,5 +1,6 @@
 package dev.jabberdrake.jade.items.decorators;
 
+import dev.jabberdrake.jade.items.ItemGroup;
 import dev.jabberdrake.jade.items.JadeItem;
 import dev.jabberdrake.jade.utils.TextUtils;
 import io.papermc.paper.datacomponent.DataComponentTypes;
@@ -18,11 +19,11 @@ public class MaterialDecorator extends JadeItemDecorator {
 
     @Override
     public void decorate(JadeItem.Builder builder) {
-        decorate(builder.getTemplate(), builder.getLore());
+        decorate(builder.getTemplate(), builder.getLore(), builder.getItemGroup());
     }
 
     @Override
-    public void decorate(ItemStack template, List<String> lore) {
+    public void decorate(ItemStack template, List<String> lore, ItemGroup itemGroup) {
         ItemLore.Builder loreBuilder = ItemLore.lore();
         List<String> enchLore = parseEnchantments(template);
         if (!enchLore.isEmpty()) {

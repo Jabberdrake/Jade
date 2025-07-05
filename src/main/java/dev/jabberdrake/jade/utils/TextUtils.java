@@ -5,11 +5,15 @@ import dev.jabberdrake.jade.utils.message.InfoStrategy;
 import dev.jabberdrake.jade.utils.message.SuccessStrategy;
 import dev.jabberdrake.jade.utils.message.SystemStrategy;
 import io.papermc.paper.datacomponent.item.ItemLore;
+import it.unimi.dsi.fastutil.Pair;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import org.bukkit.inventory.meta.trim.ArmorTrim;
+import org.bukkit.inventory.meta.trim.TrimMaterial;
+import org.bukkit.inventory.meta.trim.TrimPattern;
 
 import java.text.DecimalFormat;
 import java.util.HashMap;
@@ -28,6 +32,8 @@ public class TextUtils {
 
     public static final DecimalFormat DF = new DecimalFormat("#.#");
     private static final Map<String, Integer> ROMAN_CONVERSION_MAP = new LinkedHashMap<>();
+    private static final Map<TrimMaterial, Pair<String, TextColor>> TRIM_MATERIAL_MAP = new LinkedHashMap<>();
+    private static final Map<TrimPattern, String> TRIM_PATTERN_MAP = new LinkedHashMap<>();
 
     static {
         ROMAN_CONVERSION_MAP.put("M", 1000);
@@ -43,6 +49,37 @@ public class TextUtils {
         ROMAN_CONVERSION_MAP.put("V", 5);
         ROMAN_CONVERSION_MAP.put("IV", 4);
         ROMAN_CONVERSION_MAP.put("I", 1);
+
+        TRIM_MATERIAL_MAP.put(TrimMaterial.AMETHYST, Pair.of("Amethyst", JadeTextColor.AMETHYST));
+        TRIM_MATERIAL_MAP.put(TrimMaterial.COPPER, Pair.of("Copper", JadeTextColor.COPPER));
+        TRIM_MATERIAL_MAP.put(TrimMaterial.DIAMOND, Pair.of("Diamond", JadeTextColor.DIAMOND));
+        TRIM_MATERIAL_MAP.put(TrimMaterial.EMERALD, Pair.of("Emerald", JadeTextColor.EMERALD));
+        TRIM_MATERIAL_MAP.put(TrimMaterial.GOLD , Pair.of("Golden", JadeTextColor.GOLD));
+        TRIM_MATERIAL_MAP.put(TrimMaterial.IRON, Pair.of("Iron", JadeTextColor.IRON));
+        TRIM_MATERIAL_MAP.put(TrimMaterial.LAPIS, Pair.of("Lapis", JadeTextColor.LAPIS));
+        TRIM_MATERIAL_MAP.put(TrimMaterial.NETHERITE, Pair.of("Netherite", JadeTextColor.NETHERITE));
+        TRIM_MATERIAL_MAP.put(TrimMaterial.QUARTZ, Pair.of("Quartz", JadeTextColor.QUARTZ));
+        TRIM_MATERIAL_MAP.put(TrimMaterial.REDSTONE, Pair.of("Redstone", JadeTextColor.REDSTONE));
+        TRIM_MATERIAL_MAP.put(TrimMaterial.RESIN, Pair.of("Resin", JadeTextColor.RESIN));
+
+        TRIM_PATTERN_MAP.put(TrimPattern.BOLT, "Bolt");
+        TRIM_PATTERN_MAP.put(TrimPattern.COAST, "Coast");
+        TRIM_PATTERN_MAP.put(TrimPattern.DUNE, "Dune");
+        TRIM_PATTERN_MAP.put(TrimPattern.EYE, "Eye");
+        TRIM_PATTERN_MAP.put(TrimPattern.FLOW, "Flow");
+        TRIM_PATTERN_MAP.put(TrimPattern.HOST, "Host");
+        TRIM_PATTERN_MAP.put(TrimPattern.RAISER, "Raiser");
+        TRIM_PATTERN_MAP.put(TrimPattern.RIB, "Rib");
+        TRIM_PATTERN_MAP.put(TrimPattern.SENTRY, "Sentry");
+        TRIM_PATTERN_MAP.put(TrimPattern.SHAPER, "Shaper");
+        TRIM_PATTERN_MAP.put(TrimPattern.SILENCE, "Silence");
+        TRIM_PATTERN_MAP.put(TrimPattern.SNOUT, "Snout");
+        TRIM_PATTERN_MAP.put(TrimPattern.SPIRE, "Spire");
+        TRIM_PATTERN_MAP.put(TrimPattern.TIDE, "Tide");
+        TRIM_PATTERN_MAP.put(TrimPattern.VEX, "Vex");
+        TRIM_PATTERN_MAP.put(TrimPattern.WARD, "Ward");
+        TRIM_PATTERN_MAP.put(TrimPattern.WAYFINDER, "Wayfinder");
+        TRIM_PATTERN_MAP.put(TrimPattern.WILD, "Wild");
     }
 
     public static final TextColor DARK_ZORBA = TextColor.color(0x4b4047);
@@ -240,4 +277,11 @@ public class TextUtils {
         return romanNumeral.toString();
     }
 
+    public static String getTrimAsString(ArmorTrim trim) {
+        String pattern = TRIM_PATTERN_MAP.get(trim.getPattern());
+        String material = TRIM_MATERIAL_MAP.get(trim.getMaterial()).left();
+        String color = "<" + TRIM_MATERIAL_MAP.get(trim.getMaterial()).right().asHexString() + ">";
+
+        return "<zorba>Trim: " + color + material + " " + pattern;
+    }
 }

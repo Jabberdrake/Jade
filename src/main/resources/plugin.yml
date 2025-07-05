@@ -1,10 +1,10 @@
 name: Jade
-version: '1.0'
+version: '1.1'
 main: dev.jabberdrake.jade.Jade
 description: "A lightweight territory management plugin."
 author: Jabberdrake
 website: https://github.com/Jabberdrake/Jade
-api-version: '1.21.5'
+api-version: '1.21.7'
 depend: [BlueMap]
 commands:
   jade:

@@ -506,6 +506,9 @@ public class VanillaItemRegistry {
     public static final VanillaItem MUSIC_DISC_OTHERSIDE = registerItem(VanillaItem.builder()
             .data("Music Disc", Material.MUSIC_DISC_OTHERSIDE, Rarity.UNCOMMON)
             .build());
+    public static final VanillaItem MUSIC_DISC_LAVA_CHICKEN = registerItem(VanillaItem.builder()
+            .data("Music Disc", Material.MUSIC_DISC_LAVA_CHICKEN, Rarity.UNCOMMON)
+            .build());
 
     public static final VanillaItem HEAVY_CORE = registerItem(VanillaItem.builder()
             .data("Heavy Core", Material.HEAVY_CORE, Rarity.UNCOMMON)

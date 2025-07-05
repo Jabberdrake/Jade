@@ -1,11 +1,14 @@
 package dev.jabberdrake.jade.items.decorators;
 
+import dev.jabberdrake.jade.items.ItemGroup;
 import dev.jabberdrake.jade.items.JadeItem;
 import dev.jabberdrake.jade.utils.AttributeUtils;
 import dev.jabberdrake.jade.utils.TextUtils;
 import io.papermc.paper.datacomponent.DataComponentTypes;
 import io.papermc.paper.datacomponent.item.ItemAttributeModifiers;
 import io.papermc.paper.datacomponent.item.ItemLore;
+import net.kyori.adventure.text.Component;
+import org.bukkit.Bukkit;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.inventory.ItemStack;
 
@@ -22,11 +25,11 @@ public class ArmorDecorator extends JadeItemDecorator {
 
     @Override
     public void decorate(JadeItem.Builder builder) {
-        decorate(builder.getTemplate(), builder.getLore());
+        decorate(builder.getTemplate(), builder.getLore(), builder.getItemGroup());
     }
 
     @Override
-    public void decorate(ItemStack template, List<String> lore) {
+    public void decorate(ItemStack template, List<String> lore, ItemGroup group) {
         List<String> primaryAttrLore = parsePrimaryAttributes(template);
         if (primaryAttrLore == null) throw new IllegalStateException("[ArmorDecorator] Invalid primary attributes in armor item!");
 
@@ -41,6 +44,11 @@ public class ArmorDecorator extends JadeItemDecorator {
         List<String> enchLore = parseEnchantments(template);
         if (!enchLore.isEmpty()) {
             TextUtils.lore(loreBuilder, enchLore);
+        }
+
+        if (group == ItemGroup.VANILLA) {
+            List<String> trimLore = parseTrim(template);
+            if (!trimLore.isEmpty()) TextUtils.lore(loreBuilder, trimLore);
         }
 
         applyLore(loreBuilder, lore);
@@ -91,10 +99,14 @@ public class ArmorDecorator extends JadeItemDecorator {
 
         // We assume that the item has attribute modifiers to read, since this method is only ever called after parsePrimaryAttributes,
         // which throws an exception if this data component cannot be found.
-        List<ItemAttributeModifiers.Entry> modifiers = template.getData(DataComponentTypes.ATTRIBUTE_MODIFIERS).modifiers();
-        if (!modifiers.isEmpty()) {
+        List<ItemAttributeModifiers.Entry> modifiers = template.getData(DataComponentTypes.ATTRIBUTE_MODIFIERS)
+                .modifiers()
+                .stream().filter(entry -> entry.modifier().getAmount() > 0.1 && entry.attribute() != Attribute.ARMOR && entry.attribute() != Attribute.MAX_HEALTH)
+                .toList();
+
+        if (modifiers.isEmpty()) {
             return attrLore;
-        }
+        } else attrLore.add("");
         for (ItemAttributeModifiers.Entry entry : modifiers) {
             Attribute entryAttr = entry.attribute();
             double amount = entry.modifier().getAmount();

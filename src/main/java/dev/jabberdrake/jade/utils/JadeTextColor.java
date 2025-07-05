@@ -58,13 +58,21 @@ public class JadeTextColor implements TextColor {
     public static final JadeTextColor LIVINGMETAL = new JadeTextColor("livingmetal", color(0x5afc9f), "minecraft:music_disc_creator");
     public static final JadeTextColor MYTHIC_BLUE = new JadeTextColor("mythic_blue", color(0x30eeb4), "minecraft:light_blue_candle");
     public static final JadeTextColor AUDALAD_CYAN = new JadeTextColor("audalad_cyan", color(0x53b5b5), "minecraft:tide_armor_trim_smithing_template");
-    public static final JadeTextColor COPPER_RED = new JadeTextColor("copper_red", color(0xb4684d), "minecraft:copper_ingot");
     public static final JadeTextColor BEER_YELLOW = new JadeTextColor("beer_yellow", color(0xf4ac5e), "minecraft:wheat");
     public static final JadeTextColor WINE_RED = new JadeTextColor("wine_red", color(0x7b0323), "minecraft:sweet_berries");
     public static final JadeTextColor TYRIAN_PURPLE = new JadeTextColor("tyrian_purple", color(0x66023c), "minecraft:nautilus_shell");
     public static final JadeTextColor CORAL = new JadeTextColor("coral", color(0xff7f50), "minecraft:fire_coral");
     public static final JadeTextColor SALMON = new JadeTextColor("salmon", color(0xfa8072), "minecraft:salmon");
     public static final JadeTextColor ORANGE = new JadeTextColor("orange", color(0xffa500), "minecraft:orange_dye");
+    public static final JadeTextColor COPPER = new JadeTextColor("copper", color(0xb4684d), "minecraft:copper_ingot");
+    public static final JadeTextColor DIAMOND = new JadeTextColor("diamond", color(0x6eecd2), "minecraft:diamond");
+    public static final JadeTextColor EMERALD = new JadeTextColor("emerald", color(0x11a036), "minecraft:emerald");
+    public static final JadeTextColor IRON = new JadeTextColor("iron", color(0xececec), "minecraft:iron_ingot");
+    public static final JadeTextColor LAPIS = new JadeTextColor("lapis", color(0x416e97), "minecraft:lapis_lazuli");
+    public static final JadeTextColor QUARTZ = new JadeTextColor("quartz", color(0xe3d4c4), "minecraft:quartz");
+    public static final JadeTextColor NETHERITE = new JadeTextColor("netherite", color(0x625859), "minecraft:netherite_ingot");
+    public static final JadeTextColor REDSTONE = new JadeTextColor("redstone", color(0x971607), "minecraft:redstone");
+    public static final JadeTextColor RESIN = new JadeTextColor("resin", color(0xfc7812), "minecraft:resin_brick");
 
     private static final List<JadeTextColor> VANILLA_VALUES = List.of(
             BLACK, BLUE, GREEN, CYAN, CARMINE, PURPLE, GOLD, LIGHT_GRAY, GRAY, LIGHT_BLUE, LIME, AQUA, RED, MAGENTA, YELLOW, WHITE
@@ -82,8 +90,9 @@ public class JadeTextColor implements TextColor {
             DARK_MANA, LIGHT_MANA,
             ROSEMETAL, LIGHT_ROSEMETAL,
             LIVINGMETAL, MYTHIC_BLUE, AUDALAD_CYAN,
-            COPPER_RED, BEER_YELLOW, WINE_RED, TYRIAN_PURPLE,
-            CORAL, SALMON, ORANGE
+            BEER_YELLOW, WINE_RED, TYRIAN_PURPLE,
+            CORAL, SALMON, ORANGE,
+            COPPER, DIAMOND, EMERALD, IRON, LAPIS, QUARTZ, NETHERITE, REDSTONE, RESIN
     );
 
     public static final List<String> NAMES = VALUES.stream().map(JadeTextColor::toString).toList();

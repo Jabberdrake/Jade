@@ -38,7 +38,7 @@ public class VanillaItem extends JadeItem {
         ItemUtils.hideAttributes(source);
 
         // Apply lore
-        JadeItem.relore(source, template.getItemTags(), template.getLore());
+        JadeItem.relore(source, template);
     }
 
     public static void update(ItemStack source) {
@@ -49,7 +49,7 @@ public class VanillaItem extends JadeItem {
         if (template == null) return;
 
         // Re-apply lore
-        JadeItem.relore(source, template.getItemTags(), template.getLore());
+        JadeItem.relore(source, template);
     }
 
     public static VanillaItem.Builder builder() {

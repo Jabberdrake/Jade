@@ -1,11 +1,14 @@
 package dev.jabberdrake.jade.items.decorators;
 
+import dev.jabberdrake.jade.items.ItemGroup;
 import dev.jabberdrake.jade.items.JadeItem;
 import dev.jabberdrake.jade.utils.AttributeUtils;
 import dev.jabberdrake.jade.utils.TextUtils;
 import io.papermc.paper.datacomponent.DataComponentTypes;
 import io.papermc.paper.datacomponent.item.ItemAttributeModifiers;
 import io.papermc.paper.datacomponent.item.ItemLore;
+import net.kyori.adventure.text.Component;
+import org.bukkit.Bukkit;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
@@ -24,11 +27,11 @@ public class WeaponDecorator extends JadeItemDecorator {
 
     @Override
     public void decorate(JadeItem.Builder builder) {
-        decorate(builder.getTemplate(), builder.getLore());
+        decorate(builder.getTemplate(), builder.getLore(), builder.getItemGroup());
     }
 
     @Override
-    public void decorate(ItemStack template, List<String> lore) {
+    public void decorate(ItemStack template, List<String> lore, ItemGroup itemGroup) {
         List<String> primaryAttrLore = parsePrimaryAttributes(template);
         if (primaryAttrLore == null) throw new IllegalStateException("[WeaponDecorator] Invalid primary attributes in weapon item!");
 
@@ -84,7 +87,7 @@ public class WeaponDecorator extends JadeItemDecorator {
                 damageLore = damageLoreBuilder.toString();
             }
             else if (entryAttr == Attribute.ATTACK_SPEED) {
-                StringBuilder speedLoreBuilder = new StringBuilder("<copper_red>⌛ Attack Speed: " + TextUtils.DF.format(AttributeUtils.BASE_ATTACK_SPEED + amount));
+                StringBuilder speedLoreBuilder = new StringBuilder("<copper>⌛ Attack Speed: " + TextUtils.DF.format(AttributeUtils.BASE_ATTACK_SPEED + amount));
                 atkSpeedLore = speedLoreBuilder.toString();
             }
         }
@@ -99,10 +102,13 @@ public class WeaponDecorator extends JadeItemDecorator {
 
         // We assume that the item has attribute modifiers to read, since this method is only ever called after parsePrimaryAttributes,
         // which throws an exception if this data component cannot be found.
-        List<ItemAttributeModifiers.Entry> modifiers = template.getData(DataComponentTypes.ATTRIBUTE_MODIFIERS).modifiers();
-        if (!modifiers.isEmpty()) {
+        List<ItemAttributeModifiers.Entry> modifiers = template.getData(DataComponentTypes.ATTRIBUTE_MODIFIERS)
+                .modifiers()
+                .stream().filter(entry -> entry.modifier().getAmount() > 0 && entry.attribute() != Attribute.ATTACK_DAMAGE && entry.attribute() != Attribute.ATTACK_SPEED)
+                .toList();
+        if (modifiers.isEmpty()) {
             return attrLore;
-        }
+        } else attrLore.add("");
         for (ItemAttributeModifiers.Entry entry : modifiers) {
             Attribute entryAttr = entry.attribute();
             double amount = entry.modifier().getAmount();

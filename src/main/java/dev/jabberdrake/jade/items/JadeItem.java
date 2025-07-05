@@ -16,6 +16,7 @@ import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Item;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
 
@@ -52,8 +53,8 @@ public abstract class JadeItem {
         return this.key;
     }
 
-    public String getNamespacedKey(boolean includeGroup) {
-        return "jade:" + (includeGroup ? getItemGroup().name() + "/" : "") + getKey();
+    public String getFullKey() {
+        return "jade:" + getItemGroup().name() + "/" + getKey();
     }
 
     public Rarity getRarity() {
@@ -99,15 +100,15 @@ public abstract class JadeItem {
         }
     }
 
-    public static void relore(ItemStack item, ItemTag[] tags, List<String> flavorText) {
+    public static void relore(ItemStack item, JadeItem template) {
         if (item == null) return;
 
-        ItemTag tag = tags == null ? ItemTag.MATERIAL : tags[0];
+        ItemTag tag = template.getItemTags() == null ? ItemTag.MATERIAL : template.getItemTags()[0];
         switch (tag) {
-            case WEAPON,TOOL -> WeaponDecorator.weaponDecorator().decorate(item, flavorText);
-            case ARMOR -> ArmorDecorator.armorDecorator().decorate(item, flavorText);
-            case CONSUMABLE -> ConsumableDecorator.consumableDecorator().decorate(item, flavorText);
-            default -> MaterialDecorator.materialDecorator().decorate(item, flavorText);
+            case WEAPON,TOOL -> WeaponDecorator.weaponDecorator().decorate(item, template.getLore(), template.getItemGroup());
+            case ARMOR -> ArmorDecorator.armorDecorator().decorate(item, template.getLore(), template.getItemGroup());
+            case CONSUMABLE -> ConsumableDecorator.consumableDecorator().decorate(item, template.getLore(), template.getItemGroup());
+            default -> MaterialDecorator.materialDecorator().decorate(item, template.getLore(), template.getItemGroup());
         }
     }
 
@@ -131,6 +132,8 @@ public abstract class JadeItem {
         public ItemTag[] getItemTags() {
             return this.tags;
         }
+
+        public ItemGroup getItemGroup() { return this.group; }
 
         protected Builder data(String name, String key, Rarity rarity, ItemGroup group) {
             this.name = name;
