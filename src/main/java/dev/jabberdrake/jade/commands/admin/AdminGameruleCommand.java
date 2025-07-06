@@ -45,7 +45,7 @@ public class AdminGameruleCommand {
                                 .executes(AdminGameruleCommand::runCommandForRandomAdvice)
                         )
                 )
-                .then(Commands.literal("doMobExplosion")
+                .then(Commands.literal("doMonsterGriefing")
                         .then(Commands.argument("value", BoolArgumentType.bool())
                                 .requires(sender -> sender.getExecutor() instanceof Player)
                                 .requires(sender -> sender.getSender().hasPermission("jade.admin") || sender.getSender().isOp())
@@ -136,12 +136,12 @@ public class AdminGameruleCommand {
 
         boolean valueArg = BoolArgumentType.getBool(context, "value");
 
-        boolean result = JadeConfig.setGamerule("doMobExplosion", valueArg);
+        boolean result = JadeConfig.setGamerule("doMonsterGriefing", valueArg);
         if (result == true) {
             if (valueArg) {
-                Bukkit.broadcast(system("An operator has set gamerule <highlight>doMobExplosion</highlight> to <green>TRUE</green>!"));
+                Bukkit.broadcast(system("An operator has set gamerule <highlight>doMonsterGriefing</highlight> to <green>TRUE</green>!"));
             } else {
-                Bukkit.broadcast(system("An operator has set gamerule <highlight>doMobExplosion</highlight> to <red>FALSE</red>!"));
+                Bukkit.broadcast(system("An operator has set gamerule <highlight>doMonsterGriefing</highlight> to <red>FALSE</red>!"));
             }
         } else {
             player.sendMessage(error("An error occurred while altering gamerules! Please report this to a developer!"));

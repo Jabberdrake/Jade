@@ -28,7 +28,7 @@ public class JadeConfig {
     public static boolean enablePlayerGraves = true;
     public static boolean enableSpeedRoads = true;
     public static boolean sayRandomAdvice = true;
-    public static boolean doMobExplosion = false;
+    public static boolean doMonsterGriefing = false;
 
     // OTHER
     public static List<Road> roads = new ArrayList<>();
@@ -48,7 +48,7 @@ public class JadeConfig {
         enablePlayerGraves = config.getBoolean("gamerules.enablePlayerGraves", true);
         enableSpeedRoads = config.getBoolean("gamerules.enableSpeedRoads", true);
         sayRandomAdvice = config.getBoolean("gamerules.sayRandomAdvice", true);
-        doMobExplosion = config.getBoolean("gamerules.doMobExplosion", false);
+        doMonsterGriefing = config.getBoolean("gamerules.doMonsterGriefing", false);
 
         // Load roads
         List<String> roadEntries = config.getStringList("roads");
@@ -119,9 +119,9 @@ public class JadeConfig {
                 config.set("gamerules.sayRandomAdvice", value);
                 JadeConfig.save();
                 return true;
-            case "doMobExplosion":
-                doMobExplosion = value;
-                config.set("gamerules.doMobExplosion", value);
+            case "doMonsterGriefing":
+                doMonsterGriefing = value;
+                config.set("gamerules.doMonsterGriefing", value);
                 JadeConfig.save();
                 return true;
             default:

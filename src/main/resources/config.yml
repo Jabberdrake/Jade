@@ -8,6 +8,6 @@ gamerules:
   enablePlayerGraves: true
   enableSpeedRoads: true
   sayRandomAdvice: true
-  doMobExplosion: false
+  doMonsterGriefing: false
 roads:
   - ANY;PACKED_MUD;GRAVEL;2
