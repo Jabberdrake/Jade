@@ -65,8 +65,9 @@ public class PlayerMoveHandler implements Listener {
                 // This happens when the player moves from a claimed chunk to an unclaimed chunk.
                 // To inform them that they have left a claimed region, show them that they are
                 // now in 'Wilderness', like in Factions:
-                player.clearTitle();
-                player.sendActionBar(text("Wilderness", NamedTextColor.DARK_GREEN));
+                jadePlayer.announceSettlement(null);
+                //player.clearTitle();
+                //player.sendActionBar(text("Wilderness", NamedTextColor.DARK_GREEN));
             }
             return;
         } else {
@@ -101,6 +102,9 @@ public class PlayerMoveHandler implements Listener {
                 // - from an unclaimed chunk to a claimed chunk
                 // - from a chunk claimed by A to a chunk claimed by B
                 // When this happens, present the settlement name (decorated) and description:
+                jadePlayer.announceSettlement(owner);
+
+                /*
                 Component mainTitle = owner.getDisplayNameAsComponent();
                 Component subTitle = owner.getDescriptionAsComponent();
 
@@ -108,7 +112,7 @@ public class PlayerMoveHandler implements Listener {
 
                 player.clearTitle();
                 player.showTitle(stmTitle);
-                return;
+                */
             }
         }
     }

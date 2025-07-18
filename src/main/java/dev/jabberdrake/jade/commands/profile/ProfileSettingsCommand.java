@@ -11,6 +11,7 @@ import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import org.bukkit.entity.Player;
 
+import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
 
 import static dev.jabberdrake.jade.utils.TextUtils.*;
@@ -58,6 +59,13 @@ public class ProfileSettingsCommand {
             } else {
                 player.sendMessage(system("Changed setting <highlight>" + booleanSetting.getName() + "</highlight> to <red>FALSE</red>!"));
             }
+        } else if (setting instanceof StringSetting) {
+            StringSetting stringSetting = (StringSetting) setting;
+            String stringValue = valueArgument.toUpperCase(Locale.ROOT);
+
+            jadePlayer.setSetting(stringSetting, stringValue);
+
+            player.sendMessage(system("Changed setting <highlight>" + stringSetting.getName() + "</highlight> to <highlight>" + stringValue + "</highlight>!"));
         } else {
             player.sendMessage(error("Could not find the matching class type for the specified setting <highlight>" + settingArgument + "</highlight>. Please report this to a developer!"));
         }

@@ -65,6 +65,12 @@ public class PlayerManager {
                 boolean booleanValue = useDefaults ? booleanSetting.getDefaultValue() : pdc.get(setting.getKey(), PersistentDataType.BOOLEAN);
                 player.setSetting(booleanSetting, booleanValue);
             }
+
+            if (setting instanceof StringSetting) {
+                StringSetting stringSetting = (StringSetting) setting;
+                String stringValue = useDefaults ? stringSetting.getDefaultValue() : pdc.get(setting.getKey(), PersistentDataType.STRING);
+                player.setSetting(stringSetting, stringValue);
+            }
             // add more setting types
         }
 

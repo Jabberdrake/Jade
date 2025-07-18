@@ -10,13 +10,19 @@ import dev.jabberdrake.jade.realms.Settlement;
 import dev.jabberdrake.jade.titles.DefaultJadeTitle;
 import dev.jabberdrake.jade.titles.JadeTitle;
 import dev.jabberdrake.jade.titles.TitleManager;
+import dev.jabberdrake.jade.utils.TextUtils;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.title.Title;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
 import java.util.stream.Stream;
+
+import static net.kyori.adventure.text.Component.text;
 
 public class JadePlayer {
     private static final int VIEW_RANGE = 2;
@@ -246,6 +252,32 @@ public class JadePlayer {
 
     public void setFocusSettlement(Settlement settlement) {
         this.stmFocus = settlement.getId();
+    }
+
+    public void announceSettlement(Settlement settlement) {
+        Player player = this.asPlayer();
+        switch (this.getSetting(PlayerSettings.ANNOUNCE_SETTLEMENT_FORMAT)) {
+            case "CHAT":
+                if (settlement == null) {
+                    player.sendMessage(TextUtils.info("You are now entering the <dark_green>Wilderness</dark_green>..."));
+                } else {
+                    player.sendMessage(TextUtils.info("You are now entering " + settlement.getDisplayName() + "<normal>!"));
+                }
+                break;
+            default:
+                if (settlement == null) {
+                    player.clearTitle();
+                    player.sendActionBar(text("Wilderness", NamedTextColor.DARK_GREEN));
+                } else {
+                    Component mainTitle = settlement.getDisplayNameAsComponent();
+                    Component subTitle = settlement.getDescriptionAsComponent();
+
+                    final Title stmTitle = Title.title(mainTitle, subTitle);
+
+                    player.clearTitle();
+                    player.showTitle(stmTitle);
+                }
+        }
     }
 
     public static ParticleBuilder buildClaimParticle(TextColor mapColor, Player player) {
