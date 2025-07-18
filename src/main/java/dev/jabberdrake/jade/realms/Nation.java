@@ -260,4 +260,12 @@ public class Nation {
         }
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof Nation) {
+            Nation other = (Nation) o;
+            return other.getId() == this.getId();
+        } else return false;
+    }
+
 }

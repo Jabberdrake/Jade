@@ -332,7 +332,6 @@ public class VanillaItemRegistry {
 
     public static final VanillaItem OMINOUS_BOTTLE = registerItem(VanillaItem.builder()
             .data("Ominous Bottle", Material.OMINOUS_BOTTLE, Rarity.UNCOMMON)
-            .tags(ItemTag.CONSUMABLE)
             .build());
     public static final VanillaItem NETHERITE_UPGRADE_SMITHING_TEMPLATE = registerItem(VanillaItem.builder()
             .data("Netherite Upgrade", Material.NETHERITE_UPGRADE_SMITHING_TEMPLATE, Rarity.UNCOMMON)

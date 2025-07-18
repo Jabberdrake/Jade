@@ -32,12 +32,12 @@ public class WeaponDecorator extends JadeItemDecorator {
 
     @Override
     public void decorate(ItemStack template, List<String> lore, ItemGroup itemGroup) {
-        List<String> primaryAttrLore = parsePrimaryAttributes(template);
-        if (primaryAttrLore == null) throw new IllegalStateException("[WeaponDecorator] Invalid primary attributes in weapon item!");
-
         ItemLore.Builder loreBuilder = ItemLore.lore();
-        TextUtils.lore(loreBuilder, primaryAttrLore);
 
+        List<String> primaryAttrLore = parsePrimaryAttributes(template);
+        if (primaryAttrLore != null && !primaryAttrLore.isEmpty()) {
+            TextUtils.lore(loreBuilder, primaryAttrLore);
+        }
         List<String> secondaryAttrLore = parseSecondaryAttributes(template);
         if (!secondaryAttrLore.isEmpty()) {
             TextUtils.lore(loreBuilder, secondaryAttrLore);

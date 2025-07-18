@@ -17,6 +17,7 @@ public class StonecutterRecipes {
         registerRecipe("cobblestone_to_gravel", ItemStack.of(Material.GRAVEL), Material.COBBLESTONE);
         registerRecipe("cobbledDeepslate_to_gravel", ItemStack.of(Material.GRAVEL), Material.COBBLED_DEEPSLATE);
         registerRecipe("gravel_to_sand", ItemStack.of(Material.SAND), Material.GRAVEL);
+        registerRecipe("dripstone_to_pointed_dripstone", ItemStack.of(Material.POINTED_DRIPSTONE), Material.DRIPSTONE_BLOCK);
 
         // OAK
         registerRecipe("OAK_log_to_strippedLog", ItemStack.of(Material.STRIPPED_OAK_LOG), Material.OAK_LOG);

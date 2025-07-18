@@ -3,6 +3,7 @@ package dev.jabberdrake.jade.crafting.recipes;
 import dev.jabberdrake.jade.Jade;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.entity.Item;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.RecipeChoice;
 import org.bukkit.inventory.ShapelessRecipe;
@@ -17,6 +18,9 @@ public class ShapelessRecipes {
     private static final Map<NamespacedKey, ShapelessRecipe> RECIPES = new LinkedHashMap<>();
 
     static {
+        registerRecipe("wool_to_string", ItemStack.of(Material.STRING, 4), Ingredient.of(new RecipeChoice.MaterialChoice(ALL_WOOL)));
+        registerRecipe("nether_wart_block_to_nether_wart", ItemStack.of(Material.NETHER_WART, 9), Ingredient.of(Material.NETHER_WART_BLOCK));
+
         registerRecipe("OAK_slabs_to_planks", ItemStack.of(Material.OAK_PLANKS), Ingredient.of(Material.OAK_SLAB, 2));
         registerRecipe("BIRCH_slabs_to_planks", ItemStack.of(Material.BIRCH_PLANKS), Ingredient.of(Material.BIRCH_SLAB, 2));
         registerRecipe("SPRUCE_slabs_to_planks", ItemStack.of(Material.SPRUCE_PLANKS), Ingredient.of(Material.SPRUCE_SLAB, 2));

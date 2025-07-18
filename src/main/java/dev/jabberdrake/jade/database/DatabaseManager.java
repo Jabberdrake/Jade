@@ -12,6 +12,9 @@ import org.sqlite.SQLiteDataSource;
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 public class DatabaseManager {
@@ -56,6 +59,23 @@ public class DatabaseManager {
         dataObjectRegistry.put(Grave.class, new GraveDataObject(plugin, database));
 
         plugin.getLogger().info("[DatabaseManager::initialize] Finished database initialization!");
+    }
+
+    public static String backup() {
+        String backupFilename = null;
+
+        try {
+            ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("ddMMMyy_HHmm'utc'");
+            String time = now.format(formatter).toLowerCase();
+
+            backupFilename = "BACKUP_" + time + ".db";
+            database.backup(new File(plugin.getDataFolder(), "backups/" + backupFilename).getAbsolutePath());
+        } catch (SQLException e) {
+            plugin.getLogger().severe("[DatabaseManager::backup] Severe error occured during database backup:\n\t" + e.getMessage());
+        }
+
+        return backupFilename;
     }
 
     // DATA OBJECT GETTERS

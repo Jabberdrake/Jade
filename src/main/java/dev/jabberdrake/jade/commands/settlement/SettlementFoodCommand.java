@@ -150,6 +150,11 @@ public class SettlementFoodCommand {
             totalFoodValue += itemFoodValue;
         }
 
+        if (totalFoodValue == 0) {
+            player.sendMessage(error("Could not deposit food since the settlement's stores are at capacity!"));
+            return Command.SINGLE_SUCCESS;
+        }
+
         focus.addFood(totalFoodValue);
         focus.broadcast("<highlight>" + player.getName() + "<normal> has deposited <livingmetal>" + totalFoodValue + "</livingmetal> food!");
         return Command.SINGLE_SUCCESS;
@@ -174,6 +179,11 @@ public class SettlementFoodCommand {
 
             player.getInventory().setItem(slot, null);
             totalFoodValue += itemFoodValue;
+        }
+
+        if (totalFoodValue == 0) {
+            player.sendMessage(error("Could not deposit food since the settlement's stores are at capacity!"));
+            return Command.SINGLE_SUCCESS;
         }
 
         focus.addFood(totalFoodValue);

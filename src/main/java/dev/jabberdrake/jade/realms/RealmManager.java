@@ -162,6 +162,10 @@ public class RealmManager {
         DatabaseManager.deleteSettlement(settlement.getId());
     }
 
+    public static Map<UUID, Settlement> getSettlementInvites() {
+        return RealmManager.activeSettlementInvites;
+    }
+
     public static Settlement getWhoInvitedPlayer(Player player) {
         UUID playerID = player.getUniqueId();
         return RealmManager.activeSettlementInvites.get(playerID);
@@ -352,6 +356,10 @@ public class RealmManager {
         }
 
         DatabaseManager.deleteNation(nation.getId());
+    }
+
+    public static Map<Integer, Nation> getNationInvites() {
+        return RealmManager.activeNationInvites;
     }
 
     public static Nation getWhoInvitedSettlement(Settlement settlement) {

@@ -1,9 +1,9 @@
 package dev.jabberdrake.jade.database;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import dev.jabberdrake.jade.Jade;
+
+import java.io.File;
+import java.sql.*;
 
 public class Database {
 
@@ -36,6 +36,12 @@ public class Database {
     public void execute(String sql) throws SQLException {
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.executeUpdate();
+        }
+    }
+
+    public void backup(String absolutePath) throws SQLException {
+        try (Statement stmt = connection.createStatement()) {
+            stmt.executeUpdate("BACKUP to " + absolutePath);
         }
     }
 

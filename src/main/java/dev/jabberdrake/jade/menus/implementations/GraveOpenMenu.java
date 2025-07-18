@@ -60,7 +60,7 @@ public class GraveOpenMenu extends PagedJadeMenu {
             if (!grave.getPlayerID().equals(getPlayer().getUniqueId())) {
                 OfflinePlayer owner = Bukkit.getOfflinePlayer(grave.getPlayerID());
                 if (owner.isOnline()) {
-                    ((Player) owner).sendMessage(info("<sunsteel>" + player.getName() + "</sunsteel> has <red>emptied</red your grave, <coral>" + grave.getID() + "</coral>!"));
+                    ((Player) owner).sendMessage(info("<sunsteel>" + player.getName() + "</sunsteel> has <red>emptied</red> your grave, <coral>" + grave.getID() + "</coral>!"));
                 }
             }
             PlayerManager.clearGrave(grave);

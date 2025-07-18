@@ -24,11 +24,12 @@ public class ConsumableDecorator extends JadeItemDecorator {
 
     @Override
     public void decorate(ItemStack template, List<String> lore, ItemGroup group) {
-        List<String> effectLore = parseEffects(template);
-        if (effectLore == null) throw new IllegalStateException("ConsumableDecorator cannot process non-consumable templates.");
-
         ItemLore.Builder loreBuilder = ItemLore.lore();
-        TextUtils.lore(loreBuilder, effectLore);
+
+        List<String> effectLore = parseEffects(template);
+        if (effectLore != null && !effectLore.isEmpty()) {
+            TextUtils.lore(loreBuilder, effectLore);
+        }
 
         List<String> enchLore = parseEnchantments(template);
         if (!enchLore.isEmpty()) {

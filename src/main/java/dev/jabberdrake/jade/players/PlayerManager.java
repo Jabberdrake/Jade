@@ -3,6 +3,8 @@ package dev.jabberdrake.jade.players;
 import dev.jabberdrake.jade.Jade;
 import dev.jabberdrake.jade.database.DatabaseManager;
 import dev.jabberdrake.jade.menus.implementations.GraveOpenMenu;
+import dev.jabberdrake.jade.realms.RealmManager;
+import dev.jabberdrake.jade.realms.Settlement;
 import dev.jabberdrake.jade.titles.DefaultJadeTitle;
 import dev.jabberdrake.jade.titles.JadeTitle;
 import org.bukkit.Location;
@@ -64,6 +66,12 @@ public class PlayerManager {
                 player.setSetting(booleanSetting, booleanValue);
             }
             // add more setting types
+        }
+
+        // Set focus settlement if player spawned in trusted settlement
+        Settlement owner = RealmManager.getChunkOwner(player.asPlayer().getChunk());
+        if (owner != null && owner.containsPlayer(uuid)) {
+            player.setFocusSettlement(owner);
         }
 
         playerCache.put(uuid, player);

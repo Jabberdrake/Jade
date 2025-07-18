@@ -42,6 +42,9 @@ public class JadeConfig {
         database = config.getString("generic.database", "jade.db");
         chunkCost = config.getInt("generic.chunkCost", 20);
         gameworlds = config.getStringList("generic.gameworlds");
+        for (String gameworld : gameworlds) {
+            logger.info("[JadeConfig::load] Adding new gameworld \"" + gameworld + "\"");
+        }
 
         // Load gamerules
         preventCoralFading = config.getBoolean("gamerules.preventCoralFading", true);

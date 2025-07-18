@@ -159,6 +159,33 @@ public class ShapedRecipes {
         registerRecipe("chainmail_chestplate", VanillaItemRegistry.getVanillaItem("chainmail_chestplate").getItem(), "A A;AAA;AAA", Ingredient.of(Material.CHAIN, 'A'));
         registerRecipe("chainmail_leggings", VanillaItemRegistry.getVanillaItem("chainmail_leggings").getItem(), "AAA;A A;A A", Ingredient.of(Material.CHAIN, 'A'));
         registerRecipe("chainmail_boots", VanillaItemRegistry.getVanillaItem("chainmail_boots").getItem(), "A A;A A;   ", Ingredient.of(Material.CHAIN, 'A'));
+
+        registerRecipe("name_tag", ItemStack.of(Material.NAME_TAG), "A  ; BB; BC", Ingredient.of(Material.STRING, 'A'), Ingredient.of(Material.PAPER, 'B'), Ingredient.of(Material.INK_SAC, 'C'));
+        registerRecipe("cobweb", ItemStack.of(Material.COBWEB), "A A; A ;A A", Ingredient.of(Material.STRING, 'A'));
+
+        registerRecipe("DUPLICATE_SHERD_angler", ItemStack.of(Material.ANGLER_POTTERY_SHERD, 2), "ACA;ABA;AAA", Ingredient.of(Material.BRICK, 'A'), Ingredient.of(Material.FISHING_ROD, 'B'), Ingredient.of(Material.ANGLER_POTTERY_SHERD, 'C'));
+        registerRecipe("DUPLICATE_SHERD_archer", ItemStack.of(Material.ARCHER_POTTERY_SHERD, 2), "ACA;ABA;AAA", Ingredient.of(Material.BRICK, 'A'), Ingredient.of(Material.BOW, 'B'), Ingredient.of(Material.ARCHER_POTTERY_SHERD, 'C'));
+        registerRecipe("DUPLICATE_SHERD_arms_up", ItemStack.of(Material.ARMS_UP_POTTERY_SHERD, 2), "ACA;ABA;AAA", Ingredient.of(Material.BRICK, 'A'), Ingredient.of(Material.BLAZE_POWDER, 'B'), Ingredient.of(Material.ARMS_UP_POTTERY_SHERD, 'C'));
+        registerRecipe("DUPLICATE_SHERD_blade", ItemStack.of(Material.BLADE_POTTERY_SHERD, 2), "ACA;ABA;AAA", Ingredient.of(Material.BRICK, 'A'), Ingredient.of(Material.STONE_SWORD, 'B'), Ingredient.of(Material.BLADE_POTTERY_SHERD, 'C'));
+        registerRecipe("DUPLICATE_SHERD_brewer", ItemStack.of(Material.BREWER_POTTERY_SHERD, 2), "ACA;ABA;AAA", Ingredient.of(Material.BRICK, 'A'), Ingredient.of(Material.GLASS_BOTTLE, 'B'), Ingredient.of(Material.BREWER_POTTERY_SHERD, 'C'));
+        registerRecipe("DUPLICATE_SHERD_burn", ItemStack.of(Material.BURN_POTTERY_SHERD, 2), "ACA;ABA;AAA", Ingredient.of(Material.BRICK, 'A'), Ingredient.of(Material.COAL, 'B'), Ingredient.of(Material.BURN_POTTERY_SHERD, 'C'));
+        registerRecipe("DUPLICATE_SHERD_danger", ItemStack.of(Material.DANGER_POTTERY_SHERD, 2), "ACA;ABA;AAA", Ingredient.of(Material.BRICK, 'A'), Ingredient.of(Material.GUNPOWDER, 'B'), Ingredient.of(Material.DANGER_POTTERY_SHERD, 'C'));
+        registerRecipe("DUPLICATE_SHERD_explorer", ItemStack.of(Material.EXPLORER_POTTERY_SHERD, 2), "ACA;ABA;AAA", Ingredient.of(Material.BRICK, 'A'), Ingredient.of(Material.MAP, 'B'), Ingredient.of(Material.EXPLORER_POTTERY_SHERD, 'C'));
+        registerRecipe("DUPLICATE_SHERD_flow", ItemStack.of(Material.FLOW_POTTERY_SHERD, 2), "ACA;ABA;AAA", Ingredient.of(Material.BRICK, 'A'), Ingredient.of(Material.WIND_CHARGE, 'B'), Ingredient.of(Material.FLOW_POTTERY_SHERD, 'C'));
+        registerRecipe("DUPLICATE_SHERD_friend", ItemStack.of(Material.FRIEND_POTTERY_SHERD, 2), "ACA;ABA;AAA", Ingredient.of(Material.BRICK, 'A'), Ingredient.of(Material.EMERALD, 'B'), Ingredient.of(Material.FRIEND_POTTERY_SHERD, 'C'));
+        registerRecipe("DUPLICATE_SHERD_guster", ItemStack.of(Material.GUSTER_POTTERY_SHERD, 2), "ACA;ABA;AAA", Ingredient.of(Material.BRICK, 'A'), Ingredient.of(Material.BREEZE_ROD, 'B'), Ingredient.of(Material.GUSTER_POTTERY_SHERD, 'C'));
+        registerRecipe("DUPLICATE_SHERD_heart", ItemStack.of(Material.HEART_POTTERY_SHERD, 2), "ACA;ABA;AAA", Ingredient.of(Material.BRICK, 'A'), Ingredient.of(Material.ROSE_BUSH, 'B'), Ingredient.of(Material.HEART_POTTERY_SHERD, 'C'));
+        registerRecipe("DUPLICATE_SHERD_heartbreak", ItemStack.of(Material.HEARTBREAK_POTTERY_SHERD, 2), "ACA;ABA;AAA", Ingredient.of(Material.BRICK, 'A'), Ingredient.of(Material.FERMENTED_SPIDER_EYE, 'B'), Ingredient.of(Material.HEARTBREAK_POTTERY_SHERD, 'C'));
+        registerRecipe("DUPLICATE_SHERD_howl", ItemStack.of(Material.HOWL_POTTERY_SHERD, 2), "ACA;ABA;AAA", Ingredient.of(Material.BRICK, 'A'), Ingredient.of(Material.BONE, 'B'), Ingredient.of(Material.HOWL_POTTERY_SHERD, 'C'));
+        registerRecipe("DUPLICATE_SHERD_miner", ItemStack.of(Material.MINER_POTTERY_SHERD, 2), "ACA;ABA;AAA", Ingredient.of(Material.BRICK, 'A'), Ingredient.of(Material.STONE_PICKAXE, 'B'), Ingredient.of(Material.MINER_POTTERY_SHERD, 'C'));
+        registerRecipe("DUPLICATE_SHERD_mourner", ItemStack.of(Material.MOURNER_POTTERY_SHERD, 2), "ACA;ABA;AAA", Ingredient.of(Material.BRICK, 'A'), Ingredient.of(Material.ECHO_SHARD, 'B'), Ingredient.of(Material.MOURNER_POTTERY_SHERD, 'C'));
+        registerRecipe("DUPLICATE_SHERD_plenty", ItemStack.of(Material.PLENTY_POTTERY_SHERD, 2), "ACA;ABA;AAA", Ingredient.of(Material.BRICK, 'A'), Ingredient.of(Material.CHEST, 'B'), Ingredient.of(Material.PLENTY_POTTERY_SHERD, 'C'));
+        registerRecipe("DUPLICATE_SHERD_prize", ItemStack.of(Material.PRIZE_POTTERY_SHERD, 2), "ACA;ABA;AAA", Ingredient.of(Material.BRICK, 'A'), Ingredient.of(Material.DIAMOND, 'B'), Ingredient.of(Material.PRIZE_POTTERY_SHERD, 'C'));
+        registerRecipe("DUPLICATE_SHERD_scrape", ItemStack.of(Material.SCRAPE_POTTERY_SHERD, 2), "ACA;ABA;AAA", Ingredient.of(Material.BRICK, 'A'), Ingredient.of(Material.STONE_AXE, 'B'), Ingredient.of(Material.SCRAPE_POTTERY_SHERD, 'C'));
+        registerRecipe("DUPLICATE_SHERD_sheaf", ItemStack.of(Material.SHEAF_POTTERY_SHERD, 2), "ACA;ABA;AAA", Ingredient.of(Material.BRICK, 'A'), Ingredient.of(Material.WHEAT, 'B'), Ingredient.of(Material.SHEAF_POTTERY_SHERD, 'C'));
+        registerRecipe("DUPLICATE_SHERD_shelter", ItemStack.of(Material.SHELTER_POTTERY_SHERD, 2), "ACA;ABA;AAA", Ingredient.of(Material.BRICK, 'A'), Ingredient.of(Material.ACACIA_SAPLING, 'B'), Ingredient.of(Material.SHELTER_POTTERY_SHERD, 'C'));
+        registerRecipe("DUPLICATE_SHERD_skull", ItemStack.of(Material.SKULL_POTTERY_SHERD, 2), "ACA;ABA;AAA", Ingredient.of(Material.BRICK, 'A'), Ingredient.of(Material.SKELETON_SKULL, 'B'), Ingredient.of(Material.SKULL_POTTERY_SHERD, 'C'));
+        registerRecipe("DUPLICATE_SHERD_snort", ItemStack.of(Material.SNORT_POTTERY_SHERD, 2), "ACA;ABA;AAA", Ingredient.of(Material.BRICK, 'A'), Ingredient.of(Material.TORCHFLOWER_SEEDS, 'B'), Ingredient.of(Material.SNORT_POTTERY_SHERD, 'C'));
     }
 
     private static class Ingredient {

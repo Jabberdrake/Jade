@@ -25,6 +25,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.File;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -47,6 +48,12 @@ public final class Jade extends JavaPlugin {
         if (!getDataFolder().exists()) {
             logger.info("[Jade::onEnable] Data folder not found! Creating a new one...");
             getDataFolder().mkdirs();
+        }
+
+        File backupsDir = new File(getDataFolder(), "backups");
+        if (!backupsDir.exists()) {
+            logger.info("[Jade::onEnable] Backup folder not found! Creating a new one...");
+            backupsDir.mkdir();
         }
 
 
@@ -77,6 +84,9 @@ public final class Jade extends JavaPlugin {
     @Override
     public void onDisable() {
         // Plugin shutdown logic
+        DatabaseManager.backup();
+        logger.info("[Jade::onDisable] Backup routine finished!");
+
         logger.info("I'll be back...");
 
         DatabaseManager.shutdown();
@@ -94,6 +104,7 @@ public final class Jade extends JavaPlugin {
             commands.registrar().register(ProfileCommand.buildCommand("profile"), "Manage profile interactions!");
             commands.registrar().register(GraveCommand.buildCommand("grave"), "Manage existing deathchests!");
             commands.registrar().register(ToggleRoleplayCommand.buildCommand("toggleroleplay"), "Toggle roleplay mode!");
+            commands.registrar().register(BuildworldCommand.buildCommand("buildworld"), "Teleport to the build world and back!");
         });
     }
 

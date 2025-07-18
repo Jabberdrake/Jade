@@ -31,7 +31,7 @@ public class ArmorDecorator extends JadeItemDecorator {
     @Override
     public void decorate(ItemStack template, List<String> lore, ItemGroup group) {
         List<String> primaryAttrLore = parsePrimaryAttributes(template);
-        if (primaryAttrLore == null) throw new IllegalStateException("[ArmorDecorator] Invalid primary attributes in armor item!");
+        if (primaryAttrLore == null) throw new IllegalStateException("[ArmorDecorator] Invalid primary attributes in armor item " + template.getType() + " !");
 
         ItemLore.Builder loreBuilder = ItemLore.lore();
         TextUtils.lore(loreBuilder, primaryAttrLore);

@@ -6,13 +6,17 @@ import dev.jabberdrake.jade.items.VanillaItemRegistry;
 import dev.jabberdrake.jade.menus.JadeMenu;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Item;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockDropItemEvent;
 import org.bukkit.event.enchantment.EnchantItemEvent;
 import org.bukkit.event.enchantment.PrepareItemEnchantEvent;
+import org.bukkit.event.entity.EntityDropItemEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.inventory.*;
+import org.bukkit.event.player.PlayerAttemptPickupItemEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -24,6 +28,11 @@ public class VanillaItemHandler implements Listener {
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onItemPickup(EntityPickupItemEvent event) {
+        processVanillaItem(event.getItem().getItemStack());
+    }
+
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onItemPickupAttempt(PlayerAttemptPickupItemEvent event) {
         processVanillaItem(event.getItem().getItemStack());
     }
 
@@ -92,6 +101,13 @@ public class VanillaItemHandler implements Listener {
     public void onPotionBrew(BrewEvent event) {
         for (ItemStack result : event.getResults()) {
             processVanillaItem(result);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onBlockDropItem(BlockDropItemEvent event) {
+        for (ItemStack drop : event.getItems().stream().map(Item::getItemStack).toList()) {
+            processVanillaItem(drop);
         }
     }
 

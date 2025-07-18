@@ -54,6 +54,7 @@ public class SettlementJoinCommand {
             return Command.SINGLE_SUCCESS;
         } else if (!settlement.equals(inviter)) {
             player.sendMessage(error("You do not have a pending nation invite from <highlight>" + settlementArgument + "</highlight>!"));
+            return Command.SINGLE_SUCCESS;
         }
 
         settlement.addMember(player.getUniqueId(), settlement.getDefaultRole());

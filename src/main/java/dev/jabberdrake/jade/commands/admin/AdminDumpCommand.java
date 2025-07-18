@@ -5,10 +5,7 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import dev.jabberdrake.jade.commands.settlement.CommonSettlementSuggestions;
-import dev.jabberdrake.jade.realms.ChunkAnchor;
-import dev.jabberdrake.jade.realms.RealmManager;
-import dev.jabberdrake.jade.realms.Settlement;
-import dev.jabberdrake.jade.realms.SettlementRole;
+import dev.jabberdrake.jade.realms.*;
 import dev.jabberdrake.jade.utils.TextUtils;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
@@ -18,9 +15,13 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+
+import java.util.Map;
+import java.util.UUID;
 
 public class AdminDumpCommand {
 
@@ -45,6 +46,16 @@ public class AdminDumpCommand {
                                         .requires(sender -> sender.getExecutor() instanceof Player)
                                         .requires(sender -> sender.getSender().hasPermission("jade.admin") || sender.getSender().isOp())
                                         .executes(AdminDumpCommand::runCommandForRoles))
+                        )
+                        .then(Commands.literal("nation_invites")
+                                .requires(sender -> sender.getExecutor() instanceof Player)
+                                .requires(sender -> sender.getSender().hasPermission("jade.admin") || sender.getSender().isOp())
+                                .executes(AdminDumpCommand::runCommandForNationInvites)
+                        )
+                        .then(Commands.literal("settlement_invites")
+                                .requires(sender -> sender.getExecutor() instanceof Player)
+                                .requires(sender -> sender.getSender().hasPermission("jade.admin") || sender.getSender().isOp())
+                                .executes(AdminDumpCommand::runCommandForSettlementInvites)
                         )
                 )
                 .build();
@@ -116,26 +127,45 @@ public class AdminDumpCommand {
         }
         return Command.SINGLE_SUCCESS;
     }
+
     public static int runCommandForRoles(CommandContext<CommandSourceStack> context) {
         Player player = (Player) context.getSource().getSender();
         Settlement settlement = RealmManager.getSettlement(StringArgumentType.getString(context, "settlement"));
         if (settlement == null) {
-            player.sendMessage(TextUtils.composeSimpleErrorMessage("Settlement not found!"));
+            player.sendMessage(TextUtils.error("Settlement not found!"));
             return Command.SINGLE_SUCCESS;
         }
 
-        player.sendMessage(TextUtils.composeSimpleOperatorMessage("Dumping ")
-                .append(TextUtils.composeOperatorHighlight("role list"))
-                .append(TextUtils.composeOperatorText(" for "))
-                .append(settlement.getDisplayNameAsComponent())
-                .append(TextUtils.composeOperatorText(":")));
+        player.sendMessage(TextUtils.system("Dumping <highlight>role list</highlight> for " + settlement.getDisplayName() + ": "));
 
         for (SettlementRole role : settlement.getRoles()) {
-            player.sendMessage(
-                    Component.text()
-                            .append(TextUtils.composeOperatorText(INDENT + "[" + role.getDisplayAsString() + ", authority=" + role.getAuthority() + "]"))
-                            .build()
-            );
+            player.sendMessage(TextUtils.system(INDENT + "[" + role.getDisplayAsString() + ", authority=" + role.getAuthority() + "]"));
+        }
+        return Command.SINGLE_SUCCESS;
+    }
+
+    public static int runCommandForNationInvites(CommandContext<CommandSourceStack> context) {
+        Player player = (Player) context.getSource().getSender();
+        player.sendMessage(TextUtils.system("Dumping <highlight>RealmManager::activeNationInvites</highlight>: "));
+
+        for (Map.Entry<Integer, Nation> invite : RealmManager.getNationInvites().entrySet()) {
+            int stmID = invite.getKey();
+            Nation nation = invite.getValue();
+
+            player.sendMessage(TextUtils.system("Settlement no. " + stmID + " <highlight>(" + RealmManager.getSettlement(stmID).getDisplayName() + ")</highlight> has been invited to <highlight>" + nation.getDisplayName()));
+        }
+        return Command.SINGLE_SUCCESS;
+    }
+
+    public static int runCommandForSettlementInvites(CommandContext<CommandSourceStack> context) {
+        Player player = (Player) context.getSource().getSender();
+        player.sendMessage(TextUtils.system("Dumping <highlight>RealmManager::activeSettlementInvites</highlight>: "));
+
+        for (Map.Entry<UUID, Settlement> invite : RealmManager.getSettlementInvites().entrySet()) {
+            UUID playerID = invite.getKey();
+            Settlement settlement = invite.getValue();
+
+            player.sendMessage(TextUtils.system("<highlight>" + Bukkit.getOfflinePlayer(playerID).getName() + ")</highlight> has been invited to <highlight>" + settlement.getDisplayName()));
         }
         return Command.SINGLE_SUCCESS;
     }
