@@ -74,6 +74,12 @@ public class PlayerManager {
             // add more setting types
         }
 
+        // Check if player received any new invites while offline
+        Settlement inviter = RealmManager.getWhoInvitedPlayer(player.asPlayer());
+        if (inviter != null) {
+            inviter.tell(player.asPlayer(), "An officer has invited you to join " + inviter.getDisplayName() + "<normal>!");
+        }
+
         // Set focus settlement if player spawned in trusted settlement
         Settlement owner = RealmManager.getChunkOwner(player.asPlayer().getChunk());
         if (owner != null && owner.containsPlayer(uuid)) {

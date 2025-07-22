@@ -23,6 +23,7 @@ public class RealmManager {
     private static Map<ChunkAnchor, Settlement> territoryMap = new HashMap<>();
 
     public static void initialize() {
+
         plugin = Jade.getInstance();
         logger = plugin.getLogger();
 
@@ -171,8 +172,7 @@ public class RealmManager {
         return RealmManager.activeSettlementInvites.get(playerID);
     }
 
-    public static boolean registerInviteToSettlement(Player player, Settlement settlement) {
-        UUID playerID = player.getUniqueId();
+    public static boolean registerInviteToSettlement(UUID playerID, Settlement settlement) {
         if (!RealmManager.activeSettlementInvites.containsKey(playerID)) {
             RealmManager.activeSettlementInvites.put(playerID, settlement);
             return true;

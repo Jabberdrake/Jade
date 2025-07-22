@@ -68,7 +68,7 @@ public class NationDataObject implements DatabaseObject<Nation, Integer> {
 
     public Nation fetchByName(String name) {
         Nation[] result = {null};
-        String sql = "SELECT id, display_name, description, map_color, icon, creation_time, capital_id FROM nation WHERE name = ?;";
+        String sql = "SELECT id, display_name, description, map_color, icon, creation_time, capital_id FROM nations WHERE name = ?;";
         try {
             database.query(sql, stmt -> {
                 stmt.setString(1, name);

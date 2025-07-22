@@ -59,7 +59,7 @@ public class CommonSettlementSuggestions {
         }
 
         Set<UUID> memberSet = focus.getPopulationAsIDSet();
-        memberSet.stream().map(uuid -> Bukkit.getPlayer(uuid).getName())
+        memberSet.stream().map(uuid -> Bukkit.getOfflinePlayer(uuid).getName())
                 .filter(playerName -> playerName.toLowerCase().startsWith(builder.getRemainingLowerCase()))
                 .forEach(builder::suggest);
 

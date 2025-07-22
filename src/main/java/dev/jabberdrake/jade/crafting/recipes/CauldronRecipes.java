@@ -20,6 +20,7 @@ public class CauldronRecipes {
         registerRecipe("coarse_dirt_to_mud", ItemStack.of(Material.MUD), Material.COARSE_DIRT);
         registerRecipe("rooted_dirt_to_mud", ItemStack.of(Material.MUD), Material.ROOTED_DIRT);
         registerRecipe("gravel_to_clay", ItemStack.of(Material.CLAY), Material.GRAVEL);
+        registerRecipe("magma_cream_to_slimeball", ItemStack.of(Material.SLIME_BALL), Material.MAGMA_CREAM);
         registerRecipe("white_concrete_powder_to_white_concrete", ItemStack.of(Material.WHITE_CONCRETE), Material.WHITE_CONCRETE_POWDER);
         registerRecipe("light_gray_concrete_powder_to_light_gray_concrete", ItemStack.of(Material.LIGHT_GRAY_CONCRETE), Material.LIGHT_GRAY_CONCRETE_POWDER);
         registerRecipe("gray_concrete_powder_to_gray_concrete", ItemStack.of(Material.GRAY_CONCRETE), Material.GRAY_CONCRETE_POWDER);

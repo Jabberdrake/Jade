@@ -162,6 +162,7 @@ public class ShapedRecipes {
 
         registerRecipe("name_tag", ItemStack.of(Material.NAME_TAG), "A  ; BB; BC", Ingredient.of(Material.STRING, 'A'), Ingredient.of(Material.PAPER, 'B'), Ingredient.of(Material.INK_SAC, 'C'));
         registerRecipe("cobweb", ItemStack.of(Material.COBWEB), "A A; A ;A A", Ingredient.of(Material.STRING, 'A'));
+        registerRecipe("bell", ItemStack.of(Material.BELL), " A ; B ;BCB", Ingredient.of(Material.STICK, 'A'), Ingredient.of(Material.GOLD_INGOT, 'B'), Ingredient.of(Material.LIGHTNING_ROD, 'C'));
 
         registerRecipe("DUPLICATE_SHERD_angler", ItemStack.of(Material.ANGLER_POTTERY_SHERD, 2), "ACA;ABA;AAA", Ingredient.of(Material.BRICK, 'A'), Ingredient.of(Material.FISHING_ROD, 'B'), Ingredient.of(Material.ANGLER_POTTERY_SHERD, 'C'));
         registerRecipe("DUPLICATE_SHERD_archer", ItemStack.of(Material.ARCHER_POTTERY_SHERD, 2), "ACA;ABA;AAA", Ingredient.of(Material.BRICK, 'A'), Ingredient.of(Material.BOW, 'B'), Ingredient.of(Material.ARCHER_POTTERY_SHERD, 'C'));

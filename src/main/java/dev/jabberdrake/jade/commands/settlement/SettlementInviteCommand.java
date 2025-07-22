@@ -52,9 +52,6 @@ public class SettlementInviteCommand {
         } else if (targetArgument.equals(player.getName())) {
             player.sendMessage(error("You can't invite yourself!"));
             return Command.SINGLE_SUCCESS;
-        } else if (!target.isOnline()) {
-            player.sendMessage(error("This player (<highlight>" + target.getName() + "</highlight>) is not online!"));
-            return Command.SINGLE_SUCCESS;
         } else if (focus.containsPlayer(target.getUniqueId())) {
             player.sendMessage(error("This player (<highlight>" + target.getName() + "</highlight>) is already a member of your settlement!"));
             return Command.SINGLE_SUCCESS;
@@ -62,12 +59,14 @@ public class SettlementInviteCommand {
 
         // TODO: Check if at max capacity if we decide to implement that
 
-        Player onlineTarget = (Player) target;
-        boolean successFlag = RealmManager.registerInviteToSettlement(onlineTarget, focus);
+        boolean successFlag = RealmManager.registerInviteToSettlement(target.getUniqueId(), focus);
         if (successFlag) {
             player.sendMessage(success("Invited <highlight>" + target.getName() + "</highlight> to " + focus.getDisplayName() + "<normal>!"));
-            focus.tell(onlineTarget, "<highlight>" + player.getName() + "</highlight> has invited you to join " + focus.getDisplayName() + "<normal>!");
-            onlineTarget.sendMessage(info("To accept a settlement invite, do <highlight>/settlement join"));
+            if (target.isOnline()) {
+                Player onlineTarget = (Player) target;
+                focus.tell(onlineTarget, "<highlight>" + player.getName() + "</highlight> has invited you to join " + focus.getDisplayName() + "<normal>!");
+                onlineTarget.sendMessage(info("To accept a settlement invite, do <highlight>/settlement join"));
+            }
         } else {
             player.sendMessage(error("This player (<highlight>" + target.getName() + "</highlight>) already has a pending settlement invite!"));
         }
