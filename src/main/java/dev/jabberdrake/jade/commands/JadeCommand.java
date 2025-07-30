@@ -18,6 +18,13 @@ public class JadeCommand {
                 .then(SettlementCommand.buildCommand("settlement"))
                 .then(NationCommand.buildCommand("nation"))
                 .then(GraveCommand.buildCommand("grave"))
+                .then(RestrictedTeleportCommand.buildCommand("tp"))
+                .then(RestrictedTeleportCommand.buildCommand("teleport"))
+                .then(RestrictedGamemodeCommand.buildCommand("gamemode"))
+                .then(RestrictedGamemodeCommand.buildShorthandForSurvival("gms"))
+                .then(RestrictedGamemodeCommand.buildShorthandForCreative("gmc"))
+                .then(RestrictedGamemodeCommand.buildShorthandForAdventure("gma"))
+                .then(RestrictedGamemodeCommand.buildShorthandForSpectator("gmsp"))
                 .then(ToggleRoleplayCommand.buildCommand("toggleroleplay"))
                 .build();
     }

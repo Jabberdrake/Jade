@@ -105,6 +105,10 @@ public final class Jade extends JavaPlugin {
             commands.registrar().register(GraveCommand.buildCommand("grave"), "Manage existing deathchests!");
             commands.registrar().register(ToggleRoleplayCommand.buildCommand("toggleroleplay"), "Toggle roleplay mode!");
             commands.registrar().register(BuildworldCommand.buildCommand("buildworld"), "Teleport to the build world and back!");
+            commands.registrar().register(RestrictedGamemodeCommand.buildShorthandForSurvival("gms"), "Set own game mode to survival!");
+            commands.registrar().register(RestrictedGamemodeCommand.buildShorthandForCreative("gmc"), "Set own game mode to creative!");
+            commands.registrar().register(RestrictedGamemodeCommand.buildShorthandForAdventure("gma"), "Set own game mode to adventure!");
+            commands.registrar().register(RestrictedGamemodeCommand.buildShorthandForSpectator("gmsp"), "Set own game mode to spectator!");
         });
     }
 

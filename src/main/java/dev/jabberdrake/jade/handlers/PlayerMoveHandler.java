@@ -47,6 +47,9 @@ public class PlayerMoveHandler implements Listener {
             if (jadePlayer.isAutoclaiming()) {
                 if (!SettlementClaimCommand.validateWorldspawnDistance(player, toAnchor)) {
                     player.sendActionBar(error("Too close to worldspawn!"));
+                } else if (!SettlementClaimCommand.validateGameworld(player, jadePlayer.getFocusSettlement())) {
+                    player.clearTitle();
+                    player.sendActionBar(error("Incorrect world!"));
                 } else {
                     if (RealmManager.claimChunk(jadePlayer.getFocusSettlement(), toAnchor)) {
                         player.clearTitle();
@@ -92,6 +95,9 @@ public class PlayerMoveHandler implements Listener {
             if (jadePlayer.isAutoclaiming()) {
                 player.clearTitle();
                 player.sendActionBar(error("This chunk is already claimed!"));
+            } else if (!SettlementClaimCommand.validateGameworld(player, jadePlayer.getFocusSettlement())) {
+                player.clearTitle();
+                player.sendActionBar(error("Incorrect world!"));
             } else {
                 // Handle title/actionbar messages when moving to claimed chunks
                 if (RealmManager.getChunkOwner(fromAnchor) != null && RealmManager.getChunkOwner(fromAnchor).equals(owner)) {

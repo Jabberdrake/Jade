@@ -50,14 +50,15 @@ public class PlayerGraveHandler implements Listener {
         if (viewerUUID != null) {
             if (viewerUUID.equals(player.getUniqueId())) {
                 // weird shit, ignore
-            } else if (grave.getPlayerID().equals(viewerUUID)) {
-                player.sendMessage(error("Cannot open someone's grave while its rightful owner already has it open!"));
-                return;
             } else if (grave.getPlayerID().equals(player.getUniqueId())) {
                 Player viewerPlayer = Bukkit.getPlayer(viewerUUID);
                 if (viewerPlayer != null) {
                     viewerPlayer.closeInventory();
                 }
+            } else {
+                player.sendMessage(error("Someone else is already viewing this grave!"));
+                event.setCancelled(true);
+                return;
             }
         }
 

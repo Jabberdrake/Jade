@@ -16,6 +16,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.Container;
 import org.bukkit.block.data.Openable;
 import org.bukkit.block.data.Powerable;
+import org.bukkit.block.data.type.Bed;
 import org.bukkit.entity.AbstractHorse;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -25,6 +26,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityMountEvent;
+import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
@@ -209,7 +211,7 @@ public class RealmProtectionHandler implements Listener {
             switch (protectionLevel) {
                 case BlockProtectionSetting.REGULAR -> event.setCancelled(true);
                 case BlockProtectionSetting.ADVENTURE -> {
-                    if (block.getState() instanceof Container || block.getBlockData() instanceof Openable || block.getBlockData() instanceof Powerable) {
+                    if (block.getState() instanceof Container || block.getBlockData() instanceof Openable || block.getBlockData() instanceof Powerable || block.getType() == Material.VAULT || block.getBlockData() instanceof Bed) {
                         event.setCancelled(false);
                     } else {
                         player.sendMessage(error("You are not a member of the <highlight>" + owner.getName() + "</highlight> settlement!"));
@@ -217,6 +219,32 @@ public class RealmProtectionHandler implements Listener {
                     }
                 }
                 case BlockProtectionSetting.NONE -> event.setCancelled(false);
+            }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void onHangingBreak(HangingBreakByEntityEvent event) {
+        if (!(event.getRemover() instanceof Player)) return;
+        Player player = (Player) event.getRemover();
+        Chunk chunk = player.getChunk();
+
+        Settlement owner = RealmManager.getChunkOwner(chunk);
+        if (owner == null) return;
+
+        Area area = owner.getHighestPriorityAreaForLocation(player.getLocation());
+        if (area != null) {
+            if (!area.isMember(player.getUniqueId())) {
+                player.sendMessage(error("You are not trusted in the <highlight>" + area.getName() + "</highlight> area!"));
+            }
+        } else {
+            if (owner.containsPlayer(player.getUniqueId())) return;
+
+            String protectionLevel = owner.getSetting(BlockProtectionSetting.class).getValue();
+            switch (protectionLevel) {
+                case BlockProtectionSetting.REGULAR, BlockProtectionSetting.ADVENTURE:
+                    player.sendMessage(error("You are not a member of the <highlight>" + owner.getName() + "</highlight> settlement!"));
+                    event.setCancelled(true);
             }
         }
     }

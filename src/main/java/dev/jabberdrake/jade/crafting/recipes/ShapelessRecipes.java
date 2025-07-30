@@ -21,6 +21,8 @@ public class ShapelessRecipes {
         registerRecipe("wool_to_string", ItemStack.of(Material.STRING, 4), Ingredient.of(new RecipeChoice.MaterialChoice(ALL_WOOL)));
         registerRecipe("nether_wart_block_to_nether_wart", ItemStack.of(Material.NETHER_WART, 9), Ingredient.of(Material.NETHER_WART_BLOCK));
 
+        registerRecipe("chocolate_icecream", ItemStack.of(Material.BARRIER), Ingredient.of(Material.MILK_BUCKET), Ingredient.of(Material.ICE), Ingredient.of(Material.SUGAR), Ingredient.of(Material.COCOA_BEANS), Ingredient.of(Material.BOWL));
+
         registerRecipe("OAK_slabs_to_planks", ItemStack.of(Material.OAK_PLANKS), Ingredient.of(Material.OAK_SLAB, 2));
         registerRecipe("BIRCH_slabs_to_planks", ItemStack.of(Material.BIRCH_PLANKS), Ingredient.of(Material.BIRCH_SLAB, 2));
         registerRecipe("SPRUCE_slabs_to_planks", ItemStack.of(Material.SPRUCE_PLANKS), Ingredient.of(Material.SPRUCE_SLAB, 2));
