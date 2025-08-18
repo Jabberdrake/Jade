@@ -9,6 +9,7 @@ import de.bluecolored.bluemap.api.markers.MarkerSet;
 import de.bluecolored.bluemap.api.markers.ShapeMarker;
 import de.bluecolored.bluemap.api.math.Color;
 import de.bluecolored.bluemap.api.math.Shape;
+import dev.jabberdrake.jade.building.BuildingManager;
 import dev.jabberdrake.jade.chat.ChatManager;
 import dev.jabberdrake.jade.commands.*;
 import dev.jabberdrake.jade.crafting.CraftingManager;
@@ -23,9 +24,12 @@ import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
+import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -33,6 +37,7 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 public final class Jade extends JavaPlugin {
+    private static final org.slf4j.Logger log = LoggerFactory.getLogger(Jade.class);
     private static Jade instance;
     private final Logger logger = this.getLogger();
 
@@ -56,11 +61,15 @@ public final class Jade extends JavaPlugin {
             backupsDir.mkdir();
         }
 
+        File warpsDir = new File(getDataFolder(), "warps");
+        if (!warpsDir.exists()) {
+            logger.info("[Jade::onEnable] Warps folder not found! Creating a new one...");
+            backupsDir.mkdir();
+        }
 
         saveResource(JadeConfig.FILENAME, false);
         logger.info("[Jade::onEnable] Loading settings...");
         JadeConfig.load(this);
-
 
         registerCommands();
         registerHandlers();
@@ -71,6 +80,7 @@ public final class Jade extends JavaPlugin {
         PlayerManager.initialize();
         ChatManager.initialize();
         CraftingManager.initialize();
+        BuildingManager.initialize();
 
         logger.info("[Jade::onEnable] Looking for dependencies...");
         BlueMapAPI.onEnable(api -> {
@@ -93,6 +103,7 @@ public final class Jade extends JavaPlugin {
         RealmManager.shutdown();
         TitleManager.shutdown();
         PlayerManager.shutdown();
+        BuildingManager.shutdown();
     }
 
     private void registerCommands() {
@@ -103,6 +114,7 @@ public final class Jade extends JavaPlugin {
             commands.registrar().register(TitleCommand.buildCommand("title"), "Manages vanity titles!");
             commands.registrar().register(ProfileCommand.buildCommand("profile"), "Manage profile interactions!");
             commands.registrar().register(GraveCommand.buildCommand("grave"), "Manage existing deathchests!");
+            commands.registrar().register(WarpCommand.buildCommand("warp"), "Manage warp points!");
             commands.registrar().register(ToggleRoleplayCommand.buildCommand("toggleroleplay"), "Toggle roleplay mode!");
             commands.registrar().register(BuildworldCommand.buildCommand("buildworld"), "Teleport to the build world and back!");
             commands.registrar().register(RestrictedGamemodeCommand.buildShorthandForSurvival("gms"), "Set own game mode to survival!");

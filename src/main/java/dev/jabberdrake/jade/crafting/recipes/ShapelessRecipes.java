@@ -1,6 +1,7 @@
 package dev.jabberdrake.jade.crafting.recipes;
 
 import dev.jabberdrake.jade.Jade;
+import dev.jabberdrake.jade.items.JadeItemRegistry;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Item;
@@ -21,7 +22,7 @@ public class ShapelessRecipes {
         registerRecipe("wool_to_string", ItemStack.of(Material.STRING, 4), Ingredient.of(new RecipeChoice.MaterialChoice(ALL_WOOL)));
         registerRecipe("nether_wart_block_to_nether_wart", ItemStack.of(Material.NETHER_WART, 9), Ingredient.of(Material.NETHER_WART_BLOCK));
 
-        registerRecipe("chocolate_icecream", ItemStack.of(Material.BARRIER), Ingredient.of(Material.MILK_BUCKET), Ingredient.of(Material.ICE), Ingredient.of(Material.SUGAR), Ingredient.of(Material.COCOA_BEANS), Ingredient.of(Material.BOWL));
+        //registerRecipe("chocolate_icecream", ItemStack.of(Material.BARRIER), Ingredient.of(Material.MILK_BUCKET), Ingredient.of(Material.ICE), Ingredient.of(Material.SUGAR), Ingredient.of(Material.COCOA_BEANS), Ingredient.of(Material.BOWL));
 
         registerRecipe("OAK_slabs_to_planks", ItemStack.of(Material.OAK_PLANKS), Ingredient.of(Material.OAK_SLAB, 2));
         registerRecipe("BIRCH_slabs_to_planks", ItemStack.of(Material.BIRCH_PLANKS), Ingredient.of(Material.BIRCH_SLAB, 2));
@@ -135,6 +136,21 @@ public class ShapelessRecipes {
         registerRecipe("CANDLE_any_to_purple", ItemStack.of(Material.PURPLE_CANDLE), Ingredient.of(Material.PURPLE_DYE), Ingredient.of(new RecipeChoice.MaterialChoice(ALL_CANDLE)));
         registerRecipe("CANDLE_any_to_magenta", ItemStack.of(Material.MAGENTA_CANDLE), Ingredient.of(Material.MAGENTA_DYE), Ingredient.of(new RecipeChoice.MaterialChoice(ALL_CANDLE)));
         registerRecipe("CANDLE_any_to_pink", ItemStack.of(Material.PINK_CANDLE), Ingredient.of(Material.PINK_DYE), Ingredient.of(new RecipeChoice.MaterialChoice(ALL_CANDLE)));
+
+        registerRecipe("FROGLIGHT_any_to_ochre", ItemStack.of(Material.OCHRE_FROGLIGHT), Ingredient.of(Material.YELLOW_DYE), Ingredient.of(new RecipeChoice.MaterialChoice(ALL_FROGLIGHT)));
+        registerRecipe("FROGLIGHT_any_to_pearlescent", ItemStack.of(Material.PEARLESCENT_FROGLIGHT), Ingredient.of(Material.PURPLE_DYE), Ingredient.of(new RecipeChoice.MaterialChoice(ALL_FROGLIGHT)));
+        registerRecipe("FROGLIGHT_any_to_verdant", ItemStack.of(Material.VERDANT_FROGLIGHT), Ingredient.of(Material.GREEN_DYE), Ingredient.of(new RecipeChoice.MaterialChoice(ALL_FROGLIGHT)));
+
+        registerRecipe("sand_to_red_sand", ItemStack.of(Material.RED_SAND), Ingredient.of(Material.REDSTONE), Ingredient.of(Material.SAND));
+        registerRecipe("sandstone_to_red_sandstone", ItemStack.of(Material.RED_SANDSTONE), Ingredient.of(Material.REDSTONE), Ingredient.of(Material.SANDSTONE));
+        registerRecipe("chiseled_sandstone_to_chiseled_red_sandstone", ItemStack.of(Material.CHISELED_RED_SANDSTONE), Ingredient.of(Material.REDSTONE), Ingredient.of(Material.CHISELED_SANDSTONE));
+        registerRecipe("cut_sandstone_to_cut_red_sandstone", ItemStack.of(Material.CUT_RED_SANDSTONE), Ingredient.of(Material.REDSTONE), Ingredient.of(Material.CUT_SANDSTONE));
+        registerRecipe("smooth_sandstone_to_smooth_red_sandstone", ItemStack.of(Material.SMOOTH_RED_SANDSTONE), Ingredient.of(Material.REDSTONE), Ingredient.of(Material.SMOOTH_SANDSTONE));
+
+        registerRecipe("big_dripleaf_to_small_dripleaf", ItemStack.of(Material.SMALL_DRIPLEAF), Ingredient.of(Material.BIG_DRIPLEAF));
+        registerRecipe("small_dripleaf_to_big_dripleaf", ItemStack.of(Material.BIG_DRIPLEAF), Ingredient.of(Material.SMALL_DRIPLEAF));
+
+        registerRecipe("ender_shard", JadeItemRegistry.ENDER_SHARD.getItem(8), Ingredient.of(Material.ENDER_PEARL));
     }
 
     private static class Ingredient {

@@ -313,6 +313,11 @@ public class DatabaseManager {
         getGraveDao().delete(id);
     }
 
+    // GENERIC
+    public static void sanityCheck() {
+        getSettlementDao().sanityCheck();
+    }
+
     public static void shutdown() {
         try {
             if (source.getConnection() != null && !source.getConnection().isClosed()) {

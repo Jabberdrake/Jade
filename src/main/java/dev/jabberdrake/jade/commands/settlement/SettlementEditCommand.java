@@ -33,7 +33,7 @@ public class SettlementEditCommand {
                                 .executes(SettlementEditCommand::runCommandForName)
                         )
                 )
-                .then(Commands.literal("display")
+                .then(Commands.literal("display_name")
                         .then(Commands.argument("display_name", StringArgumentType.greedyString())
                                 .requires(sender -> sender.getExecutor() instanceof Player)
                                 .executes(SettlementEditCommand::runCommandForDisplay)

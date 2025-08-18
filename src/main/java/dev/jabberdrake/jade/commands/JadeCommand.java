@@ -18,6 +18,7 @@ public class JadeCommand {
                 .then(SettlementCommand.buildCommand("settlement"))
                 .then(NationCommand.buildCommand("nation"))
                 .then(GraveCommand.buildCommand("grave"))
+                .then(WarpCommand.buildCommand("warp"))
                 .then(RestrictedTeleportCommand.buildCommand("tp"))
                 .then(RestrictedTeleportCommand.buildCommand("teleport"))
                 .then(RestrictedGamemodeCommand.buildCommand("gamemode"))

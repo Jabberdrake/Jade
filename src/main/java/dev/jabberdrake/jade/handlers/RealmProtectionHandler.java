@@ -2,13 +2,13 @@ package dev.jabberdrake.jade.handlers;
 
 import com.destroystokyo.paper.event.entity.PreCreatureSpawnEvent;
 import dev.jabberdrake.jade.Jade;
+import dev.jabberdrake.jade.events.BuilderWandEvent;
+import dev.jabberdrake.jade.players.PlayerManager;
 import dev.jabberdrake.jade.realms.Area;
 import dev.jabberdrake.jade.realms.RealmManager;
 import dev.jabberdrake.jade.realms.Settlement;
 import dev.jabberdrake.jade.realms.settings.BlockProtectionSetting;
-import dev.jabberdrake.jade.utils.TextUtils;
 import dev.jabberdrake.jade.utils.UUIDDataType;
-import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -19,6 +19,7 @@ import org.bukkit.block.data.Powerable;
 import org.bukkit.block.data.type.Bed;
 import org.bukkit.entity.AbstractHorse;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -29,6 +30,7 @@ import org.bukkit.event.entity.EntityMountEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.EquipmentSlot;
 
 import static dev.jabberdrake.jade.utils.TextUtils.error;
 
@@ -197,15 +199,25 @@ public class RealmProtectionHandler implements Listener {
         Chunk chunk = block.getChunk();
 
         Settlement owner = RealmManager.getChunkOwner(chunk);
-        if (owner == null) return;
+        if (owner == null) {
+            fireSecondaryEvent(event, BuilderWandEvent.class);
+            return;
+        }
 
         Area area = owner.getHighestPriorityAreaForLocation(player.getLocation());
         if (area != null) {
             if (!area.isMember(player.getUniqueId())) {
+                event.setCancelled(true);
                 player.sendMessage(error("You are not trusted in the <highlight>" + area.getName() + "</highlight> area!"));
+            } else {
+                event.setCancelled(false);
+                fireSecondaryEvent(event, BuilderWandEvent.class);
             }
         } else {
-            if (owner.containsPlayer(player.getUniqueId())) return;
+            if (owner.containsPlayer(player.getUniqueId())) {
+                fireSecondaryEvent(event, BuilderWandEvent.class);
+                return;
+            }
 
             String protectionLevel = owner.getSetting(BlockProtectionSetting.class).getValue();
             switch (protectionLevel) {
@@ -245,6 +257,17 @@ public class RealmProtectionHandler implements Listener {
                 case BlockProtectionSetting.REGULAR, BlockProtectionSetting.ADVENTURE:
                     player.sendMessage(error("You are not a member of the <highlight>" + owner.getName() + "</highlight> settlement!"));
                     event.setCancelled(true);
+            }
+        }
+    }
+
+    public void fireSecondaryEvent(Event primaryEvent, Class<?> secondaryEvent) {
+        if (secondaryEvent.equals(BuilderWandEvent.class)) {
+            if (primaryEvent instanceof PlayerInteractEvent intEvent) {
+                if (intEvent.getHand() == EquipmentSlot.HAND && PlayerManager.asJadePlayer(intEvent.getPlayer().getUniqueId()).isHoldingJadeItem("builders_wand")) {
+                    BuilderWandEvent wandEvent = new BuilderWandEvent(intEvent);
+                    wandEvent.callEvent();
+                }
             }
         }
     }

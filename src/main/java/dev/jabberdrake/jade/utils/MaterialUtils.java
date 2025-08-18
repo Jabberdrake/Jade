@@ -4,6 +4,12 @@ import org.bukkit.Material;
 
 public class MaterialUtils {
 
+    public static final Material[] ALL_FROGLIGHT = {
+            Material.OCHRE_FROGLIGHT,
+            Material.PEARLESCENT_FROGLIGHT,
+            Material.VERDANT_FROGLIGHT
+    };
+
     public static final Material[] ALL_CONCRETE = {
             Material.WHITE_CONCRETE,
             Material.LIGHT_GRAY_CONCRETE,

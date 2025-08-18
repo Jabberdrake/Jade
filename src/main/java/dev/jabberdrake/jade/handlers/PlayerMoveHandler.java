@@ -95,9 +95,9 @@ public class PlayerMoveHandler implements Listener {
             if (jadePlayer.isAutoclaiming()) {
                 player.clearTitle();
                 player.sendActionBar(error("This chunk is already claimed!"));
-            } else if (!SettlementClaimCommand.validateGameworld(player, jadePlayer.getFocusSettlement())) {
-                player.clearTitle();
-                player.sendActionBar(error("Incorrect world!"));
+            //} else if (!SettlementClaimCommand.validateGameworld(player, jadePlayer.getFocusSettlement())) {
+            //    player.clearTitle();
+            //    player.sendActionBar(error("Incorrect world!"));
             } else {
                 // Handle title/actionbar messages when moving to claimed chunks
                 if (RealmManager.getChunkOwner(fromAnchor) != null && RealmManager.getChunkOwner(fromAnchor).equals(owner)) {

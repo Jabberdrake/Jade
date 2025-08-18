@@ -3,6 +3,8 @@ package dev.jabberdrake.jade.commands;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
+import dev.jabberdrake.jade.building.BuildingManager;
+import dev.jabberdrake.jade.building.Warp;
 import dev.jabberdrake.jade.players.Grave;
 import dev.jabberdrake.jade.players.PlayerManager;
 import dev.jabberdrake.jade.utils.JadeTextColor;
@@ -53,6 +55,11 @@ public class CommonArgumentSuggestions {
 
     public static CompletableFuture<Suggestions> suggestAllGraves(final CommandContext<CommandSourceStack> context, final SuggestionsBuilder builder) {
         PlayerManager.getAllGraves().stream().map(Grave::getID).forEach(builder::suggest);
+        return builder.buildFuture();
+    }
+
+    public static CompletableFuture<Suggestions> suggestAllWarps(final CommandContext<CommandSourceStack> context, final SuggestionsBuilder builder) {
+        BuildingManager.getAllWarps().stream().map(Warp::getName).forEach(builder::suggest);
         return builder.buildFuture();
     }
 }

@@ -153,6 +153,10 @@ public class ShapedRecipes {
         registerRecipe("CANDLE_any_to_magenta", ItemStack.of(Material.MAGENTA_CANDLE, 8), "AAA;ABA;AAA", Ingredient.of(Material.MAGENTA_DYE, 'B'), Ingredient.of(new RecipeChoice.MaterialChoice(ALL_CANDLE), 'A'));
         registerRecipe("CANDLE_any_to_pink", ItemStack.of(Material.PINK_CANDLE, 8), "AAA;ABA;AAA", Ingredient.of(Material.PINK_DYE, 'B'), Ingredient.of(new RecipeChoice.MaterialChoice(ALL_CANDLE), 'A'));
 
+        registerRecipe("FROGLIGHT_any_to_ochre", ItemStack.of(Material.OCHRE_FROGLIGHT, 8), "AAA;ABA;AAA", Ingredient.of(Material.YELLOW_DYE, 'B'), Ingredient.of(new RecipeChoice.MaterialChoice(ALL_FROGLIGHT), 'A'));
+        registerRecipe("FROGLIGHT_any_to_pearlescent", ItemStack.of(Material.PEARLESCENT_FROGLIGHT, 8), "AAA;ABA;AAA", Ingredient.of(Material.PURPLE_DYE, 'B'), Ingredient.of(new RecipeChoice.MaterialChoice(ALL_FROGLIGHT), 'A'));
+        registerRecipe("FROGLIGHT_any_to_verdant", ItemStack.of(Material.VERDANT_FROGLIGHT, 8), "AAA;ABA;AAA", Ingredient.of(Material.GREEN_DYE, 'B'), Ingredient.of(new RecipeChoice.MaterialChoice(ALL_FROGLIGHT), 'A'));
+
         registerRecipe("phantom_item_frame", JadeItemRegistry.PHANTOM_ITEM_FRAME.getItem(8), "AAA;ABA;AAA", Ingredient.of(Material.PHANTOM_MEMBRANE, 'B'), Ingredient.of(Material.ITEM_FRAME, 'A'));
 
         registerRecipe("chainmail_helmet", VanillaItemRegistry.getVanillaItem("chainmail_helmet").getItem(), "AAA;A A;   ", Ingredient.of(Material.CHAIN, 'A'));
@@ -187,6 +191,16 @@ public class ShapedRecipes {
         registerRecipe("DUPLICATE_SHERD_shelter", ItemStack.of(Material.SHELTER_POTTERY_SHERD, 2), "ACA;ABA;AAA", Ingredient.of(Material.BRICK, 'A'), Ingredient.of(Material.ACACIA_SAPLING, 'B'), Ingredient.of(Material.SHELTER_POTTERY_SHERD, 'C'));
         registerRecipe("DUPLICATE_SHERD_skull", ItemStack.of(Material.SKULL_POTTERY_SHERD, 2), "ACA;ABA;AAA", Ingredient.of(Material.BRICK, 'A'), Ingredient.of(Material.SKELETON_SKULL, 'B'), Ingredient.of(Material.SKULL_POTTERY_SHERD, 'C'));
         registerRecipe("DUPLICATE_SHERD_snort", ItemStack.of(Material.SNORT_POTTERY_SHERD, 2), "ACA;ABA;AAA", Ingredient.of(Material.BRICK, 'A'), Ingredient.of(Material.TORCHFLOWER_SEEDS, 'B'), Ingredient.of(Material.SNORT_POTTERY_SHERD, 'C'));
+
+        registerRecipe("sand_to_red_sand", ItemStack.of(Material.RED_SAND, 8), "AAA;ABA;AAA", Ingredient.of(Material.REDSTONE, 'B'), Ingredient.of(Material.SAND, 'A'));
+        registerRecipe("sandstone_to_red_sandstone", ItemStack.of(Material.RED_SANDSTONE, 8), "AAA;ABA;AAA", Ingredient.of(Material.REDSTONE, 'B'), Ingredient.of(Material.SANDSTONE, 'A'));
+        registerRecipe("chiseled_sandstone_to_chiseled_red_sandstone", ItemStack.of(Material.CHISELED_RED_SANDSTONE, 8), "AAA;ABA;AAA", Ingredient.of(Material.REDSTONE, 'B'), Ingredient.of(Material.CHISELED_SANDSTONE, 'A'));
+        registerRecipe("cut_sandstone_to_cut_red_sandstone", ItemStack.of(Material.CUT_RED_SANDSTONE, 8), "AAA;ABA;AAA", Ingredient.of(Material.REDSTONE, 'B'), Ingredient.of(Material.CUT_SANDSTONE, 'A'));
+        registerRecipe("smooth_sandstone_to_smooth_red_sandstone", ItemStack.of(Material.SMOOTH_RED_SANDSTONE, 8), "AAA;ABA;AAA", Ingredient.of(Material.REDSTONE, 'B'), Ingredient.of(Material.SMOOTH_SANDSTONE, 'A'));
+
+        registerRecipe("builders_wand", JadeItemRegistry.BUILDERS_WAND.getItem(), " AB; CA;D  ", Ingredient.of(Material.AMETHYST_SHARD, 'A'), Ingredient.of(Material.AMETHYST_BLOCK, 'B'), Ingredient.of(Material.STICK, 'C'), Ingredient.of(Material.COPPER_INGOT, 'D'));
+
+        registerRecipe("end_stone", ItemStack.of(Material.END_STONE, 8), "AAA;ABA;AAA", Ingredient.of(Material.SANDSTONE, 'A'), Ingredient.of(JadeItemRegistry.ENDER_SHARD.getMaterial(), 'B'));
     }
 
     private static class Ingredient {

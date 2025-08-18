@@ -3,6 +3,7 @@ package dev.jabberdrake.jade.players;
 import com.destroystokyo.paper.ParticleBuilder;
 import dev.jabberdrake.jade.Jade;
 import dev.jabberdrake.jade.database.DatabaseManager;
+import dev.jabberdrake.jade.items.JadeItem;
 import dev.jabberdrake.jade.realms.Area;
 import dev.jabberdrake.jade.realms.ChunkAnchor;
 import dev.jabberdrake.jade.realms.RealmManager;
@@ -17,6 +18,7 @@ import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.title.Title;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
@@ -473,5 +475,14 @@ public class JadePlayer {
             particle = particle.location(new Location(world, (anchor.getX() << 4) + 16, y, (anchor.getZ() << 4) + i));
             particle.spawn();
         }
+    }
+
+    public boolean isHoldingJadeItem() {
+        return this.asPlayer().getInventory().getItemInMainHand().getPersistentDataContainer().has(JadeItem.JADE_ITEM_KEY);
+    }
+
+    public boolean isHoldingJadeItem(String key) {
+        return this.isHoldingJadeItem() &&
+                this.asPlayer().getInventory().getItemInMainHand().getPersistentDataContainer().get(JadeItem.JADE_ITEM_KEY, PersistentDataType.STRING).equalsIgnoreCase(key);
     }
 }

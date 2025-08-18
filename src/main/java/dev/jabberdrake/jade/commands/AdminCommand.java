@@ -3,10 +3,7 @@ package dev.jabberdrake.jade.commands;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.LiteralCommandNode;
-import dev.jabberdrake.jade.commands.admin.AdminBackupCommand;
-import dev.jabberdrake.jade.commands.admin.AdminDumpCommand;
-import dev.jabberdrake.jade.commands.admin.AdminGameruleCommand;
-import dev.jabberdrake.jade.commands.admin.AdminMakeVirtualCommand;
+import dev.jabberdrake.jade.commands.admin.*;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import org.bukkit.entity.Player;
@@ -23,6 +20,7 @@ public class AdminCommand {
                 .then(AdminGameruleCommand.buildCommand("gamerule"))
                 .then(AdminDumpCommand.buildCommand("dump"))
                 .then(AdminMakeVirtualCommand.buildCommand("makevirtual"))
+                .then(SanityCheckCommand.buildCommand("sanitycheck"))
                 .then(AdminBackupCommand.buildCommand("backup"))
                 .build();
     }

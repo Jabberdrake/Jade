@@ -161,6 +161,17 @@ public class RealmManager {
         for (ChunkAnchor anchor : chunkEntriesToRemove) territoryMap.remove(anchor);
 
         DatabaseManager.deleteSettlement(settlement.getId());
+
+        //ON DELETE CASCADE doesn't FUCKING WORK
+        for (ChunkAnchor anchor : settlement.getTerritory()) {
+            DatabaseManager.removeChunkFromSettlement(anchor, settlement);
+        }
+        for (SettlementRole role : settlement.getRoles()) {
+            DatabaseManager.deleteSettlementRole(role);
+        }
+        for (UUID memberID : settlement.getPopulationAsIDSet()) {
+            DatabaseManager.removePlayerFromSettlement(memberID, settlement);
+        }
     }
 
     public static Map<UUID, Settlement> getSettlementInvites() {

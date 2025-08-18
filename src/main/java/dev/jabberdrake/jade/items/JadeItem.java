@@ -5,6 +5,7 @@ import dev.jabberdrake.jade.items.decorators.*;
 import dev.jabberdrake.jade.utils.AttributeUtils;
 import dev.jabberdrake.jade.utils.ItemUtils;
 import dev.jabberdrake.jade.utils.TextUtils;
+import io.papermc.paper.datacomponent.DataComponentType;
 import io.papermc.paper.datacomponent.DataComponentTypes;
 import io.papermc.paper.datacomponent.item.ItemAttributeModifiers;
 import io.papermc.paper.datacomponent.item.ItemLore;
@@ -60,6 +61,8 @@ public abstract class JadeItem {
     public Rarity getRarity() {
         return this.rarity;
     }
+
+    public Material getMaterial() { return this.template.getType(); }
 
     public ItemStack getItem() {
         return this.template.clone();
@@ -171,6 +174,22 @@ public abstract class JadeItem {
             if (this.template == null) throw new IllegalStateException("Missing itemstack!");
 
             this.template.setData(DataComponentTypes.ITEM_MODEL, Jade.key(this.key));
+            return this;
+        }
+
+        public Builder removeComponent(DataComponentType... types) {
+            for (DataComponentType type : types) {
+                if (this.template.hasData(type)) {
+                    this.template.unsetData(type);
+                }
+            }
+            return this;
+        }
+
+        public Builder stackSize(int size) {
+            if (size < 0 || size > 64) return this;
+
+            this.template.setData(DataComponentTypes.MAX_STACK_SIZE, size);
             return this;
         }
 

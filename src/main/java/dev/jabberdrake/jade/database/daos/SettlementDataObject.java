@@ -503,6 +503,93 @@ public class SettlementDataObject implements DatabaseObject<Settlement, Integer>
         return map;
     }
 
+    public void sanityCheck() {
+        List<Integer> ghostSettlements = new ArrayList<>();
+
+        String sql_ghostsInRoles = "SELECT settlement_id FROM settlement_roles;";
+        try {
+            database.query(sql_ghostsInRoles, resultSet -> {
+                while (resultSet.next()) {
+                    int settlementID = resultSet.getInt("settlement_id");
+                    Settlement settlement = RealmManager.getSettlement(settlementID);
+                    if (settlement == null) {
+                        plugin.getLogger().info("[SettlementDataObject::sanityCheck] Found ghost settlement in settlement_roles table: " + settlementID);
+                        if (!ghostSettlements.contains(settlementID)) ghostSettlements.add(settlementID);
+                    }
+                }
+            });
+        } catch (SQLException e) {
+            plugin.getLogger().warning("[SettlementDataObject::sanityCheck] Caught SQLException while performing sanity check (phase: getGhostsInRoles): ");
+            e.printStackTrace();
+        }
+
+        String sql_ghostsInMembers = "SELECT settlement_id FROM settlement_members;";
+        try {
+            database.query(sql_ghostsInMembers, resultSet -> {
+                while (resultSet.next()) {
+                    int settlementID = resultSet.getInt("settlement_id");
+                    Settlement settlement = RealmManager.getSettlement(settlementID);
+                    if (settlement == null) {
+                        plugin.getLogger().info("[SettlementDataObject::sanityCheck] Found ghost settlement in settlement_members table: " + settlementID);
+                        if (!ghostSettlements.contains(settlementID)) ghostSettlements.add(settlementID);
+                    }
+                }
+            });
+        } catch (SQLException e) {
+            plugin.getLogger().warning("[SettlementDataObject::sanityCheck] Caught SQLException while performing sanity check (phase: getGhostsInMembers): ");
+            e.printStackTrace();
+        }
+
+        String sql_ghostsInChunks = "SELECT settlement_id FROM settlement_chunks;";
+        try {
+            database.query(sql_ghostsInChunks, resultSet -> {
+                while (resultSet.next()) {
+                    int settlementID = resultSet.getInt("settlement_id");
+                    Settlement settlement = RealmManager.getSettlement(settlementID);
+                    if (settlement == null) {
+                        plugin.getLogger().info("[SettlementDataObject::sanityCheck] Found ghost settlement in settlement_chunks table: " + settlementID);
+                        if (!ghostSettlements.contains(settlementID)) ghostSettlements.add(settlementID);
+                    }
+                }
+            });
+        } catch (SQLException e) {
+            plugin.getLogger().warning("[SettlementDataObject::sanityCheck] Caught SQLException while performing sanity check (phase: getGhostsInChunks): ");
+            e.printStackTrace();
+        }
+
+        for (int ghostID : ghostSettlements) {
+            String sql_delGhostsFromRoles = "DELETE FROM settlement_roles WHERE settlement_id = ?;";
+            try {
+                database.execute(sql_delGhostsFromRoles, stmt -> {
+                    stmt.setInt(1, ghostID);
+                });
+            } catch (SQLException e) {
+                plugin.getLogger().warning("[SettlementDataObject::sanityCheck] Caught SQLException while performing sanity check (phase: delGhostsInChunks): ");
+                e.printStackTrace();
+            }
+
+            String sql_delGhostsFromMembers = "DELETE FROM settlement_members WHERE settlement_id = ?;";
+            try {
+                database.execute(sql_delGhostsFromMembers, stmt -> {
+                    stmt.setInt(1, ghostID);
+                });
+            } catch (SQLException e) {
+                plugin.getLogger().warning("[SettlementDataObject::sanityCheck] Caught SQLException while performing sanity check (phase: delGhostsInChunks): ");
+                e.printStackTrace();
+            }
+
+            String sql_delGhostsFromChunks = "DELETE FROM settlement_chunks WHERE settlement_id = ?;";
+            try {
+                database.execute(sql_delGhostsFromChunks, stmt -> {
+                    stmt.setInt(1, ghostID);
+                });
+            } catch (SQLException e) {
+                plugin.getLogger().warning("[SettlementDataObject::sanityCheck] Caught SQLException while performing sanity check (phase: delGhostsInChunks): ");
+                e.printStackTrace();
+            }
+        }
+    }
+
     public void initialize() throws SQLException {
         String SQL_INIT_SETTLEMENTS =
                 """

@@ -164,6 +164,7 @@ public class SettlementAreasCommand {
 
         Area newArea = new Area(treatedName, focus, player);
         focus.addArea(newArea);
+        newArea.addMember(focus.getLeaderUUID());
 
         focus.broadcast( "<highlight>" + player.getName() + "</highlight> has created a <highlight>new area</highlight> named " + newArea.getDisplayName() + "<normal>!");
         return Command.SINGLE_SUCCESS;

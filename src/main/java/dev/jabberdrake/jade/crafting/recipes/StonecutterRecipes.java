@@ -14,9 +14,11 @@ public class StonecutterRecipes {
     private static final Map<NamespacedKey, StonecuttingRecipe> RECIPES = new LinkedHashMap<>();
 
     static {
-        registerRecipe("cobblestone_to_gravel", ItemStack.of(Material.GRAVEL), Material.COBBLESTONE);
+        registerRecipe("cobblestone_to_gravel", ItemStack.of(Material.GRAVEL, 2), Material.COBBLESTONE);
+        registerRecipe("cobblestone_to_sand", ItemStack.of(Material.SAND, 4), Material.COBBLESTONE);
+        registerRecipe("cobblestone_to_sandstone", ItemStack.of(Material.SANDSTONE), Material.COBBLESTONE);
         registerRecipe("cobbledDeepslate_to_gravel", ItemStack.of(Material.GRAVEL), Material.COBBLED_DEEPSLATE);
-        registerRecipe("gravel_to_sand", ItemStack.of(Material.SAND), Material.GRAVEL);
+        registerRecipe("gravel_to_sand", ItemStack.of(Material.SAND, 2), Material.GRAVEL);
         registerRecipe("dripstone_to_pointed_dripstone", ItemStack.of(Material.POINTED_DRIPSTONE), Material.DRIPSTONE_BLOCK);
         registerRecipe("clay_block_to_clay_balls", ItemStack.of(Material.CLAY_BALL, 4), Material.CLAY);
 
